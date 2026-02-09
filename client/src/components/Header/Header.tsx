@@ -39,6 +39,16 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    name: "Dự án Vin Home",
+    href: "/#",
+    children: [
+      { name: "Căn hộ Studio", href: "/#studio" },
+      { name: "Căn hộ 1 phòng ngủ", href: "/#1pn" },
+      { name: "Căn hộ 2 phòng ngủ", href: "/#2pn" },
+      { name: "Căn hộ 3 phòng ngủ", href: "/#3pn" },
+    ],
+  },
+  {
     name: "Dự án căn hộ cao cấp khác",
     href: "/#",
     children: [
