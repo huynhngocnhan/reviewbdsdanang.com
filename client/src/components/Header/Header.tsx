@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dropdown } from "antd";
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
   ChevronDownIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import SunLogo from "../assets/logo/Sun-Group-logo.png";
+import SunLogo from "../../assets/logo/Sun-Group-logo.png";
 
 type MenuItem = {
   name: string;
@@ -51,17 +51,37 @@ const menuItems: MenuItem[] = [
 
 const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // init on mount
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white shadow-sm" : "bg-transparent"
+      }`}
+    >
       <nav
         aria-label="Global"
-        className="mx-auto flex max-w-7xl items-center justify-between p-4 sm:p-6 lg:px-8"
+        className={`mx-auto flex max-w-7xl items-center justify-between transition-all duration-300 lg:px-8 ${
+          isScrolled ? "p-4 sm:p-4" : "p-5 sm:p-6"
+        }`}
       >
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
             <span className="sr-only">Sun Group</span>
-            <img alt="Sun Group" src={SunLogo} className="h-10 w-auto" />
+            <img
+              alt="Sun Group"
+              src={SunLogo}
+              className={`w-auto transition-all duration-300 ${isScrolled ? "h-10" : "h-12"}`}
+            />
           </a>
         </div>
 
@@ -69,7 +89,11 @@ const Header: React.FC = () => {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-600 hover:text-gray-900 bg-transparent"
+            className={`-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 bg-transparent transition-colors ${
+              isScrolled
+                ? "text-gray-600 hover:text-gray-900"
+                : "text-white hover:text-white/80"
+            }`}
           >
             <span className="sr-only">Mở menu</span>
             <Bars3Icon aria-hidden="true" className="size-4" />
@@ -79,24 +103,56 @@ const Header: React.FC = () => {
         <div className="hidden lg:flex lg:flex-1 lg:justify-center lg:gap-x-12">
           {menuItems.map((item) =>
             item.children ? (
-              <div key={item.name} className="border-r border-gray-200 pr-4">
+              <div
+                key={item.name}
+                className={`border-r pr-4 ${isScrolled ? "border-gray-200" : "border-white/30"}`}
+              >
                 <Dropdown
                   menu={{
                     items: item.children.map((child) => ({
                       key: child.name,
-                      label: <a href={child.href}>{child.name}</a>,
-                      style: { padding: "10px 20px", fontSize: "15px" },
+                      label: (
+                        <a
+                          href={child.href}
+                          className={
+                            !isScrolled
+                              ? "!text-white hover:!text-white/90"
+                              : ""
+                          }
+                        >
+                          {child.name}
+                        </a>
+                      ),
+                      style: {
+                        padding: "8px 16px",
+                        fontSize: "14px",
+                        ...(!isScrolled && { backgroundColor: "transparent" }),
+                      },
                     })),
-                    style: { minWidth: 280, padding: "8px 0" },
+                    style: {
+                      minWidth: 240,
+                      padding: "6px 0",
+                      ...(!isScrolled && {
+                        backgroundColor: "transparent",
+                        border: "none",
+                        boxShadow: "none",
+                      }),
+                    },
                   }}
                   trigger={["hover"]}
                   placement="bottom"
                 >
-                  <span className="flex items-center gap-x-1 text-base/7 font-semibold text-gray-800 cursor-pointer whitespace-nowrap">
+                  <span
+                    className={`flex items-center gap-x-1 text-base/7 font-semibold cursor-pointer whitespace-nowrap transition-colors ${
+                      isScrolled
+                        ? "text-gray-800"
+                        : "text-white hover:text-white/90"
+                    }`}
+                  >
                     {item.name}
                     <ChevronDownIcon
                       aria-hidden="true"
-                      className="size-4 flex-none"
+                      className={`size-4 flex-none ${isScrolled ? "text-gray-500" : "text-white/80"}`}
                     />
                   </span>
                 </Dropdown>
@@ -105,7 +161,11 @@ const Header: React.FC = () => {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-base/7 font-semibold text-gray-800 hover:text-gray-600 border-r border-gray-200 pr-6 whitespace-nowrap"
+                className={`text-base/7 font-semibold border-r pr-6 whitespace-nowrap transition-colors ${
+                  isScrolled
+                    ? "text-gray-800 hover:text-gray-600 border-gray-200"
+                    : "text-white hover:text-white/90 border-white/30"
+                }`}
               >
                 {item.name}
               </a>
