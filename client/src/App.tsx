@@ -1,8 +1,12 @@
-function App() {
+import HomePage from "./pages/homePage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+const App: React.FC = () => {
   return (
-    <div className="flex justify-center items-center text-3xl font-bold text-blue-500">
-      React + TS + Tailwind 🚀
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
