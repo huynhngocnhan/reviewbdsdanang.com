@@ -1,3 +1,5 @@
+// schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,9 +9,221 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ProjectCategory {
+  SUN
+  VIN
+  OTHER
+}
+
+enum SectionType {
+  OVERVIEW
+  LOCATION
+  GALLERY
+  AMENITIES
+  FLOORPLAN
+  PRICE
+  PROGRESS
+  FAQ
+  CTA
+}
+
+enum AssetProvider {
+  R2
+}
+
+enum AssetType {
+  IMAGE
+  VIDEO
+  FILE
+}
+
+model Admin {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String
+  isActive     Boolean @default(true)
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile       AdminProfile?
+  refreshTokens AdminRefreshToken[]
+  projects      Project[]           @relation("ProjectCreatedBy")
+}
+
+model AdminRefreshToken {
+  id      String @id @default(uuid())
+  adminId String
+  admin   Admin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  tokenHash String
+  /// Hết hạn refresh token
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+model AdminProfile {
+  id      String @id @default(uuid())
+  adminId String @unique
+  admin   Admin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  fullName String
+  /// Chức danh (vd: Chuyên viên tư vấn BĐS)
+  title    String?
+  /// Mô tả ngắn / slogan
+  tagline  String?
+  phone    String?
+  /// Địa chỉ làm việc
+  address  String?
+
+  /// Ảnh đại diện (tham chiếu sang Asset)
+  avatarAssetId String?
+  avatarAsset   Asset?  @relation("AdminAvatar", fields: [avatarAssetId], references: [id], onDelete: SetNull)
+  mediaLinks Json? @default("[]")
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model Asset {
+  id String @id @default(uuid())
+
+  /// Nhà cung cấp lưu trữ (R2)
+  provider AssetProvider @default(R2)
+  /// Loại file (image/video/file)
+  type     AssetType
+
+  /// Key object trong R2 (vd: projects/{projectId}/gallery/{uuid}.webp)
+  key String @unique
+  /// URL public/CDN để render trực tiếp
+  url String
+
+  /// MIME type (image/jpeg, image/webp, application/pdf...)
+  contentType String
+  /// Kích thước (bytes)
+  size        Int
+  width  Int?
+  height Int?
+  /// Alt text SEO (tuỳ chọn)
+  alt    String?
+
+  createdAt DateTime @default(now())
+
+  adminAvatarProfiles AdminProfile[] @relation("AdminAvatar")
+
+  projectCoverOf Project[] @relation("ProjectCover")
+  projectOgOf    Project[] @relation("ProjectOg")
+}
+
+model Project {
+  id String @id @default(uuid())
+
+  /// Slug dùng cho route SEO (vd: sun-symphony-residence-da-nang)
+  slug String @unique
+
+  /// Trạng thái dự án: nháp / đã publish / lưu trữ
+  status ProjectStatus @default(DRAFT)
+
+  /// Tên dự án (vd: Căn hộ Sun Symphony)
+  title    String
+  /// Tiêu đề phụ (vd: "Sở hữu lâu dài - view sông Hàn") (tuỳ chọn)
+  subtitle String?
+
+  shortDescription String
+  longDescription  String?
+
+  /// Nhóm dự án để filter như hiện tại: SUN / VIN / OTHER
+  category      ProjectCategory @default(OTHER)
+  /// Tên chủ đầu tư (vd: Sun Group) - để hiển thị
+  developerName String?
+
+  /// Loại hình dự án (vd: Căn hộ, Biệt thự, Đất nền)
+  projectType String?
+
+  /// Thành phố (vd: Đà Nẵng)
+  city     String?
+  /// Quận/Huyện (vd: Sơn Trà)
+  district String?
+  /// Địa chỉ chi tiết
+  address  String?
+
+  /// Toạ độ bản đồ (tuỳ chọn)
+  lat Decimal? @db.Decimal(10, 7)
+  lng Decimal? @db.Decimal(10, 7)
+
+  /// Giá từ (để sort/filter; tuỳ chọn vì nhiều dự án không công khai giá)
+  priceFrom BigInt?
+  /// Giá đến (nếu muốn hiển thị khoảng giá)
+  priceTo   BigInt?
+  /// Đơn vị giá (vd: "tỷ", "triệu/m2", "liên hệ") - tuỳ chọn
+  priceUnit String?
+
+  /// Pháp lý (vd: "Sở hữu lâu dài", "50 năm") - tuỳ chọn
+  legal        String?
+  /// Thời điểm bàn giao (vd: "2026", "Q4/2026") - tuỳ chọn
+  handoverTime String?
+
+  /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"])
+  highlightTags String[] @default([])
+
+  /// Ảnh cover dùng cho card/list
+  coverAssetId String?
+  coverAsset   Asset?  @relation("ProjectCover", fields: [coverAssetId], references: [id], onDelete: SetNull)
+
+  /// Ảnh OG cho chia sẻ mạng xã hội (tuỳ chọn)
+  ogAssetId String?
+  ogAsset   Asset?  @relation("ProjectOg", fields: [ogAssetId], references: [id], onDelete: SetNull)
+
+  /// SEO title (nếu không set thì fallback = title)
+  metaTitle       String?
+  /// SEO description (nếu không set thì fallback = shortDescription)
+  metaDescription String?
+
+  /// Admin tạo dự án
+  createdByAdminId String
+  createdByAdmin   Admin  @relation("ProjectCreatedBy", fields: [createdByAdminId], references: [id])
+
+  /// Danh sách sections linh động để render trang chi tiết
+  sections ProjectSection[]
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([city, district])
+}
+
+model ProjectSection {
+  id        String  @id @default(uuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// Loại section (overview/location/gallery...)
+  type  SectionType
+  /// Tiêu đề section (tuỳ chọn; nhiều section có thể không cần)
+  title String?
+
+  /// Thứ tự hiển thị của section (kéo-thả)
+  order   Int     @default(0)
+  /// Bật/tắt section (admin có thể tắt mà không xoá)
+  enabled Boolean @default(true)
+
+  /// Payload dữ liệu theo type (JSON để linh động)
+  data Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, order])
+  @@index([projectId, type])
 }
