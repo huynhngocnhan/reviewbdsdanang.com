@@ -74,7 +74,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
               key={item.title}
               className="bg-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
-              <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-200">
+              <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-200">
                 <img
                   src={item.image}
                   alt={item.title}

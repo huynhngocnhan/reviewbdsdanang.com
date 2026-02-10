@@ -3,6 +3,8 @@ import Header from "../components/Header/Header";
 import VideoBanner from "../components/VideoBanner/VideoBanner";
 import HomePageCard from "../components/HomePageCard/HomePageCard";
 import type { ProjectProps } from "../components/HomePageCard/HomePageCard";
+import RegisterForm from "../components/RegisterForm/RegisterForm";
+import Footer from "../components/Footer/Footer";
 
 const projectData: ProjectProps[] = [
   {
@@ -44,16 +46,16 @@ const projectData: ProjectProps[] = [
 ];
 
 const HomePage: React.FC = () => {
+  const projectTitles = projectData.map((project) => project.title);
+
   return (
-    <>
+    <div className="bg-gray-100/90">
       <Header />
-      <div className="">
-        <VideoBanner />
-      </div>
-      <div className="">
-        <HomePageCard projectData={projectData} />
-      </div>
-    </>
+      <VideoBanner />
+      <HomePageCard projectData={projectData} />
+      <RegisterForm projects={projectTitles} />
+      <Footer />
+    </div>
   );
 };
 
