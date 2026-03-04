@@ -12,7 +12,7 @@ type OwnerInfo = {
 };
 
 const Footer: React.FC<OwnerInfo> = ({
-  profileImageUrl = "https://scontent.fdad3-6.fna.fbcdn.net/v/t39.30808-6/616774652_1156655896678102_766339363288306569_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHfibp6aDQdUWZrYHwyeNtmsN1qKP5ljUaw3Woo_mWNRgFvLiV7OOq_2HRyS-S891qC14r5kiEAhmufboiJ7csY&_nc_ohc=0J6VdhNiTJoQ7kNvwFU9U2N&_nc_oc=Adk31oBQXl5YWOUhpsOm3uvfHh5bRWlm2-iQUfSh3sGTHetrDos0KJh3YS2Kmz2nyUS8-Zq6a8ECTjFd_CGDqfVQ&_nc_zt=23&_nc_ht=scontent.fdad3-6.fna&_nc_gid=-rLBlUKH_yVnmr4NxLjKRw&oh=00_Aftrn4AjZwjbj78CvsTQK7E5wUDU8hHd36VoUnklpjsvIw&oe=698F683F",
+  profileImageUrl = "https://scontent.fdad3-6.fna.fbcdn.net/v/t39.30808-6/637774480_1182970300713328_4456950395402008238_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=1d70fc&_nc_eui2=AeFNVFyUw7GIEPko_ut1v61xyEdVxdy5-4LIR1XF3Ln7gqgKsYgbNkYLetrAPwHPftWW35qHlkSCq-ObRNgqCjSI&_nc_ohc=3NxocggvlNEQ7kNvwG9uuTq&_nc_oc=AdngmdNRm9_tv1NydjCgLhzSorLgmNg1POYpo2Ub8NYYXz7N5F8YCVezQKFIPZSJioD677fYOavTpxdaqHQSZYO8&_nc_zt=23&_nc_ht=scontent.fdad3-6.fna&_nc_gid=1fTLHOP6HYpQxJQq6rqeDA&_nc_ss=8&oh=00_AfvFVe_px5NWRa2leLwj7uu4CdNulWOqpGDCY1tXh610HA&oe=69A7FED0",
   fullName = "Trần Tiến Quang",
   title = "Chuyên viên tư vấn BĐS",
   tagline =
