@@ -74,4 +74,19 @@ export class AuthController {
         .json({ message: error.message || "Refresh token failed" });
     }
   }
+
+  static async logout(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.body as { refreshToken?: string };
+
+      if (!refreshToken) {
+        return res.status(400).json({ message: "Missing refreshToken" });
+      }
+
+      const result = await authService.logout(refreshToken);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      return res.status(401).json({ message: error.message || "Logout failed" });
+    }
+  }
 }

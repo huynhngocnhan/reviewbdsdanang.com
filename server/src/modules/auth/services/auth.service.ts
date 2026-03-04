@@ -72,4 +72,14 @@ export class AuthService {
 
     return tokens;
   }
+
+  async logout(refreshToken: string) {
+    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as { adminId: string };
+
+    await prisma.adminRefreshToken.deleteMany({
+      where: { adminId: decoded.adminId },
+    });
+
+    return { message: "Logout successful" };
+  }
 }
