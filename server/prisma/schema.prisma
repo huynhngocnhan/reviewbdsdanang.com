@@ -24,8 +24,8 @@ enum ProjectCategory {
 enum SectionType {
   OVERVIEW
   LOCATION
-  GALLERY
-  AMENITIES
+  GALLERY // Phối cảnh
+  EXTENTION
   FLOORPLAN
   PRICE
   PROGRESS
@@ -219,6 +219,16 @@ model ProjectSection {
   enabled Boolean @default(true)
 
   /// Payload dữ liệu theo type (JSON để linh động)
+  /// Với EXTENTION, đề xuất schema:
+  /// {
+  ///   "extentionDescription": "string",
+  ///   "images": [{ "assetId": "uuid", "title": "string", "description": "string" }]
+  /// }
+  /// Với FLOORPLAN, đề xuất schema:
+  /// {
+  ///   "description": "string",
+  ///   "floorPlanImage": [{ "assetId": "uuid", "alt": "string" }]
+  /// }
   data Json
 
   createdAt DateTime @default(now())

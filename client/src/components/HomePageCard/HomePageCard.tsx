@@ -1,28 +1,20 @@
 import { useState } from "react";
 import type React from "react";
 import { Divider } from "antd";
-
-export type ProjectType = "sun" | "vin" | "other";
-
-export type ProjectProps = {
-  title: string;
-  description: string;
-  image: string;
-  link: string;
-  type: ProjectType;
-};
+import { Link } from "react-router-dom";
+import type { ProjectData, ProjectCategory } from "../../constants/projectData";
 
 type Props = {
-  projectData: ProjectProps[];
+  projectData: ProjectData[];
 };
 
 const HomePageCard: React.FC<Props> = ({ projectData }) => {
-  const [activeFilter, setActiveFilter] = useState<ProjectType | "all">("all");
+  const [activeFilter, setActiveFilter] = useState<ProjectCategory | "all">("all");
 
   const filteredProjects =
     activeFilter === "all"
       ? projectData
-      : projectData.filter((item) => item.type === activeFilter);
+      : projectData.filter((item) => item.category === activeFilter);
 
   const buttonBaseClass = " font-light px-6 py-3 rounded-3xl transition-colors";
   const buttonActiveClass = "border-red-600 bg-yellow-600/90 text-white";
@@ -37,25 +29,25 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
         </h2>
         <div className="flex flex-wrap justify-center gap-4 ">
           <button
-            onClick={() => setActiveFilter("sun")}
+            onClick={() => setActiveFilter("SUN")}
             className={`${buttonBaseClass} ${
-              activeFilter === "sun" ? buttonActiveClass : buttonInactiveClass
+              activeFilter === "SUN" ? buttonActiveClass : buttonInactiveClass
             }`}
           >
             Dự án của Sun Group
           </button>
           <button
-            onClick={() => setActiveFilter("vin")}
+            onClick={() => setActiveFilter("VIN")}
             className={`${buttonBaseClass} ${
-              activeFilter === "vin" ? buttonActiveClass : buttonInactiveClass
+              activeFilter === "VIN" ? buttonActiveClass : buttonInactiveClass
             }`}
           >
             Dự án của Vin Home
           </button>
           <button
-            onClick={() => setActiveFilter("other")}
+            onClick={() => setActiveFilter("OTHER")}
             className={`${buttonBaseClass} ${
-              activeFilter === "other" ? buttonActiveClass : buttonInactiveClass
+              activeFilter === "OTHER" ? buttonActiveClass : buttonInactiveClass
             }`}
           >
             Căn hộ cao cấp khác
@@ -71,12 +63,12 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
         ) : (
           filteredProjects.map((item) => (
             <div
-              key={item.title}
+              key={item.id}
               className="bg-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-200">
                 <img
-                  src={item.image}
+                  src={item.coverImage}
                   alt={item.title}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -92,17 +84,17 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
                   {item.title}
                 </h2>
                 <p className="text-sm text-gray-700 mb-3 line-clamp-3">
-                  {item.description}
+                  {item.shortDescription}
                 </p>
-                <a
-                  href={item.link}
+                <Link
+                  to={`/project/${item.slug}`}
                   className="group inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-700 font-medium text-sm py-2 px-4 rounded-lg border border-amber-500/50 hover:border-amber-500 hover:bg-amber-50 transition-all duration-300 hover:scale-105 hover:shadow-md"
                 >
                   Xem chi tiết
                   <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
                     →
                   </span>
-                </a>
+                </Link>
               </div>
             </div>
           ))
