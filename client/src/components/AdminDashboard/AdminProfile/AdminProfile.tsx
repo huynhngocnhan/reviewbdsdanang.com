@@ -1,6 +1,8 @@
 import type React from "react";
-import { useMemo, useState } from "react";
-import { CameraIcon, CheckCircleIcon, MapPinIcon, PhoneIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
+import { CameraIcon, CheckCircleIcon, MapPinIcon, PhoneIcon, PlusIcon, TrashIcon, ClockIcon, EnvelopeIcon, LinkIcon } from "@heroicons/react/24/outline";
+import { adminService } from "../../../services/admin.service";
 
 type MediaLink = {
   label: string;
@@ -20,21 +22,34 @@ type AdminProfileForm = {
   mediaLinks: MediaLink[];
 };
 
-const mockAdminProfile: AdminProfileForm = {
-  fullName: "Trần Tiến Quang",
-  title: "Chuyên viên tư vấn BĐS cao cấp",
-  tagline: "Kết nối đúng nhu cầu, tối ưu giá trị đầu tư.",
-  phone: "0987 654 321",
-  address: "Lô A12, Đường Trần Hưng Đạo, Sơn Trà, Đà Nẵng",
+type AdminApiResponse = {
+  id: string;
+  email?: string;
+  isActive?: boolean;
+  profile?: {
+    fullName?: string;
+    title?: string;
+    tagline?: string;
+    phone?: string;
+    address?: string;
+    workHours?: string;
+    avatarAssetId?: string;
+    avatarUrl?: string;
+    mediaLinks?: unknown;
+  } | null;
+};
+
+const defaultForm: AdminProfileForm = {
+  fullName: "",
+  title: "",
+  tagline: "",
+  phone: "",
+  address: "",
   workHours: "08:00 - 17:30 (Thứ 2 - Thứ 7)",
-  email: "admin@reviewbdsdanang.com",
+  email: "",
   isActive: true,
-  avatarUrl: "https://i.pravatar.cc/240?img=12",
-  mediaLinks: [
-    { label: "Facebook", url: "https://facebook.com/reviewbdsdanang" },
-    { label: "Zalo", url: "https://zalo.me/0987654321" },
-    { label: "Website", url: "https://reviewbdsdanang.com" },
-  ],
+  avatarUrl: "",
+  mediaLinks: [],
 };
 
 const getSocialIcon = (url: string) => {
@@ -102,8 +117,59 @@ const detectSocialLabel = (url: string) => {
 };
 
 const AdminProfile: React.FC = () => {
-  const [form, setForm] = useState<AdminProfileForm>(mockAdminProfile);
+  const [form, setForm] = useState<AdminProfileForm>(defaultForm);
   const [newMediaUrl, setNewMediaUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarAssetId, setAvatarAssetId] = useState("");
+  const [adminId, setAdminId] = useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const id = localStorage.getItem("adminId") ?? "";
+    setAdminId(id);
+
+    if (!id) {
+      toast.error("Không tìm thấy adminId");
+      return;
+    }
+
+    const fetchAdmin = async () => {
+      try {
+        setIsLoading(true);
+        const data: AdminApiResponse = await adminService.getAdminById(id);
+        const admin = (data?.id ? data : (data as { admin?: AdminApiResponse })?.admin) as AdminApiResponse;
+        const profile = admin?.profile;
+
+        const mediaLinks = Array.isArray(profile?.mediaLinks)
+          ? (profile?.mediaLinks as string[]).map((url) => ({ label: detectSocialLabel(url), url }))
+          : [];
+
+        setForm((prev) => ({
+          ...prev,
+          fullName: profile?.fullName ?? "",
+          title: profile?.title ?? "",
+          tagline: profile?.tagline ?? "",
+          phone: profile?.phone ?? "",
+          address: profile?.address ?? "",
+          workHours: profile?.workHours ?? defaultForm.workHours,
+          avatarUrl: profile?.avatarUrl ?? "",
+          mediaLinks,
+          email: admin?.email ?? "",
+          isActive: admin?.isActive ?? true,
+        }));
+
+        setAvatarAssetId(profile?.avatarAssetId ?? "");
+      } catch {
+        toast.error("Không thể tải thông tin profile");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchAdmin();
+  }, []);
 
   const initials = useMemo(() => {
     return form.fullName
@@ -136,6 +202,98 @@ const AdminProfile: React.FC = () => {
     }));
   };
 
+  const handleAvatarPick = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Chỉ cho phép upload file hình ảnh");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (!adminId) {
+      toast.error("Không tìm thấy adminId");
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+
+      const presign = await adminService.getPresignedUrl({
+        fileName: file.name,
+        contentType: file.type,
+        folder: "admin/avatar",
+      });
+
+      await fetch(presign.uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      const createdAsset = await adminService.createAsset({
+        key: presign.key,
+        url: presign.publicUrl,
+        contentType: file.type,
+        size: file.size,
+        type: "IMAGE",
+      });
+
+      setAvatarAssetId(createdAsset?.id ?? "");
+      setForm((prev) => ({ ...prev, avatarUrl: createdAsset?.url ?? presign.publicUrl }));
+      toast.success("Upload avatar thành công");
+    } catch {
+      toast.error("Upload avatar thất bại");
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSave = async () => {
+    if (!adminId) {
+      toast.error("Không tìm thấy adminId");
+      return;
+    }
+
+    const payload = {
+      fullName: form.fullName.trim(),
+      title: form.title.trim(),
+      tagline: form.tagline.trim(),
+      phone: form.phone.trim(),
+      address: form.address.trim(),
+      workHours: form.workHours.trim(),
+      avatarAssetId: avatarAssetId.trim(),
+      mediaLinks: form.mediaLinks.map((item) => item.url.trim()).filter(Boolean),
+    };
+
+    if (Object.values(payload).some((value) => (Array.isArray(value) ? value.length === 0 : value.length === 0))) {
+      toast.error("Vui lòng nhập đầy đủ tất cả trường bắt buộc");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await adminService.updateAdminProfile(adminId, payload);
+      toast.success("Cập nhật profile thành công");
+    } catch (error: unknown) {
+      const message =
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: { data?: { message?: string } } }).response?.data?.message === "string"
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : "Cập nhật profile thất bại";
+
+      toast.error(message ?? "Cập nhật profile thất bại");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
@@ -153,7 +311,7 @@ const AdminProfile: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-lg sm:p-6">
           <div className="flex flex-col items-center text-center">
             <div className="relative">
               {form.avatarUrl ? (
@@ -163,44 +321,85 @@ const AdminProfile: React.FC = () => {
                   {initials || "AD"}
                 </div>
               )}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarPick}
+              />
+
               <button
                 type="button"
-                className="absolute -bottom-2 -right-2 rounded-full bg-gray-900 p-2 text-white shadow-md hover:bg-black"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingAvatar}
+                className="absolute -bottom-2 -right-2 rounded-full bg-gray-900 p-2 text-white shadow-md hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <CameraIcon className="h-4 w-4" />
               </button>
             </div>
 
-            <h2 className="mt-4 text-lg font-semibold text-gray-900">{form.fullName}</h2>
+            <h2 className="mt-4 text-lg font-semibold text-gray-900">{form.fullName || "Chưa cập nhật"}</h2>
             <p className="text-sm text-gray-500">{form.title || "Chưa cập nhật chức danh"}</p>
             <p className="mt-2 text-xs text-gray-500">{form.tagline || "Chưa cập nhật tagline"}</p>
 
-            <div className="mt-5 w-full space-y-2 rounded-xl border border-gray-100 bg-gray-50 p-3 text-left text-sm text-gray-600">
-              <div className="flex items-start gap-2">
-                <PhoneIcon className="mt-0.5 h-4 w-4 text-gray-400" />
-                <span>{form.phone || "Chưa cập nhật số điện thoại"}</span>
+            <div className="mt-5 w-full rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4 text-left shadow-sm">
+              <div className="space-y-3 text-sm text-slate-700">
+                <div className="flex items-start gap-2.5 rounded-lg bg-white p-2.5 ring-1 ring-slate-100">
+                  <PhoneIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <span>{form.phone || "Chưa cập nhật số điện thoại"}</span>
+                </div>
+
+                <div className="flex items-start gap-2.5 rounded-lg bg-white p-2.5 ring-1 ring-slate-100">
+                  <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <span>{form.address || "Chưa cập nhật địa chỉ"}</span>
+                </div>
+
+                <div className="flex items-start gap-2.5 rounded-lg bg-white p-2.5 ring-1 ring-slate-100">
+                  <ClockIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <span>{form.workHours || "Chưa cập nhật giờ làm việc"}</span>
+                </div>
+
+                <div className="flex items-start gap-2.5 rounded-lg bg-white p-2.5 ring-1 ring-slate-100">
+                  <EnvelopeIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="break-all">{form.email || "Chưa cập nhật email"}</span>
+                </div>
               </div>
-              <div className="flex items-start gap-2">
-                <MapPinIcon className="mt-0.5 h-4 w-4 text-gray-400" />
-                <span>{form.address || "Chưa cập nhật địa chỉ"}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">Giờ làm việc: </span>
-                <span>{form.workHours || "Chưa cập nhật"}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">Email: </span>
-                <span className="break-all">{form.email}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">Mạng xã hội: </span>
-                <span>{form.mediaLinks.length} liên kết</span>
+
+              <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-800">
+                  <LinkIcon className="h-4 w-4 text-slate-500" />
+                  Mạng xã hội ({form.mediaLinks.length})
+                </div>
+
+                {form.mediaLinks.length === 0 ? (
+                  <p className="text-xs text-slate-500">Chưa có liên kết mạng xã hội.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {form.mediaLinks.map((item, index) => (
+                      <a
+                        key={`${item.url}-${index}`}
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-900 px-2.5 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                        title={item.url}
+                      >
+                        {getSocialIcon(item.url)}
+                        <span className="max-w-[140px] truncate">{item.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+          {isLoading ? <p className="text-sm text-gray-500">Đang tải dữ liệu...</p> : null}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="mb-1.5 block text-sm font-medium text-gray-700">Họ và tên</label>
@@ -325,11 +524,20 @@ const AdminProfile: React.FC = () => {
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
               Huỷ
             </button>
-            <button type="button" className="rounded-xl bg-yellow-600 px-4 py-2 text-sm font-semibold text-white hover:bg-yellow-500">
-              Lưu thay đổi
+            <button
+              type="button"
+              disabled={isSaving || isUploadingAvatar}
+              onClick={handleSave}
+              className="rounded-xl bg-yellow-600 px-4 py-2 text-sm font-semibold text-white hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
             </button>
           </div>
         </div>

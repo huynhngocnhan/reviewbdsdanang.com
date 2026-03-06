@@ -8,6 +8,7 @@ import AdminProfile from "./AdminProfile/AdminProfile";
 
 type AdminProfileInfo = {
   fullName?: string;
+  avatarUrl?: string;
 };
 
 type AdminData = {
@@ -22,7 +23,7 @@ type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { name: "Dashboard", icon: HomeIcon },
+  // { name: "Dashboard", icon: HomeIcon },
   { name: "Profile", icon: UserGroupIcon },
   { name: "Projects", icon: FolderIcon },
   { name: "Reports", icon: ChartPieIcon },
@@ -31,7 +32,7 @@ const navigation: NavItem[] = [
 const AdminDashboard: React.FC = () => {
   const [admin, setAdmin] = useState<AdminData | null>(null);
   const [isLoadingAdmin, setIsLoadingAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<NavItem["name"]>("Dashboard");
+  const [activeTab, setActiveTab] = useState<NavItem["name"]>("Profile");
 
   useEffect(() => {
     const fetchAdmin = async () => {
@@ -120,7 +121,7 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between rounded-lg px-2 py-2">
               <div className="flex items-center gap-3">
                 <img
-                  src="https://i.pravatar.cc/100?img=68"
+                  src={admin?.profile?.avatarUrl ?? ""}
                   alt="Admin avatar"
                   className="h-9 w-9 rounded-full object-cover"
                 />
