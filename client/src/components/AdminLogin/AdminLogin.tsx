@@ -27,6 +27,14 @@ const AdminLogin: React.FC = () => {
         localStorage.setItem("token", data.accessToken);
       }
 
+      if (data?.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
+
+      if (data?.admin?.id) {
+        localStorage.setItem("adminId", data.admin.id);
+      }
+
       setTimeout(() => {
         navigate("/admin/dashboard");
       }, 1000);

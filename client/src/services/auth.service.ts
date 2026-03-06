@@ -15,4 +15,9 @@ export const authService = {
     const response = await api.post("/auth/register", userData);
     return response.data;
   },
+
+  async logout(refreshToken: string) {
+    const response = await api.post("/auth/logout", { refreshToken });
+    return response.data;
+  },
 };

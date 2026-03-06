@@ -5,10 +5,13 @@ import ProjectDetail from "./components/ProjectDetail/ProjectDetail";
 import ContactOverlay from "./components/ContactOverlay/ContactOverlay";
 import AdminLogin from "./components/AdminLogin/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import TopProgressBar from "./components/TopProgressBar";
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
+      <TopProgressBar />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/project/:slug" element={<ProjectDetail />} />
@@ -17,12 +20,9 @@ const App: React.FC = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      <ContactOverlay
-        phoneNumber="0901830909"
-        zaloUrl="https://zalo.me/0901830909"
-      />
+      <ContactOverlay phoneNumber="0901830909" zaloUrl="https://zalo.me/0901830909" />
     </BrowserRouter>
   );
-}
+};
 
 export default App;

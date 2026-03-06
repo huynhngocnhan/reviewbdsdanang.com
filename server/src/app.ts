@@ -4,6 +4,7 @@ import morgan from "morgan";
 import authRoutes from "./modules/auth/routes/auth.route";
 import uploadRoutes from "./modules/upload/routes/upload.route";
 import assetRoutes from "./modules/asset/routes/asset.route";
+import adminRoutes from "./modules/admin/routes/admin.route";
 
 const app = express();
 
@@ -12,7 +13,8 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/assets", assetRoutes);
-
 export default app;
