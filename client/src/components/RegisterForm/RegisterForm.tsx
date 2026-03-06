@@ -46,11 +46,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
 
   return (
     <div className="w-full bg-gray-100/90 pt-20 pb-14">
-      <div className="max-w-4xl mx-auto px-6">
-        <h2 className="text-3xl font-bold uppercase text-center text-gray-800 mb-16">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <h2 className="mb-10 text-center text-2xl font-bold uppercase text-gray-800 sm:mb-16 sm:text-3xl">
           Đăng ký tư vấn
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-12">
+        <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
            
         {/* Full Name */}
         <div className="relative">

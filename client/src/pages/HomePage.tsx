@@ -3,6 +3,7 @@ import Header from "../components/Header/Header";
 import VideoBanner from "../components/VideoBanner/VideoBanner";
 import HomePageCard from "../components/HomePageCard/HomePageCard";
 import { MOCK_PROJECTS } from "../constants/projectData";
+import Partner from "../components/Partner/Partner";
 import RegisterForm from "../components/RegisterForm/RegisterForm";
 import Footer from "../components/Footer/Footer";
 
@@ -16,6 +17,7 @@ const HomePage: React.FC = () => {
       <Header />
       <VideoBanner />
       <HomePageCard projectData={MOCK_PROJECTS} />
+      <Partner/>
       <RegisterForm projects={projectTitles} />
       <Footer />
     </div>
