@@ -8,7 +8,9 @@ type FooterAdminProfile = {
   tagline?: string;
   phone?: string;
   address?: string;
-  avatarUrl?: string;
+  avatarAsset?: {
+    url: string;
+  };
   mediaLinks?: unknown;
 };
 
@@ -30,18 +32,18 @@ const Footer: React.FC = () => {
   const [admin, setAdmin] = useState<FooterAdminData | null>(null);
 
   useEffect(() => {
-    const adminId = localStorage.getItem("adminId") ?? import.meta.env.VITE_PUBLIC_ADMIN_ID ?? "";
-    if (!adminId) return;
 
     const fetchAdmin = async () => {
       try {
-        const data = await adminService.getAdminById(adminId);
-        setAdmin(data?.id ? data : data?.admin ?? null);
+        const respone = await adminService.getAdmin();
+        console.log(respone.admin);
+        if (respone) {
+        setAdmin(respone.admin)
+        }
       } catch {
         setAdmin(null);
       }
     };
-
     void fetchAdmin();
   }, []);
 
@@ -52,7 +54,7 @@ const Footer: React.FC = () => {
   const phone = profile?.phone ?? "0900 000 000";
   const email = admin?.email ?? "contact@example.com";
   const address = profile?.address ?? "Đà Nẵng, Việt Nam";
-  const avatarUrl = profile?.avatarUrl ?? FALLBACK_AVATAR;
+  const avatarUrl = profile?.avatarAsset?.url  ?? FALLBACK_AVATAR;
 
   const socialLinks = useMemo<SocialLink[]>(() => {
     if (!Array.isArray(profile?.mediaLinks)) return [];
@@ -71,7 +73,7 @@ const Footer: React.FC = () => {
           <div className="mx-auto w-fit lg:mx-0 lg:shrink-0">
             <div className="rounded-2xl border border-amber-200 bg-white p-2 shadow-sm">
               <img
-                src={avatarUrl}
+                src={admin?.profile?.avatarAsset?.url ||avatarUrl}
                 alt={fullName}
                 className="h-24 w-24 rounded-xl object-cover sm:h-28 sm:w-28"
                 referrerPolicy="no-referrer"
@@ -118,7 +120,7 @@ const Footer: React.FC = () => {
               </div>
 
               <p className="mt-4 text-xs leading-relaxed text-gray-500">
-                Thông tin trong website mang tính tham khảo và được cập nhật từ hồ sơ admin.
+                Thông tin trong website là minh bạch và được cập nhật thường xuyên từ hồ sơ admin.
               </p>
             </div>
           </div>

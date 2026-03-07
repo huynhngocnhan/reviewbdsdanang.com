@@ -5,7 +5,7 @@ import { ChartPieIcon, FolderIcon, HomeIcon, UserGroupIcon } from "@heroicons/re
 import { adminService } from "../../services/admin.service";
 import { authService } from "../../services/auth.service";
 import AdminProfile from "./AdminProfile/AdminProfile";
-
+import ProjectDashboard from "./AdminProjectManagement/ProjectDashboard";
 type AdminProfileInfo = {
   fullName?: string;
   avatarUrl?: string;
@@ -79,6 +79,8 @@ const AdminDashboard: React.FC = () => {
   const renderContent = () => {
     if (activeTab === "Profile") {
       return <AdminProfile />;
+    }else if (activeTab === "Projects") {
+      return <ProjectDashboard/>
     }
 
     return <div className="h-full rounded-xl border-2 border-dashed border-gray-300 bg-white/30" />;

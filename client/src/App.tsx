@@ -17,6 +17,7 @@ const App: React.FC = () => {
         <Route path="/project/:slug" element={<ProjectDetail />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
 

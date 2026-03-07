@@ -14,6 +14,31 @@ type UpdateAdminProfileInput = {
 };
 
 export class AdminService {
+
+  async getAdmin() {
+    return prisma.admin.findFirst({
+      select: {
+        email: true,
+        profile: {
+          select: {
+            id: true,
+            fullName: true,
+            title: true,
+            tagline: true,
+            phone: true,
+            address: true,
+            mediaLinks: true,
+            avatarAsset: {
+              select: {
+                url: true
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
   async getAdminById(id: string) {
     const admin = await prisma.admin.findUnique({
       where: { id },

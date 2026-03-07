@@ -35,6 +35,10 @@ type UpdateAdminProfilePayload = {
 };
 
 export const adminService = {
+  async getAdmin() {
+    const response = await api.get(`/admin/`);
+    return response.data;
+  },
   async getAdminById(id: string) {
     const response = await api.get(`/admin/${id}`);
     return response.data;

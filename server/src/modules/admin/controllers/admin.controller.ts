@@ -19,6 +19,26 @@ export class AdminController {
     }
   }
 
+  static async getAdmin (req: Request, res: Response){
+    try {
+      const admin = await adminService.getAdmin();
+
+      if(!admin){
+        return res.status(404).json({
+          message: "Admin not found!"
+        })
+      }
+      return res.status(200).json({
+        admin
+      })
+    } catch (error) {
+      
+      return res.status(500).json({
+        message: "Internal server error"
+      });
+    }
+  }
+
   static async updateProfile(req: Request, res: Response) {
     try {
       const adminId = req.params.id as string;
