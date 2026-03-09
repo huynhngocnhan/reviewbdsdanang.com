@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   generateTokens(adminId: string) {
-    const accessToken = jwt.sign({ adminId }, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+    const accessToken = jwt.sign({ adminId }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
     const refreshToken = jwt.sign({ adminId }, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
     return { accessToken, refreshToken };
   }

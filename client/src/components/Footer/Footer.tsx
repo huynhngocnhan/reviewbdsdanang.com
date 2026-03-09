@@ -36,7 +36,6 @@ const Footer: React.FC = () => {
     const fetchAdmin = async () => {
       try {
         const respone = await adminService.getAdmin();
-        console.log(respone.admin);
         if (respone) {
         setAdmin(respone.admin)
         }
@@ -68,14 +67,14 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="border-t border-amber-100 bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
-          <div className="mx-auto w-fit lg:mx-0 lg:shrink-0">
+      <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-8 lg:gap-10">
+          <div className="mx-auto shrink-0 sm:mx-0">
             <div className="rounded-2xl border border-amber-200 bg-white p-2 shadow-sm">
               <img
-                src={admin?.profile?.avatarAsset?.url ||avatarUrl}
+                src={admin?.profile?.avatarAsset?.url || avatarUrl}
                 alt={fullName}
-                className="h-24 w-24 rounded-xl object-cover sm:h-28 sm:w-28"
+                className="h-28 w-28 rounded-xl object-cover sm:h-40 sm:w-40"
                 referrerPolicy="no-referrer"
                 loading="lazy"
                 onError={(event) => {
@@ -87,22 +86,22 @@ const Footer: React.FC = () => {
           </div>
 
           <div className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-            <div className="lg:col-span-7">
+            <div className="text-center sm:text-left lg:col-span-7">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">reviewbdsdanang.com</p>
               <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">{fullName}</h3>
               <p className="mt-2 text-sm font-medium text-gray-700">{title}</p>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">{tagline}</p>
 
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <ContactChip href={`tel:${phone.replace(/\s+/g, "")}`}>{phone}</ContactChip>
                 <ContactChip href={`mailto:${email}`}>{email}</ContactChip>
                 <ContactChip>{address}</ContactChip>
               </div>
             </div>
 
-            <div className="lg:col-span-5">
+            <div className="text-center sm:text-left lg:col-span-5">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-gray-900">Kết nối nhanh</p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <SocialButton href={`tel:${phone.replace(/\s+/g, "")}`} label="Gọi ngay">
                   <PhoneIcon className="h-4 w-4" />
                   Gọi ngay
@@ -119,14 +118,14 @@ const Footer: React.FC = () => {
                 ))}
               </div>
 
-              <p className="mt-4 text-xs leading-relaxed text-gray-500">
+              <p className="mt-5 text-xs leading-relaxed text-gray-500">
                 Thông tin trong website là minh bạch và được cập nhật thường xuyên từ hồ sơ admin.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-100 pt-4 text-center text-xs text-gray-500 sm:flex sm:items-center sm:justify-between sm:text-left">
+        <div className="mt-10 border-t border-gray-100 pt-5 text-center text-xs text-gray-500 sm:flex sm:items-center sm:justify-between sm:text-left">
           <p>© 2026 {fullName}. All rights reserved.</p>
           <p className="mt-1 sm:mt-0">Website designed by Huynh Ngoc Nhan.</p>
         </div>
@@ -137,7 +136,7 @@ const Footer: React.FC = () => {
 
 const ContactChip: React.FC<React.PropsWithChildren<{ href?: string }>> = ({ href, children }) => {
   const cls =
-    "inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-700";
+    "inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-xs font-medium text-gray-700 whitespace-nowrap";
 
   if (!href) return <span className={cls}>{children}</span>;
 

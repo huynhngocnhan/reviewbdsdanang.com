@@ -34,6 +34,7 @@ export interface ProjectData {
   projectType?: string;
   locationText: string;
   locationDescription: string;
+  locationImage?: string;
   mapEmbedUrl: string;
   coverImage: string; // Map to coverAsset later
   heroImage: string;

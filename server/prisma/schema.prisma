@@ -140,7 +140,10 @@ model Project {
   subtitle String?
 
   shortDescription String
-  longDescription  String?
+  /// Giới thiệu ngắn về dự án (matching mockup)
+  intro String?
+
+  longDescription String?
 
   /// Nhóm dự án để filter như hiện tại: SUN / VIN / OTHER
   category      ProjectCategory @default(OTHER)
@@ -156,6 +159,15 @@ model Project {
   district String?
   /// Địa chỉ chi tiết
   address  String?
+
+  /// Vị trí text (vd: "Trần Hưng Đạo, Sơn Trà, Đà Nẵng")
+  locationText String?
+  /// Mô tả vị trí
+  locationDescription String?
+  /// Ảnh vị trí (bản đồ vệ tinh, quy hoạch...)
+  locationImage String?
+  /// Google Maps embed URL
+  mapEmbedUrl String?
 
   /// Toạ độ bản đồ (tuỳ chọn)
   lat Decimal? @db.Decimal(10, 7)
@@ -173,10 +185,18 @@ model Project {
   /// Thời điểm bàn giao (vd: "2026", "Q4/2026") - tuỳ chọn
   handoverTime String?
 
-  /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"])
-  highlightTags String[] @default([])
+  /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"]) - matching mockup
+  highlights String[] @default([])
 
-  /// Ảnh cover dùng cho card/list
+  /// Hero image cho section tổng quan
+  heroImage String?
+
+  /// Thông số kỹ thuật (vd: [{label, value}])
+  specs Json?
+
+  /// Ảnh cover dùng cho card/list (URL string)
+  coverImage String?
+  /// Ảnh cover dùng cho card/list (Asset reference)
   coverAssetId String?
   coverAsset   Asset?  @relation("ProjectCover", fields: [coverAssetId], references: [id], onDelete: SetNull)
 
@@ -188,6 +208,17 @@ model Project {
   metaTitle       String?
   /// SEO description (nếu không set thì fallback = shortDescription)
   metaDescription String?
+
+  /// Gallery images (vd: [{src, alt}])
+  gallery Json?
+
+  /// Tiện ích - mô tả
+  extentionDescription String?
+  /// Tiện ích - hình ảnh (vd: [{src, alt, title, description}])
+  extentionImages Json?
+
+  /// Mặt bằng (vd: [{description, floorPlanImage}])
+  floorplans Json?
 
   /// Admin tạo dự án
   createdByAdminId String

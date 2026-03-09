@@ -8,7 +8,10 @@ type Props = {
 
 const ProjectExtention: React.FC<Props> = ({ project }) => {
   const extentionImages = project.extentionImages ?? [];
+  // Lọc riêng tiện ích có ảnh cho carousel và tất cả cho danh sách
+  const amenitiesWithImages = extentionImages.filter(item => item.src);
   const hasExtentionImages = extentionImages.length > 0;
+  const hasAmenitiesWithImages = amenitiesWithImages.length > 0;
 
   return (
     <section className="mt-12 sm:mt-20 bg-gray-100 py-12 px-8 lg:px-24">
@@ -23,16 +26,16 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
         <div className="lg:col-span-3">
           {hasExtentionImages ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
               {extentionImages.map((item, index) => (
                 <article
                   key={`${item.title}-${index}`}
-                  className="rounded-[15px] border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+                  className="flex items-center gap-3 rounded-[12px] border border-gray-200 bg-white p-3.5 shadow-sm transition-all hover:border-amber-300 hover:shadow-md"
                 >
-                  <h4 className="text-sm font-semibold text-gray-900">{item.title}</h4>
-                  <p className="mt-2 text-xs leading-relaxed text-gray-600 sm:text-sm">
-                    {item.description}
-                  </p>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50">
+                    <span className="text-sm font-bold text-amber-600">{index + 1}</span>
+                  </div>
+                  <h4 className="text-sm font-medium text-gray-800 leading-tight">{item.title}</h4>
                 </article>
               ))}
             </div>
@@ -44,10 +47,10 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
         </div>
 
         <div className="lg:col-span-9">
-          {hasExtentionImages ? (
+          {hasAmenitiesWithImages ? (
             <div className="h-full overflow-hidden rounded-[15px] shadow-xl">
               <Carousel autoplay dots className="project-extention-carousel">
-                {extentionImages.map((image, index) => (
+                {amenitiesWithImages.map((image, index) => (
                   <div key={`${image.src}-${index}`}>
                     <div className="relative h-[220px] sm:h-[300px] lg:h-[500px]">
                       <img

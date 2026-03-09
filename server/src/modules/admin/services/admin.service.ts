@@ -104,6 +104,10 @@ export class AdminService {
       },
     });
 
-    return profile;
+    // Transform to include avatarUrl
+    return {
+      ...profile,
+      avatarUrl: profile.avatarAsset?.url ?? null,
+    };
   }
 }

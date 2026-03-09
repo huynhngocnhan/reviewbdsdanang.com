@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { ChartPieIcon, FolderIcon, HomeIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { ChartPieIcon, FolderIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { adminService } from "../../services/admin.service";
 import { authService } from "../../services/auth.service";
 import AdminProfile from "./AdminProfile/AdminProfile";

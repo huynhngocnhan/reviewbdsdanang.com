@@ -11,7 +11,7 @@ const ProjectOverview: React.FC<Props> = ({ project }) => {
       <div className="lg:col-span-5 relative group">
         <div className="relative overflow-hidden px-4 lg:px-0 lg:rounded-r-[15px] shadow-2xl h-[250px] sm:h-[400px] lg:h-[550px]">
           <img
-            src={project.coverImage}
+            src={project.heroImage}
             alt={project.title}
             className="h-full w-full object-cover transform transition duration-700 group-hover:scale-[1.03]"
           />

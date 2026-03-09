@@ -1,5 +1,6 @@
 import type React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   ArrowLeftIcon,
@@ -10,9 +11,11 @@ import {
   Squares2X2Icon,
   PhotoIcon as GalleryIcon,
   CloudArrowUpIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import type { ProjectData, ProjectCategory, ProjectExtentionImage } from "../../../constants/projectData";
 import { adminService } from "../../../services/admin.service";
+import { projectService } from "../../../services/project.service";
 
 // Generate slug from title
 const generateSlug = (title: string): string => {
@@ -28,6 +31,8 @@ const generateSlug = (title: string): string => {
 
 type ProjectCreationProps = {
   onBack?: () => void;
+  onSave?: () => void; // Called after successful save
+  projectId?: string; // For edit mode
 };
 
 type ProjectFormData = Omit<ProjectData, "id"> & {
@@ -44,6 +49,7 @@ const defaultFormData: ProjectFormData = {
   projectType: "",
   locationText: "",
   locationDescription: "",
+  locationImage: "",
   mapEmbedUrl: "",
   coverImage: "",
   heroImage: "",
@@ -57,12 +63,63 @@ const defaultFormData: ProjectFormData = {
 
 type TabType = "basic" | "overview" | "location" | "extention" | "floorplan" | "gallery";
 
-const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
+// Image preview component
+const ImagePreview = ({
+  src,
+  alt,
+  onRemove,
+  height = "h-48"
+}: {
+  src: string;
+  alt?: string;
+  onRemove: () => void;
+  height?: string;
+}) => (
+  <div className="relative group">
+    <div className={`${height} w-full overflow-hidden rounded-xl border border-gray-200`}>
+      <img src={src} alt={alt || "Preview"} className="h-full w-full object-cover" />
+    </div>
+    <button
+      type="button"
+      onClick={onRemove}
+      className="absolute right-2 top-2 rounded-full bg-red-500 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+    >
+      <XMarkIcon className="h-4 w-4" />
+    </button>
+  </div>
+);
+
+// Upload button component
+const UploadButton = ({
+  onClick,
+  isUploading,
+  label,
+  hasImage,
+}: {
+  onClick: () => void;
+  isUploading: boolean;
+  label: string;
+  hasImage: boolean;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={isUploading}
+    className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-sm font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    <CloudArrowUpIcon className="h-5 w-5" />
+    {isUploading ? "Đang upload..." : hasImage ? "Thay đổi ảnh" : label}
+  </button>
+);
+
+const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, projectId }) => {
+  const navigate = useNavigate();
+  const isEditMode = !!projectId;
   const [activeTab, setActiveTab] = useState<TabType>("basic");
   const [formData, setFormData] = useState<ProjectFormData>(defaultFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<Record<string, boolean>>({});
-  const [locationImage, setLocationImage] = useState<string>("");
 
   // Refs for file inputs
   const coverImageInputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +128,50 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
   const extentionImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const floorplanImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const galleryImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
+  // Fetch project data when in edit mode
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchProject = async () => {
+      try {
+        setIsLoadingProject(true);
+        const response = await projectService.getProjectById(projectId);
+        if (response.success && response.data) {
+          const project = response.data;
+          setFormData({
+            id: project.id,
+            slug: project.slug || "",
+            title: project.title || "",
+            subtitle: project.subtitle || "",
+            shortDescription: project.shortDescription || "",
+            intro: project.intro || "",
+            category: project.category || "SUN",
+            projectType: project.projectType || "",
+            locationText: project.locationText || "",
+            locationDescription: project.locationDescription || "",
+            locationImage: project.locationImage || "",
+            mapEmbedUrl: project.mapEmbedUrl || "",
+            coverImage: project.coverImage || "",
+            heroImage: project.heroImage || "",
+            specs: project.specs || [],
+            gallery: project.gallery || [],
+            extentionDescription: project.extentionDescription || "",
+            extentionImages: project.extentionImages || [],
+            floorplans: project.floorplans || [],
+            highlights: project.highlights || [],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        toast.error("Không thể tải thông tin dự án");
+      } finally {
+        setIsLoadingProject(false);
+      }
+    };
+
+    fetchProject();
+  }, [projectId]);
 
   const tabs: { id: TabType; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
     { id: "basic", label: "Thông tin cơ bản", icon: BuildingOfficeIcon },
@@ -248,15 +349,59 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
 
     setIsSubmitting(true);
     try {
-      // TODO: Call API to save project
-      console.log("Project data:", formData);
-      toast.success("Tạo dự án thành công!");
-      // Reset form or navigate back
-      setTimeout(() => {
-        setFormData(defaultFormData);
-      }, 1000);
-    } catch {
-      toast.error("Không thể tạo dự án");
+      const projectData = {
+        slug: formData.slug,
+        title: formData.title,
+        subtitle: formData.subtitle || undefined,
+        shortDescription: formData.shortDescription,
+        longDescription: formData.intro || undefined,
+        category: formData.category,
+        projectType: formData.projectType || undefined,
+        city: "Đà Nẵng", // Default city
+        locationText: formData.locationText || undefined,
+        locationDescription: formData.locationDescription || undefined,
+        locationImage: formData.locationImage || undefined,
+        mapEmbedUrl: formData.mapEmbedUrl || undefined,
+        coverImage: formData.coverImage || undefined,
+        heroImage: formData.heroImage || undefined,
+        specs: formData.specs,
+        gallery: formData.gallery.filter(g => g.src),
+        extentionDescription: formData.extentionDescription || undefined,
+        extentionImages: formData.extentionImages?.filter(e => e.title || e.src),
+        floorplans: formData.floorplans.filter(f => f.floorPlanImage.some(img => img.src)),
+        highlights: formData.highlights,
+      };
+
+      let response;
+      if (isEditMode && projectId) {
+        response = await projectService.updateProject(projectId, projectData);
+        if (response.success) {
+          toast.success("Cập nhật dự án thành công!");
+        }
+      } else {
+        response = await projectService.createProject(projectData);
+        if (response.success) {
+          toast.success("Tạo dự án thành công!");
+          // Reset form
+          setFormData(defaultFormData);
+        }
+      }
+
+      if (response.success) {
+        onSave?.();
+        // Navigate to project list or detail
+        setTimeout(() => {
+          if (onBack) {
+            onBack();
+          } else {
+            navigate("/admin/projects");
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Error saving project:", error);
+      const err = error as { response?: { data?: { error?: string } } };
+      toast.error(err?.response?.data?.error || (isEditMode ? "Không thể cập nhật dự án" : "Không thể tạo dự án"));
     } finally {
       setIsSubmitting(false);
     }
@@ -279,16 +424,16 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">
-          Slug <span className="text-red-500">*</span>
+          Slug <span className="text-green-500">(Auto-generate)</span>
         </label>
         <input
           type="text"
           value={formData.slug}
-          onChange={(e) => updateField("slug", e.target.value)}
+          readOnly
           placeholder="sun-symphony-residence-da-nang"
-          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
+          className="w-full rounded-xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm text-gray-600 cursor-not-allowed"
         />
-        <p className="mt-1 text-xs text-gray-500">Tự động tạo từ tên dự án (có thể chỉnh sửa)</p>
+        <p className="mt-1 text-xs text-gray-500">Tự động tạo từ tên dự án</p>
       </div>
 
       <div>
@@ -404,18 +549,27 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
             }
           }}
         />
-        <button
-          type="button"
-          onClick={() => coverImageInputRef.current?.click()}
-          disabled={uploadingImages.coverImage}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-sm font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <CloudArrowUpIcon className="h-5 w-5" />
-          {uploadingImages.coverImage ? "Đang upload..." : formData.coverImage ? "Thay đổi ảnh" : "Upload ảnh Cover"}
-        </button>
-        {formData.coverImage && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
-            <img src={formData.coverImage} alt="Cover preview" className="h-48 w-full object-cover" />
+        {!formData.coverImage ? (
+          <UploadButton
+            onClick={() => coverImageInputRef.current?.click()}
+            isUploading={uploadingImages.coverImage || false}
+            label="Upload ảnh Cover"
+            hasImage={false}
+          />
+        ) : (
+          <div className="space-y-3">
+            <ImagePreview
+              src={formData.coverImage}
+              alt="Cover preview"
+              height="h-64"
+              onRemove={() => updateField("coverImage", "")}
+            />
+            <UploadButton
+              onClick={() => coverImageInputRef.current?.click()}
+              isUploading={uploadingImages.coverImage || false}
+              label="Upload ảnh Cover"
+              hasImage={true}
+            />
           </div>
         )}
       </div>
@@ -444,18 +598,27 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
             }
           }}
         />
-        <button
-          type="button"
-          onClick={() => heroImageInputRef.current?.click()}
-          disabled={uploadingImages.heroImage}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-sm font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <CloudArrowUpIcon className="h-5 w-5" />
-          {uploadingImages.heroImage ? "Đang upload..." : formData.heroImage ? "Thay đổi ảnh" : "Upload ảnh Hero"}
-        </button>
-        {formData.heroImage && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
-            <img src={formData.heroImage} alt="Hero preview" className="h-64 w-full object-cover" />
+        {!formData.heroImage ? (
+          <UploadButton
+            onClick={() => heroImageInputRef.current?.click()}
+            isUploading={uploadingImages.heroImage || false}
+            label="Upload ảnh Hero"
+            hasImage={false}
+          />
+        ) : (
+          <div className="space-y-3">
+            <ImagePreview
+              src={formData.heroImage}
+              alt="Hero preview"
+              height="h-80"
+              onRemove={() => updateField("heroImage", "")}
+            />
+            <UploadButton
+              onClick={() => heroImageInputRef.current?.click()}
+              isUploading={uploadingImages.heroImage || false}
+              label="Upload ảnh Hero"
+              hasImage={true}
+            />
           </div>
         )}
       </div>
@@ -526,42 +689,6 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Hình ảnh vị trí</label>
-        <input
-          ref={locationImageInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              await handleImageUpload(
-                file,
-                "projects/location",
-                (url) => setLocationImage(url),
-                "locationImage"
-              );
-              if (locationImageInputRef.current) locationImageInputRef.current.value = "";
-            }
-          }}
-        />
-        <button
-          type="button"
-          onClick={() => locationImageInputRef.current?.click()}
-          disabled={uploadingImages.locationImage}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-sm font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <CloudArrowUpIcon className="h-5 w-5" />
-          {uploadingImages.locationImage ? "Đang upload..." : locationImage ? "Thay đổi ảnh" : "Upload ảnh vị trí"}
-        </button>
-        {locationImage && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
-            <img src={locationImage} alt="Location preview" className="h-64 w-full object-cover" />
-          </div>
-        )}
-      </div>
-
-      <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ nhúng</label>
         <input
           type="url"
@@ -583,6 +710,60 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
             />
           </div>
         )}
+      </div>
+
+      {/* Location Image Upload */}
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Hình ảnh vị trí</label>
+        <p className="mb-3 text-xs text-gray-500">Upload hình ảnh bản đồ vệ tinh hoặc quy hoạch vị trí dự án</p>
+        {formData.locationImage ? (
+          <div className="space-y-3">
+            <ImagePreview
+              src={formData.locationImage}
+              alt="Hình ảnh vị trí"
+              onRemove={() => updateField("locationImage", "")}
+              height="h-64"
+            />
+            <button
+              type="button"
+              onClick={() => locationImageInputRef.current?.click()}
+              className="text-sm text-yellow-600 hover:text-yellow-700"
+            >
+              Thay đổi ảnh
+            </button>
+          </div>
+        ) : (
+          <UploadButton
+            onClick={() => locationImageInputRef.current?.click()}
+            isUploading={uploadingImages["locationImage"] || false}
+            label="Tải lên hình ảnh vị trí"
+            hasImage={!!formData.locationImage}
+          />
+        )}
+        <input
+          ref={locationImageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setUploadingImages((prev) => ({ ...prev, locationImage: true }));
+              try {
+                // Simulate URL upload (replace with actual upload logic)
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  updateField("locationImage", event.target?.result as string);
+                  setUploadingImages((prev) => ({ ...prev, locationImage: false }));
+                };
+                reader.readAsDataURL(file);
+              } catch (error) {
+                console.error("Error uploading location image:", error);
+                setUploadingImages((prev) => ({ ...prev, locationImage: false }));
+              }
+            }
+          }}
+        />
       </div>
     </div>
   );
@@ -615,16 +796,6 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
                   className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
-              <div className="mb-3">
-                <label className="mb-1 block text-xs font-medium text-gray-600">Mô tả</label>
-                <textarea
-                  value={image.description}
-                  onChange={(e) => updateExtentionImage(index, "description", e.target.value)}
-                  rows={2}
-                  placeholder="Tầm nhìn mở rộng hướng sông..."
-                  className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
-                />
-              </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-gray-600">Hình ảnh</label>
                 <input
@@ -649,22 +820,27 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
                     }
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => extentionImageInputRefs.current[index]?.click()}
-                  disabled={uploadingImages[`extentionImage-${index}`]}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-4 text-sm font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <CloudArrowUpIcon className="h-4 w-4" />
-                  {uploadingImages[`extentionImage-${index}`]
-                    ? "Đang upload..."
-                    : image.src
-                      ? "Thay đổi ảnh"
-                      : "Upload ảnh"}
-                </button>
-                {image.src && (
-                  <div className="mt-3 overflow-hidden rounded-lg border border-gray-200">
-                    <img src={image.src} alt={image.alt} className="h-32 w-full object-cover" />
+                {!image.src ? (
+                  <UploadButton
+                    onClick={() => extentionImageInputRefs.current[index]?.click()}
+                    isUploading={uploadingImages[`extentionImage-${index}`] || false}
+                    label="Upload ảnh"
+                    hasImage={false}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    <ImagePreview
+                      src={image.src}
+                      alt={image.alt}
+                      height="h-48"
+                      onRemove={() => updateExtentionImage(index, "src", "")}
+                    />
+                    <UploadButton
+                      onClick={() => extentionImageInputRefs.current[index]?.click()}
+                      isUploading={uploadingImages[`extentionImage-${index}`] || false}
+                      label="Upload ảnh"
+                      hasImage={true}
+                    />
                   </div>
                 )}
               </div>
@@ -752,22 +928,27 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
                           }
                         }}
                       />
-                      <button
-                        type="button"
-                        onClick={() => floorplanImageInputRefs.current[inputKey]?.click()}
-                        disabled={uploadingImages[`floorplan-${inputKey}`]}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-3 py-3 text-xs font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <CloudArrowUpIcon className="h-4 w-4" />
-                        {uploadingImages[`floorplan-${inputKey}`]
-                          ? "Đang upload..."
-                          : image.src
-                            ? "Thay đổi ảnh"
-                            : "Upload ảnh"}
-                      </button>
-                      {image.src && (
-                        <div className="overflow-hidden rounded-lg border border-gray-200">
-                          <img src={image.src} alt={image.alt} className="h-32 w-full object-cover" />
+                      {!image.src ? (
+                        <UploadButton
+                          onClick={() => floorplanImageInputRefs.current[inputKey]?.click()}
+                          isUploading={uploadingImages[`floorplan-${inputKey}`] || false}
+                          label="Upload ảnh mặt bằng"
+                          hasImage={false}
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          <ImagePreview
+                            src={image.src}
+                            alt={image.alt}
+                            height="h-40"
+                            onRemove={() => updateFloorplanImage(floorplanIndex, imageIndex, "src", "")}
+                          />
+                          <UploadButton
+                            onClick={() => floorplanImageInputRefs.current[inputKey]?.click()}
+                            isUploading={uploadingImages[`floorplan-${inputKey}`] || false}
+                            label="Thay đổi ảnh"
+                            hasImage={true}
+                          />
                         </div>
                       )}
                     </div>
@@ -843,22 +1024,27 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
                   }
                 }}
               />
-              <button
-                type="button"
-                onClick={() => galleryImageInputRefs.current[index]?.click()}
-                disabled={uploadingImages[`gallery-${index}`]}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-4 text-sm font-medium text-gray-600 transition hover:border-yellow-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <CloudArrowUpIcon className="h-4 w-4" />
-                {uploadingImages[`gallery-${index}`]
-                  ? "Đang upload..."
-                  : image.src
-                    ? "Thay đổi ảnh"
-                    : "Upload ảnh"}
-              </button>
-              {image.src && (
-                <div className="mt-3 overflow-hidden rounded-lg border border-gray-200">
-                  <img src={image.src} alt={image.alt} className="h-48 w-full object-cover" />
+              {!image.src ? (
+                <UploadButton
+                  onClick={() => galleryImageInputRefs.current[index]?.click()}
+                  isUploading={uploadingImages[`gallery-${index}`] || false}
+                  label="Upload ảnh"
+                  hasImage={false}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <ImagePreview
+                    src={image.src}
+                    alt={image.alt}
+                    height="h-56"
+                    onRemove={() => updateGalleryImage(index, "src", "")}
+                  />
+                  <UploadButton
+                    onClick={() => galleryImageInputRefs.current[index]?.click()}
+                    isUploading={uploadingImages[`gallery-${index}`] || false}
+                    label="Thay đổi ảnh"
+                    hasImage={true}
+                  />
                 </div>
               )}
               <button
@@ -902,6 +1088,18 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
     }
   };
 
+  // Show loading state when fetching project data in edit mode
+  if (isEditMode && isLoadingProject) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-yellow-600 border-t-transparent"></div>
+          <p className="mt-4 text-sm text-gray-500">Đang tải thông tin dự án...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -914,8 +1112,12 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack }) => {
             <ArrowLeftIcon className="h-4 w-4" />
             Quay lại
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Tạo dự án mới</h1>
-          <p className="mt-1 text-sm text-gray-500">Điền thông tin chi tiết về dự án bất động sản</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isEditMode ? "Chỉnh sửa dự án" : "Tạo dự án mới"}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {isEditMode ? "Cập nhật thông tin dự án bất động sản" : "Điền thông tin chi tiết về dự án bất động sản"}
+          </p>
         </div>
         <button
           onClick={handleSubmit}
