@@ -6,6 +6,8 @@ import { adminService } from "../../services/admin.service";
 import { authService } from "../../services/auth.service";
 import AdminProfile from "./AdminProfile/AdminProfile";
 import ProjectDashboard from "./AdminProjectManagement/ProjectDashboard";
+import ReportsManagement from "./ReportsManagement/ReportsManagement";
+
 type AdminProfileInfo = {
   fullName?: string;
   avatarUrl?: string;
@@ -79,8 +81,10 @@ const AdminDashboard: React.FC = () => {
   const renderContent = () => {
     if (activeTab === "Profile") {
       return <AdminProfile />;
-    }else if (activeTab === "Projects") {
-      return <ProjectDashboard/>
+    } else if (activeTab === "Projects") {
+      return <ProjectDashboard />;
+    } else if (activeTab === "Reports") {
+      return <ReportsManagement />;
     }
 
     return <div className="h-full rounded-xl border-2 border-dashed border-gray-300 bg-white/30" />;
@@ -144,7 +148,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-y-auto bg-gray-100 p-6">{renderContent()}</main>
+        <main className="flex-1 overflow-auto bg-gray-100 p-6">{renderContent()}</main>
       </div>
     </div>
   );

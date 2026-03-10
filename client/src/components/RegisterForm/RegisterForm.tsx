@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { api } from "../../api/client";
 
 interface RegisterFormData {
   fullname: string;
@@ -22,22 +23,50 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Form Data:", formData);
-    setTimeout(() => {
+    setMessage(null);
+
+    try {
+      const response = await api.post("/registrations", {
+        fullname: formData.fullname,
+        email: formData.email,
+        phonenum: formData.phonenum,
+        project: formData.project,
+        note: formData.note,
+      });
+
+      setMessage({ type: "success", text: response.data.message || "Đăng ký tư vấn thành công!" });
+
+      // Reset form
+      setFormData({
+        fullname: "",
+        email: "",
+        phonenum: "",
+        project: "",
+        note: "",
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      const err = error as { response?: { data?: { message?: string } } };
+      setMessage({
+        type: "error",
+        text: err.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+      });
+    } finally {
       setLoading(false);
-      alert("Đăng ký tư vấn thành công!");
-    }, 1000);
+    }
   };
 
   const inputClasses =
@@ -157,6 +186,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
             {loading ? "Sending..." : "Đăng ký tư vấn"}
           </button>
         </div>
+
+        {/* Message Display */}
+        {message && (
+          <div
+            className={`mt-4 p-4 text-center text-sm rounded ${
+              message.type === "success"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
       </form>
     </div>
     </div>

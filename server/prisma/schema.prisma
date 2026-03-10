@@ -55,6 +55,7 @@ model Admin {
   profile       AdminProfile?
   refreshTokens AdminRefreshToken[]
   projects      Project[]           @relation("ProjectCreatedBy")
+  reports       Report[]            @relation("ReportHandledBy")
 }
 
 model AdminRefreshToken {
@@ -269,4 +270,38 @@ model ProjectSection {
 
   @@index([projectId, order])
   @@index([projectId, type])
+}
+
+enum ReportStatus {
+  NEW
+  CONTACTED
+  COMPLETED
+  CANCELLED
+}
+
+model Report {
+  id        String       @id @default(uuid())
+  /// Họ và tên khách hàng
+  fullname  String
+  /// Email khách hàng
+  email     String
+  /// Số điện thoại khách hàng
+  phonenum  String
+  /// Dự án khách hàng quan tâm
+  project   String?
+  /// Ghi chú/câu hỏi của khách
+  note      String?
+  /// Trạng thái xử lý
+  status    ReportStatus @default(NEW)
+  /// Admin xử lý (nếu có)
+  handledByAdminId String?
+  handledByAdmin   Admin?  @relation("ReportHandledBy", fields: [handledByAdminId], references: [id], onDelete: SetNull)
+  /// Ghi chú của admin khi xử lý
+  adminNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([handledByAdminId])
 }

@@ -1,5 +1,5 @@
 import type React from "react";
-
+import DanangVideo from "../../assets/BannerVideo/DanangVideo.mp4"
 const VideoBanner: React.FC = () => {
   return (
     <div className="relative w-full min-h-[60vh] sm:min-h-[80vh] lg:min-h-screen overflow-hidden">
@@ -11,7 +11,7 @@ const VideoBanner: React.FC = () => {
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source
-          src="https://www.pexels.com/download/video/12737255/"
+          src={DanangVideo || "https://www.pexels.com/download/video/12737255/"}
           type="video/webm"
         />
         Your browser does not support the video tag.

@@ -7,7 +7,8 @@ export interface AuthRequest extends Request {
   adminId?: string;
 }
 
-export const authMiddleware = (
+// Main auth middleware function
+const authMiddlewareFn = (
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -36,3 +37,7 @@ export const authMiddleware = (
     });
   }
 };
+
+// Export both names for compatibility
+export const authMiddleware = authMiddlewareFn;
+export const authenticate = authMiddlewareFn;

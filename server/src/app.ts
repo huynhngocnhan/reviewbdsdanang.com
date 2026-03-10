@@ -6,6 +6,7 @@ import uploadRoutes from "./modules/upload/routes/upload.route";
 import assetRoutes from "./modules/asset/routes/asset.route";
 import adminRoutes from "./modules/admin/routes/admin.route";
 import projectRoutes from "./modules/project/routes/project.route";
+import registrationRoutes from "./modules/registration/routes/registration.route";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/registrations", registrationRoutes);
 
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/assets", assetRoutes);
