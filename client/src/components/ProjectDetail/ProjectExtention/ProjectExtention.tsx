@@ -15,7 +15,10 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
 
   return (
     <section className="mt-12 sm:mt-20 bg-gray-100 py-12 px-8 lg:px-24">
-      <div className="justify-center mb-8 sm:mb-10 text-center">
+      <div data-aos="fade-up"
+        data-aos-duration="1000"
+        data-aos-delay="200" 
+        className="justify-center mb-8 sm:mb-10 text-center">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-amber-800 uppercase tracking-tight">Tiện ích nổi bật</h2>
         <p className="mx-auto mt-2 max-w-3xl text-gray-600">
           {project.extentionDescription ??
@@ -24,7 +27,9 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
-        <div className="lg:col-span-3">
+        <div data-aos="fade-right"
+        data-aos-duration="800"
+        data-aos-delay="200"  className="lg:col-span-3">
           {hasExtentionImages ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
               {extentionImages.map((item, index) => (
@@ -46,7 +51,9 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
           )}
         </div>
 
-        <div className="lg:col-span-9">
+        <div data-aos="fade-left"
+        data-aos-duration="800"
+        data-aos-delay="300" className="lg:col-span-9">
           {hasAmenitiesWithImages ? (
             <div className="h-full overflow-hidden rounded-[15px] shadow-xl">
               <Carousel autoplay dots className="project-extention-carousel">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type React from "react";
+import AOS from "aos";
 import Header from "../components/Header/Header";
 import VideoBanner from "../components/VideoBanner/VideoBanner";
 import HomePageCard from "../components/HomePageCard/HomePageCard";
@@ -22,6 +23,10 @@ const HomePage: React.FC = () => {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    AOS.refresh();
+  }, [projects]);
 
   const projectTitles = projects.map((p) => p.title);
 

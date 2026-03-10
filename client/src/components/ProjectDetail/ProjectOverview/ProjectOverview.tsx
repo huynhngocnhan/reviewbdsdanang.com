@@ -7,8 +7,12 @@ type Props = {
 
 const ProjectOverview: React.FC<Props> = ({ project }) => {
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-center mb-8 lg:mb-12">
-      <div className="lg:col-span-5 relative group">
+    <section className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start mb-8 lg:mb-12">
+      <div
+        data-aos="fade-right"
+        data-aos-duration="800"
+        className="lg:col-span-5 relative group"
+      >
         <div className="relative overflow-hidden px-4 lg:px-0 lg:rounded-r-[15px] shadow-2xl h-[250px] sm:h-[400px] lg:h-[550px]">
           <img
             src={project.heroImage}
@@ -19,8 +23,13 @@ const ProjectOverview: React.FC<Props> = ({ project }) => {
         </div>
       </div>
 
-      <div className="lg:col-span-5 p-6 sm:p-10 lg:p-16 flex flex-col justify-center">
-        <div className="">
+      <div
+        data-aos="fade-left"
+        data-aos-duration="800"
+        data-aos-delay="200"
+        className="lg:col-span-5 p-6 sm:p-10 lg:p-16 flex flex-col justify-start"
+      >
+        <div>
           <h3 className="text-sm font-extrabold text-gray-800 uppercase tracking-widest">
             Thông tin chi tiết
           </h3>

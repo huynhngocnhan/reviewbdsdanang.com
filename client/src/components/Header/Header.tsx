@@ -185,9 +185,12 @@ const Header: React.FC = () => {
         </div>
 
         <div className="hidden lg:block pl-4">
-          <button className="text-base font-semibold text-white bg-red-600 hover:bg-red-700 border-0 transition-all duration-300 px-4 py-1.5 rounded-md">
+          <a
+            href="#register"
+            className="text-base font-semibold text-white bg-red-600 hover:bg-red-700 border-0 transition-all duration-300 px-4 py-1.5 rounded-md inline-block"
+          >
             Liên hệ tư vấn
-          </button>
+          </a>
         </div>
       </nav>
 

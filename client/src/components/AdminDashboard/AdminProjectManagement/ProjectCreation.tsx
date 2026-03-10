@@ -449,7 +449,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">
-          Category <span className="text-red-500">*</span>
+          Chủ đầu tư <span className="text-red-500">*</span>
         </label>
         <select
           value={formData.category}

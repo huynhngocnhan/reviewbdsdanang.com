@@ -10,7 +10,7 @@ import projectRoutes from "./modules/project/routes/project.route";
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 
 app.use("/api/auth", authRoutes);

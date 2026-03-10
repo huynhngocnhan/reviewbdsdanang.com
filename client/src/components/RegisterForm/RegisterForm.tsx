@@ -45,9 +45,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
   const labelClasses = "block text-[10px] font-semibold text-gray-500 uppercase tracking-[0.2em] mb-1";
 
   return (
-    <div className="w-full bg-gray-100/90 pt-20 pb-14">
+    <div id="register" className="w-full bg-gray-100/90 pt-20 pb-14 scroll-mt-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
-        <h2 className="mb-10 text-center text-2xl font-bold uppercase text-gray-800 sm:mb-16 sm:text-3xl">
+        <h2
+          data-aos="fade-up"
+          data-aos-duration="800"
+          className="mb-10 text-center text-2xl font-bold uppercase text-gray-800 sm:mb-16 sm:text-3xl"
+        >
           Đăng ký tư vấn
         </h2>
         <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">

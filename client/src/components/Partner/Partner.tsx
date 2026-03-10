@@ -40,7 +40,11 @@ const Partner: React.FC = () => {
 
   return (
     <section className="bg-white py-6 lg:py-10">
-      <div className="mb-8 flex items-center justify-center gap-3 px-4 sm:gap-4">
+      <div
+        data-aos="fade-up"
+        data-aos-duration="800"
+        className="mb-8 flex items-center justify-center gap-3 px-4 sm:gap-4"
+      >
         <div className="h-px w-14 bg-amber-200 sm:w-24" />
         <p className="text-center text-xl font-extrabold uppercase tracking-tight text-amber-900 sm:text-3xl">
           Đối tác chính thức

@@ -68,7 +68,11 @@ const Footer: React.FC = () => {
   return (
     <footer className="border-t border-amber-100 bg-white">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-8 lg:gap-10">
+        <div
+          data-aos="fade-up"
+          data-aos-duration="800"
+          className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-8 lg:gap-10"
+        >
           <div className="mx-auto shrink-0 sm:mx-0">
             <div className="rounded-2xl border border-amber-200 bg-white p-2 shadow-sm">
               <img

@@ -37,7 +37,7 @@ const ProjectDashboard = () => {
     { value: "ALL", label: "Tất cả", color: "bg-purple-500" },
     { value: "SUN", label: "Sun Group", color: "bg-yellow-500" },
     { value: "VIN", label: "Vin Group", color: "bg-blue-500" },
-    { value: "OTHER", label: "Khác", color: "bg-gray-500" },
+    { value: "OTHER", label: "Các dự án khác", color: "bg-gray-500" },
   ];
 
   const fetchProjects = useCallback(async (isRefresh = false) => {
