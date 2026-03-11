@@ -11,6 +11,7 @@ import ProjectLocate from "./ProjectLocate/ProjectLocate";
 import ProjectExtention from "./ProjectExtention/ProjectExtention";
 import FloorPlan from "./FloorPlan/FloorPlan";
 import ProjectGallery from "./ProjectGallery/ProjectGallery";
+import CustomSection from "./CustomSection/CustomSection";
 import { Divider } from "antd";
 
 const ProjectDetail: React.FC = () => {
@@ -144,15 +145,16 @@ const ProjectDetail: React.FC = () => {
 
           <ProjectOverview project={project} />
 
-        <div className="px-8 lg:px-24">
+        <div className="px-4 sm:px-6 lg:px-24">
         <Divider/>
         </div>
           <ProjectLocate project={project} />
           <ProjectExtention project={project} />
           <FloorPlan project={project} />
-          <div className="px-8 lg:px-24">
+          <div className="px-4 sm:px-6 lg:px-24">
         <Divider/>
         </div>
+        {project.customSections && project.customSections.length > 0 && <CustomSection project={project} />}
           <ProjectGallery project={project} />
 
         

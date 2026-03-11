@@ -7,13 +7,13 @@ type Props = {
 
 const ProjectOverview: React.FC<Props> = ({ project }) => {
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start mb-8 lg:mb-12">
+    <section className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:gap-8 items-start mb-8 lg:mb-12 overflow-hidden">
       <div
         data-aos="fade-right"
         data-aos-duration="800"
         className="lg:col-span-5 relative group"
       >
-        <div className="relative overflow-hidden px-4 lg:px-0 lg:rounded-r-[15px] shadow-2xl h-[250px] sm:h-[400px] lg:h-[550px]">
+        <div className="relative overflow-hidden px-4 lg:px-0 lg:rounded-r-[15px] shadow-2xl h-[300px] sm:h-[500px] lg:h-[600px]">
           <img
             src={project.heroImage}
             alt={project.title}

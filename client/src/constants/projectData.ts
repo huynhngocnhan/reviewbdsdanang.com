@@ -22,6 +22,22 @@ export interface FloorplanCategory {
   floorPlanImage: ProjectGallery[];
 }
 
+export interface CustomContent {
+  contentTitle: string;
+  contentDes: string;
+  images: ProjectGallery[];
+}
+
+export interface CustomSectionData {
+  customTitle: string;
+  customDes: string;
+  contents: CustomContent[];
+}
+
+export interface CustomSectionItem extends CustomSectionData {
+  id?: string;
+}
+
 export interface ProjectData {
   id: string;
   slug: string;
@@ -43,6 +59,7 @@ export interface ProjectData {
   extentionDescription?: string;
   extentionImages?: ProjectExtentionImage[];
   floorplans: FloorplanCategory[];
+  customSections?: CustomSectionItem[];
   highlights: string[];
 }
 
@@ -98,6 +115,22 @@ export const MOCK_PROJECTS: ProjectData[] = [
         floorPlanImage: [
           { src: "https://bdscaocapdanang.com/wp-content/uploads/2025/03/sdmb-1-min.png", alt: "Mặt bằng phương án 1" },
           { src: "https://bdscaocapdanang.com/wp-content/uploads/2025/03/sdmb-1-min.png", alt: "Mặt bằng phương án 2" },
+        ]
+      }
+    ],
+    customSections: [
+      {
+        customTitle: "Tuyệt phẩm nội khu",
+        customDes: "Sun Symphony Residence Đà Nẵng là dự án căn hộ hạng sang với vị trí đắc địa ven sông Hàn, thiết kế hiện đại, tối ưu trải nghiệm sống và tiềm năng khai thác cho thuê.",
+        contents: [
+          {
+            contentTitle: "Tuyệt phẩm nội khu",
+            contentDes: "Sun Symphony Residence Đà Nẵng là dự án căn hộ hạng sang với vị trí đắc địa ven sông Hàn, thiết kế hiện đại, tối ưu trải nghiệm sống và tiềm năng khai thác cho thuê.",
+            images: [
+              { src: "https://bdscaocapdanang.com/wp-content/uploads/2025/03/Anh-06-min.jpg", alt: "Phối cảnh 1" },
+              { src: "https://bdscaocapdanang.com/wp-content/uploads/2025/03/Anh-06-min.jpg", alt: "Phối cảnh 2" }
+            ]
+          }
         ]
       }
     ]
