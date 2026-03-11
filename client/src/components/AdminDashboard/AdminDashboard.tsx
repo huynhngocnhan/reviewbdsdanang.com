@@ -1,101 +1,154 @@
 import type React from "react";
-import {
-  CalendarDaysIcon,
-  ChartPieIcon,
-  DocumentTextIcon,
-  FolderIcon,
-  HomeIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { ChartPieIcon, FolderIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { adminService } from "../../services/admin.service";
+import { authService } from "../../services/auth.service";
+import AdminProfile from "./AdminProfile/AdminProfile";
+import ProjectDashboard from "./AdminProjectManagement/ProjectDashboard";
+import ReportsManagement from "./ReportsManagement/ReportsManagement";
 
-const navigation = [
-  { name: "Dashboard", icon: HomeIcon, count: "5", current: true },
-  { name: "Team", icon: UserGroupIcon, current: false },
-  { name: "Projects", icon: FolderIcon, count: "12", current: false },
-  { name: "Calendar", icon: CalendarDaysIcon, count: "20+", current: false },
-  { name: "Documents", icon: DocumentTextIcon, current: false },
-  { name: "Reports", icon: ChartPieIcon, current: false },
-];
+type AdminProfileInfo = {
+  fullName?: string;
+  avatarUrl?: string;
+};
 
-const teams = [
-  { name: "Heroicons", initial: "H" },
-  { name: "Tailwind Labs", initial: "T" },
-  { name: "Workcation", initial: "W" },
+type AdminData = {
+  id: string;
+  email: string;
+  profile?: AdminProfileInfo;
+};
+
+type NavItem = {
+  name: "Dashboard" | "Profile" | "Projects" | "Reports";
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+};
+
+const navigation: NavItem[] = [
+  // { name: "Dashboard", icon: HomeIcon },
+  { name: "Profile", icon: UserGroupIcon },
+  { name: "Projects", icon: FolderIcon },
+  { name: "Reports", icon: ChartPieIcon },
 ];
 
 const AdminDashboard: React.FC = () => {
+  const [admin, setAdmin] = useState<AdminData | null>(null);
+  const [isLoadingAdmin, setIsLoadingAdmin] = useState(false);
+  const [activeTab, setActiveTab] = useState<NavItem["name"]>("Profile");
+
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      const adminId = localStorage.getItem("adminId");
+
+      if (!adminId) {
+        return;
+      }
+
+      try {
+        setIsLoadingAdmin(true);
+        const data = await adminService.getAdminById(adminId);
+        setAdmin(data?.admin ?? data);
+      } catch {
+        toast.error("Không thể tải thông tin admin");
+      } finally {
+        setIsLoadingAdmin(false);
+      }
+    };
+
+    void fetchAdmin();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const logoutPromise = authService.logout(localStorage.getItem("refreshToken") ?? "");
+      await toast.promise(logoutPromise, {
+        loading: "Đang đăng xuất...",
+        success: <b>Đăng xuất thành công!</b>,
+        error: <b>Đăng xuất thất bại. Vui lòng kiểm tra lại token.</b>,
+      });
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("adminId");
+      setTimeout(() => {
+        window.location.href = "/admin/login";
+      }, 1000);
+    } catch {
+      toast.error("Không thể đăng xuất");
+    }
+  };
+
+  const renderContent = () => {
+    if (activeTab === "Profile") {
+      return <AdminProfile />;
+    } else if (activeTab === "Projects") {
+      return <ProjectDashboard />;
+    } else if (activeTab === "Reports") {
+      return <ReportsManagement />;
+    }
+
+    return <div className="h-full rounded-xl border-2 border-dashed border-gray-300 bg-white/30" />;
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 p-3 sm:p-4">
-      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1400px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="h-screen overflow-hidden p-1 sm:p-2">
+      <div className="mx-auto flex h-full w-full overflow-hidden rounded-2xl bg-white shadow-xl">
         <aside className="flex w-72 shrink-0 flex-col border-r border-gray-200 bg-gray-50">
           <div className="px-6 py-6">
-            <div className="h-8 w-8 rounded-md bg-indigo-600" />
+            <p className="text-xl font-bold text-yellow-800">reviewbdsdanang.com</p>
           </div>
 
           <nav className="flex-1 px-4">
             <ul className="space-y-1">
-              {navigation.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href="#"
-                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                      item.current ? "bg-indigo-50 text-indigo-600" : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    <span className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5" />
-                      {item.name}
-                    </span>
-                    {item.count && (
-                      <span className="rounded-full border border-gray-300 px-2 py-0.5 text-xs text-gray-600">
-                        {item.count}
-                      </span>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
+              {navigation.map((item) => {
+                const isActive = activeTab === item.name;
 
-            <div className="mt-8">
-              <p className="px-3 text-xs font-semibold text-gray-400">Your teams</p>
-              <ul className="mt-3 space-y-1">
-                {teams.map((team) => (
-                  <li key={team.name}>
-                    <a href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-md border border-gray-300 text-xs text-gray-500">
-                        {team.initial}
+                return (
+                  <li key={item.name}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab(item.name)}
+                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                        isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <item.icon className="h-5 w-5" />
+                        {item.name}
                       </span>
-                      {team.name}
-                    </a>
+                    </button>
                   </li>
-                ))}
-              </ul>
-            </div>
+                );
+              })}
+            </ul>
           </nav>
 
           <div className="border-t border-gray-200 px-4 py-4">
             <div className="flex items-center justify-between rounded-lg px-2 py-2">
               <div className="flex items-center gap-3">
                 <img
-                  src="https://i.pravatar.cc/100?img=68"
+                  src={admin?.profile?.avatarUrl ?? ""}
                   alt="Admin avatar"
                   className="h-9 w-9 rounded-full object-cover"
                 />
-                <span className="text-sm font-semibold text-gray-800">Tom Cook</span>
+                <span className="text-sm font-semibold text-gray-800">
+                  {isLoadingAdmin ? "Đang tải..." : admin?.profile?.fullName ?? admin?.email ?? "Admin"}
+                </span>
               </div>
-              <button
-                type="button"
-                className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"
-              >
-                Login
-              </button>
+              {admin ? (
+                <button
+                  type="button"
+                  className="rounded-md bg-yellow-600 px-2 py-1 text-xs font-semibold text-white hover:bg-yellow-500"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              ) : null}
             </div>
           </div>
         </aside>
 
-        <main className="flex-1 bg-gray-100 p-6">
-          <div className="h-full rounded-xl border-2 border-dashed border-gray-300 bg-white/30" />
-        </main>
+        <main className="flex-1 overflow-auto bg-gray-100 p-6">{renderContent()}</main>
       </div>
     </div>
   );

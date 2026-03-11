@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Dropdown } from "antd";
 import {
   Dialog,
@@ -13,6 +13,8 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import SunLogo from "../../assets/logo/Sun-Group-logo.png";
+import { projectService } from "../../services/project.service";
+import type { ProjectData } from "../../constants/projectData";
 
 type MenuItem = {
   name: string;
@@ -20,57 +22,63 @@ type MenuItem = {
   children?: {
     name: string;
     href: string;
+    disabled?: boolean;
   }[];
 };
 
-const menuItems: MenuItem[] = [
-  {
-    name: "Trang chủ",
-    href: "/",
-  },
-  {
-    name: "Dự án căn hộ Sun Group",
-    href: "/#",
-    children: [
-      { name: "Căn hộ Studio", href: "/#studio" },
-      { name: "Căn hộ 1 phòng ngủ", href: "/#1pn" },
-      { name: "Căn hộ 2 phòng ngủ", href: "/#2pn" },
-      { name: "Căn hộ 3 phòng ngủ", href: "/#3pn" },
-    ],
-  },
-  {
-    name: "Dự án Vin Home",
-    href: "/#",
-    children: [
-      { name: "Căn hộ Studio", href: "/#studio" },
-      { name: "Căn hộ 1 phòng ngủ", href: "/#1pn" },
-      { name: "Căn hộ 2 phòng ngủ", href: "/#2pn" },
-      { name: "Căn hộ 3 phòng ngủ", href: "/#3pn" },
-    ],
-  },
-  {
-    name: "Dự án căn hộ cao cấp khác",
-    href: "/#",
-    children: [
-      { name: "Căn hộ Penthouse", href: "/#penthouse" },
-      { name: "Căn hộ Duplex", href: "/#duplex" },
-      { name: "Biệt thự cao tầng", href: "/#biet-thu" },
-    ],
-  },
-];
+const EMPTY_CHILD = [{ name: "Chưa có dự án", href: "#", disabled: true }];
 
 const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [projects, setProjects] = useState<ProjectData[]>([]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // init on mount
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    projectService
+      .getProjects({ status: "PUBLISHED" })
+      .then((res) => {
+        if (res.success && res.data) setProjects(res.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const menuItems = useMemo<MenuItem[]>(() => {
+    const sun = projects.filter((p) => p.category === "SUN");
+    const vin = projects.filter((p) => p.category === "VIN");
+    const other = projects.filter((p) => p.category === "OTHER");
+
+    return [
+      { name: "Trang chủ", href: "/" },
+      {
+        name: "Dự án Sun Group",
+        href: "/",
+        children: sun.length > 0
+          ? sun.map((p) => ({ name: p.title, href: `/project/${p.slug}` }))
+          : EMPTY_CHILD,
+      },
+      {
+        name: "Dự án Vin Home",
+        href: "/",
+        children: vin.length > 0
+          ? vin.map((p) => ({ name: p.title, href: `/project/${p.slug}` }))
+          : EMPTY_CHILD,
+      },
+      {
+        name: "Dự án cao cấp khác",
+        href: "/",
+        children: other.length > 0
+          ? other.map((p) => ({ name: p.title, href: `/project/${p.slug}` }))
+          : EMPTY_CHILD,
+      },
+    ];
+  }, [projects]);
 
   return (
     <header
@@ -80,12 +88,12 @@ const Header: React.FC = () => {
     >
       <nav
         aria-label="Global"
-        className={`mx-auto flex max-w-7xl items-center justify-between transition-all duration-300 lg:px-8 ${
-          isScrolled ? "p-4 sm:p-4" : "p-5 sm:p-6"
+        className={`mx-auto flex max-w-7xl items-center justify-between transition-all duration-300 px-4 sm:px-6 lg:px-8 ${
+          isScrolled ? "py-3 sm:py-4" : "py-4 sm:py-5"
         }`}
       >
-        <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+        <div className="flex flex-1">
+          <a href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Sun Group</span>
             <img
               alt="Sun Group"
@@ -95,7 +103,7 @@ const Header: React.FC = () => {
           </a>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
@@ -106,11 +114,11 @@ const Header: React.FC = () => {
             }`}
           >
             <span className="sr-only">Mở menu</span>
-            <Bars3Icon aria-hidden="true" className="size-4" />
+            <Bars3Icon aria-hidden="true" className="size-6" />
           </button>
         </div>
 
-        <div className="hidden lg:flex lg:flex-1 lg:justify-center lg:gap-x-12">
+        <div className="hidden xl:flex xl:flex-1 xl:justify-center xl:gap-x-8">
           {menuItems.map((item) =>
             item.children ? (
               <div
@@ -121,23 +129,18 @@ const Header: React.FC = () => {
                   menu={{
                     items: item.children.map((child) => ({
                       key: child.name,
-                      label: (
+                      disabled: child.disabled,
+                      label: child.disabled ? (
+                        <span className="text-gray-400 italic">{child.name}</span>
+                      ) : (
                         <a
                           href={child.href}
-                          className={
-                            !isScrolled
-                              ? "!text-white hover:!text-white/90"
-                              : ""
-                          }
+                          className={!isScrolled ? "!text-white hover:!text-white/90" : ""}
                         >
                           {child.name}
                         </a>
                       ),
-                      style: {
-                        padding: "8px 16px",
-                        fontSize: "14px",
-                        ...(!isScrolled && { backgroundColor: "transparent" }),
-                      },
+                      style: { padding: "8px 16px", fontSize: "14px" },
                     })),
                     style: {
                       minWidth: 240,
@@ -154,9 +157,7 @@ const Header: React.FC = () => {
                 >
                   <span
                     className={`flex items-center gap-x-1 text-base/7 font-semibold cursor-pointer whitespace-nowrap transition-colors ${
-                      isScrolled
-                        ? "text-gray-800"
-                        : "text-white hover:text-white/90"
+                      isScrolled ? "text-gray-800" : "text-white hover:text-white/90"
                     }`}
                   >
                     {item.name}
@@ -182,25 +183,22 @@ const Header: React.FC = () => {
             ),
           )}
         </div>
-        <div className="hidden lg:block  pl-4">
-          <button className="text-base font-semibold text-white bg-red-600 hover:bg-red-700 border-0 transition-all duration-300 px-4 py-1.5 rounded-md">
+
+        <div className="hidden lg:block pl-4">
+          <a
+            href="#register"
+            className="text-base font-semibold text-white bg-red-600 hover:bg-red-700 border-0 transition-all duration-300 px-4 py-1.5 rounded-md inline-block"
+          >
             Liên hệ tư vấn
-          </button>
+          </a>
         </div>
       </nav>
-      <Dialog
-        open={mobileMenuOpen}
-        onClose={setMobileMenuOpen}
-        className="lg:hidden"
-      >
+
+      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="xl:hidden">
         <div className="fixed inset-0 z-50" />
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <a
-              href="/"
-              className="-m-1.5 p-1.5"
-              onClick={() => setMobileMenuOpen(false)}
-            >
+            <a href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
               <span className="sr-only">Sun Group</span>
               <img alt="Sun Group" src={SunLogo} className="h-8 w-auto" />
             </a>
@@ -227,16 +225,25 @@ const Header: React.FC = () => {
                         />
                       </DisclosureButton>
                       <DisclosurePanel className="mt-1 space-y-1 pl-3">
-                        {item.children.map((child) => (
-                          <a
-                            key={child.name}
-                            href={child.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="block rounded-lg py-2 px-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-red-600"
-                          >
-                            {child.name}
-                          </a>
-                        ))}
+                        {item.children.map((child) =>
+                          child.disabled ? (
+                            <span
+                              key={child.name}
+                              className="block rounded-lg py-2 px-3 text-sm font-medium text-gray-400 italic"
+                            >
+                              {child.name}
+                            </span>
+                          ) : (
+                            <a
+                              key={child.name}
+                              href={child.href}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="block rounded-lg py-2 px-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-red-600"
+                            >
+                              {child.name}
+                            </a>
+                          )
+                        )}
                       </DisclosurePanel>
                     </Disclosure>
                   ) : (

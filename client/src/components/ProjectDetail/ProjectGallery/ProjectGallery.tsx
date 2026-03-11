@@ -12,7 +12,9 @@ const ProjectGallery: React.FC<Props> = ({ project }) => {
 
   return (
     <section className="pt-4 lg:pt-8 ">
-      <h2 className="mb-4 text-center text-xl font-extrabold uppercase tracking-tight text-amber-800 sm:mb-6 sm:text-2xl lg:text-3xl">
+      <h2 data-aos="fade-left"
+    data-aos-duration="800"
+    data-aos-delay="200" className="mb-4 text-center text-xl font-extrabold uppercase tracking-tight text-amber-800 sm:mb-6 sm:text-2xl lg:text-3xl">
         Phối cảnh {project.title}
       </h2>
 

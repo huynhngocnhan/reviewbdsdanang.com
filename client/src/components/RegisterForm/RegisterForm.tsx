@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { api } from "../../api/client";
 
 interface RegisterFormData {
   fullname: string;
@@ -22,22 +23,50 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Form Data:", formData);
-    setTimeout(() => {
+    setMessage(null);
+
+    try {
+      const response = await api.post("/registrations", {
+        fullname: formData.fullname,
+        email: formData.email,
+        phonenum: formData.phonenum,
+        project: formData.project,
+        note: formData.note,
+      });
+
+      setMessage({ type: "success", text: response.data.message || "Đăng ký tư vấn thành công!" });
+
+      // Reset form
+      setFormData({
+        fullname: "",
+        email: "",
+        phonenum: "",
+        project: "",
+        note: "",
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      const err = error as { response?: { data?: { message?: string } } };
+      setMessage({
+        type: "error",
+        text: err.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+      });
+    } finally {
       setLoading(false);
-      alert("Đăng ký tư vấn thành công!");
-    }, 1000);
+    }
   };
 
   const inputClasses =
@@ -45,12 +74,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
   const labelClasses = "block text-[10px] font-semibold text-gray-500 uppercase tracking-[0.2em] mb-1";
 
   return (
-    <div className="w-full bg-gray-100/90 pt-20 pb-14">
-      <div className="max-w-4xl mx-auto px-6">
-        <h2 className="text-3xl font-bold uppercase text-center text-gray-800 mb-16">
+    <div id="register" className="w-full bg-gray-100/90 pt-20 pb-14 scroll-mt-20">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <h2
+          data-aos="fade-up"
+          data-aos-duration="800"
+          className="mb-10 text-center text-2xl font-bold uppercase text-gray-800 sm:mb-16 sm:text-3xl"
+        >
           Đăng ký tư vấn
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-12">
+        <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
            
         {/* Full Name */}
         <div className="relative">
@@ -69,16 +102,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-          {/* Email */}
+          {/* Email - Optional */}
           <div className="relative">
             <label htmlFor="email" className={labelClasses}>
-              *Địa chỉ Email
+              Địa chỉ Email (Tuỳ chọn)
             </label>
             <input
               type="email"
               id="email"
               name="email"
-              required
               className={inputClasses}
               value={formData.email}
               onChange={handleChange}
@@ -153,6 +185,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
             {loading ? "Sending..." : "Đăng ký tư vấn"}
           </button>
         </div>
+
+        {/* Message Display */}
+        {message && (
+          <div
+            className={`mt-4 p-4 text-center text-sm rounded ${
+              message.type === "success"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
       </form>
     </div>
     </div>

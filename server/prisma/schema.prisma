@@ -55,6 +55,7 @@ model Admin {
   profile       AdminProfile?
   refreshTokens AdminRefreshToken[]
   projects      Project[]           @relation("ProjectCreatedBy")
+  reports       Report[]            @relation("ReportHandledBy")
 }
 
 model AdminRefreshToken {
@@ -83,6 +84,8 @@ model AdminProfile {
   phone    String?
   /// Địa chỉ làm việc
   address  String?
+  /// Giờ làm việc hiển thị công khai
+  workHours String?
 
   /// Ảnh đại diện (tham chiếu sang Asset)
   avatarAssetId String?
@@ -138,7 +141,10 @@ model Project {
   subtitle String?
 
   shortDescription String
-  longDescription  String?
+  /// Giới thiệu ngắn về dự án (matching mockup)
+  intro String?
+
+  longDescription String?
 
   /// Nhóm dự án để filter như hiện tại: SUN / VIN / OTHER
   category      ProjectCategory @default(OTHER)
@@ -154,6 +160,15 @@ model Project {
   district String?
   /// Địa chỉ chi tiết
   address  String?
+
+  /// Vị trí text (vd: "Trần Hưng Đạo, Sơn Trà, Đà Nẵng")
+  locationText String?
+  /// Mô tả vị trí
+  locationDescription String?
+  /// Ảnh vị trí (bản đồ vệ tinh, quy hoạch...)
+  locationImage String?
+  /// Google Maps embed URL
+  mapEmbedUrl String?
 
   /// Toạ độ bản đồ (tuỳ chọn)
   lat Decimal? @db.Decimal(10, 7)
@@ -171,10 +186,18 @@ model Project {
   /// Thời điểm bàn giao (vd: "2026", "Q4/2026") - tuỳ chọn
   handoverTime String?
 
-  /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"])
-  highlightTags String[] @default([])
+  /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"]) - matching mockup
+  highlights String[] @default([])
 
-  /// Ảnh cover dùng cho card/list
+  /// Hero image cho section tổng quan
+  heroImage String?
+
+  /// Thông số kỹ thuật (vd: [{label, value}])
+  specs Json?
+
+  /// Ảnh cover dùng cho card/list (URL string)
+  coverImage String?
+  /// Ảnh cover dùng cho card/list (Asset reference)
   coverAssetId String?
   coverAsset   Asset?  @relation("ProjectCover", fields: [coverAssetId], references: [id], onDelete: SetNull)
 
@@ -186,6 +209,17 @@ model Project {
   metaTitle       String?
   /// SEO description (nếu không set thì fallback = shortDescription)
   metaDescription String?
+
+  /// Gallery images (vd: [{src, alt}])
+  gallery Json?
+
+  /// Tiện ích - mô tả
+  extentionDescription String?
+  /// Tiện ích - hình ảnh (vd: [{src, alt, title, description}])
+  extentionImages Json?
+
+  /// Mặt bằng (vd: [{description, floorPlanImage}])
+  floorplans Json?
 
   /// Admin tạo dự án
   createdByAdminId String
@@ -236,4 +270,38 @@ model ProjectSection {
 
   @@index([projectId, order])
   @@index([projectId, type])
+}
+
+enum ReportStatus {
+  NEW
+  CONTACTED
+  COMPLETED
+  CANCELLED
+}
+
+model Report {
+  id        String       @id @default(uuid())
+  /// Họ và tên khách hàng
+  fullname  String
+  /// Email khách hàng (optional - nếu có sẽ nhận được auto-reply)
+  email     String?
+  /// Số điện thoại khách hàng
+  phonenum  String
+  /// Dự án khách hàng quan tâm
+  project   String?
+  /// Ghi chú/câu hỏi của khách
+  note      String?
+  /// Trạng thái xử lý
+  status    ReportStatus @default(NEW)
+  /// Admin xử lý (nếu có)
+  handledByAdminId String?
+  handledByAdmin   Admin?  @relation("ReportHandledBy", fields: [handledByAdminId], references: [id], onDelete: SetNull)
+  /// Ghi chú của admin khi xử lý
+  adminNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([handledByAdminId])
 }

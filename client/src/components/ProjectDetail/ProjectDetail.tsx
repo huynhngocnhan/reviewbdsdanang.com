@@ -1,10 +1,11 @@
+import { useState, useEffect } from "react";
 import type React from "react";
-import { useMemo, } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import RegisterForm from "../RegisterForm/RegisterForm";
-import { MOCK_PROJECTS } from "../../constants/projectData";
+import type { ProjectData } from "../../constants/projectData";
+import { projectService } from "../../services/project.service";
 import ProjectOverview from "./ProjectOverview/ProjectOverview";
 import ProjectLocate from "./ProjectLocate/ProjectLocate";
 import ProjectExtention from "./ProjectExtention/ProjectExtention";
@@ -14,16 +15,47 @@ import { Divider } from "antd";
 
 const ProjectDetail: React.FC = () => {
   const { slug } = useParams();
-  const project = useMemo(
-    () => MOCK_PROJECTS.find((p) => p.slug === slug) ?? null,
-    [slug]
-  );
+  const [project, setProject] = useState<ProjectData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
+  useEffect(() => {
+    setLoading(true);
+    projectService
+      .getProjectBySlug(slug!)
+      .then((res) => {
+        if (res.success && res.data) {
+          setProject(res.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [slug]);
 
-  const registerProjects = useMemo(
-    () => MOCK_PROJECTS.map((p) => p.title),
-    []
-  );
+  useEffect(() => {
+    projectService
+      .getProjects({ status: "PUBLISHED" })
+      .then((res) => {
+        if (res.success && res.data) {
+          setAllProjects(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const registerProjects = allProjects.map((p) => p.title);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100/90">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -49,7 +81,7 @@ const ProjectDetail: React.FC = () => {
       <section className="relative">
         <div className="relative h-[80vh] min-h-[480px] w-full overflow-hidden">
           <img
-            src={project.heroImage}
+            src={project.coverImage}
             alt={project.title}
             className="h-full w-full object-cover shadow-lg"
           />
