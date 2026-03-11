@@ -1240,7 +1240,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
                     <button
                       type="button"
                       onClick={() => addContentToSection(sectionIndex)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-3 py-1.5 text-sm text-gray-900 font-medium text-amber-700 hover:bg-amber-200"
+                      className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-200"
                     >
                       <PlusIcon className="h-4 w-4" />
                       Thêm Content

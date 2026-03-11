@@ -7,7 +7,7 @@ type Props = {
 
 const ProjectOverview: React.FC<Props> = ({ project }) => {
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:gap-8 items-start mb-8 lg:mb-12 overflow-hidden">
+    <section className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:gap-8 items-start mb-8 lg:mb-12">
       <div
         data-aos="fade-right"
         data-aos-duration="800"
