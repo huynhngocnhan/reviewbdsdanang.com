@@ -13,10 +13,11 @@ const FloorPlan: React.FC<Props> = ({ project }) => {
 
   return (
     <section data-aos="fade-up"
-    data-aos-duration="800"
-    data-aos-delay="200" className="mt-12 px-8 lg:px-12 sm:mt-16 items-center justify-center">
+        data-aos-duration="800"
+        data-aos-delay="200" 
+        className="mt-12 px-8 lg:px-12 sm:mt-16 items-center justify-center">
       <h2 className="text-2xl sm:text-3xl font-extrabold text-amber-800 text-center uppercase tracking-tight">Sơ Đồ Mặt bằng {project.title}</h2>
-      <p className="mt-2 text-gray-600 text-center">
+      <p className="mt-2 text-gray-600 text-center mx-auto max-w-7xl">
         {floorplans.map((plan) => plan.description).join(" ") ||
           "Thông tin mặt bằng đang được cập nhật."}
       </p>

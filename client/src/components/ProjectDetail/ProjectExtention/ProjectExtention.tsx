@@ -14,7 +14,7 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
   const hasAmenitiesWithImages = amenitiesWithImages.length > 0;
 
   return (
-    <section className="mt-12 sm:mt-20 bg-gray-100 py-12 px-8 lg:px-24">
+    <section className="mt-12 sm:mt-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-24">
       <div data-aos="fade-up"
         data-aos-duration="1000"
         data-aos-delay="200" 
@@ -26,21 +26,21 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start lg:justify-center">
         <div data-aos="fade-right"
         data-aos-duration="800"
-        data-aos-delay="200"  className="lg:col-span-3">
+        data-aos-delay="200"  className="lg:col-span-4 lg:col-start-2">
           {hasExtentionImages ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid grid-cols-2 gap-2">
               {extentionImages.map((item, index) => (
                 <article
                   key={`${item.title}-${index}`}
-                  className="flex items-center gap-3 rounded-[12px] border border-gray-200 bg-white p-3.5 shadow-sm transition-all hover:border-amber-300 hover:shadow-md"
+                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 shadow-sm transition-all hover:border-amber-400 hover:shadow-md"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50">
-                    <span className="text-sm font-bold text-amber-600">{index + 1}</span>
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                    <span className="text-[10px] font-bold text-amber-600">{index + 1}</span>
                   </div>
-                  <h4 className="text-sm font-medium text-gray-800 leading-tight">{item.title}</h4>
+                  <h4 className="text-xs font-medium text-gray-800">{item.title}</h4>
                 </article>
               ))}
             </div>
@@ -53,13 +53,13 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
 
         <div data-aos="fade-left"
         data-aos-duration="800"
-        data-aos-delay="300" className="lg:col-span-9">
+        data-aos-delay="300" className="lg:col-span-5">
           {hasAmenitiesWithImages ? (
             <div className="h-full overflow-hidden rounded-[15px] shadow-xl">
               <Carousel autoplay dots className="project-extention-carousel">
                 {amenitiesWithImages.map((image, index) => (
                   <div key={`${image.src}-${index}`}>
-                    <div className="relative h-[220px] sm:h-[300px] lg:h-[500px]">
+                    <div className="relative h-[200px] sm:h-[300px] lg:h-[320px]">
                       <img
                         src={image.src}
                         alt={image.alt}

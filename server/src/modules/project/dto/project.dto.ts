@@ -27,6 +27,20 @@ export const FloorplanCategorySchema = z.object({
   floorPlanImage: z.array(ProjectGallerySchema),
 });
 
+// Custom Section Content schema
+export const CustomContentSchema = z.object({
+  contentTitle: z.string(),
+  contentDes: z.string(),
+  images: z.array(ProjectGallerySchema),
+});
+
+// Custom Section schema
+export const CustomSectionSchema = z.object({
+  customTitle: z.string(),
+  customDes: z.string().optional(),
+  contents: z.array(CustomContentSchema),
+});
+
 // Create Project DTO - matching mockup data format
 export const CreateProjectDtoSchema = z.object({
   slug: z.string().min(1).max(200),
@@ -76,6 +90,9 @@ export const CreateProjectDtoSchema = z.object({
 
   // Floorplan section
   floorplans: z.array(FloorplanCategorySchema).default([]),
+
+  // Custom Sections
+  customSections: z.array(CustomSectionSchema).default([]),
 
   // SEO fields
   coverImage: z.string().optional(),

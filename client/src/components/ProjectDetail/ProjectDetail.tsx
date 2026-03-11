@@ -11,6 +11,7 @@ import ProjectLocate from "./ProjectLocate/ProjectLocate";
 import ProjectExtention from "./ProjectExtention/ProjectExtention";
 import FloorPlan from "./FloorPlan/FloorPlan";
 import ProjectGallery from "./ProjectGallery/ProjectGallery";
+import CustomSection from "./CustomSection/CustomSection";
 import { Divider } from "antd";
 
 const ProjectDetail: React.FC = () => {
@@ -88,8 +89,8 @@ const ProjectDetail: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
           <div className="absolute inset-x-0 bottom-0">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10">
-              <div className="max-w-3xl">
+            <div className="max-w-6xl mx-auto px-4 md:px-8 sm:px-4 pb-10">
+              <div className="max-w-4xl">
                 <p className="text-amber-300/90 font-semibold tracking-wide text-sm">
                   {project.locationText}
                 </p>
@@ -144,16 +145,17 @@ const ProjectDetail: React.FC = () => {
 
           <ProjectOverview project={project} />
 
-        <div className="px-8 lg:px-24">
+        <div className="px-4 sm:px-6 lg:px-24">
         <Divider/>
         </div>
           <ProjectLocate project={project} />
           <ProjectExtention project={project} />
           <FloorPlan project={project} />
-          <div className="px-8 lg:px-24">
+          <div className="px-4 sm:px-6 lg:px-24">
         <Divider/>
         </div>
-          <ProjectGallery project={project} />
+        {project.customSections && project.customSections.length > 0 && <CustomSection project={project} />}
+        {project.gallery && project.gallery.length > 0 && <ProjectGallery project={project}/>}
 
         
 

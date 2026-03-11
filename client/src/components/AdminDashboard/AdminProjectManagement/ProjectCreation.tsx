@@ -12,8 +12,9 @@ import {
   PhotoIcon as GalleryIcon,
   CloudArrowUpIcon,
   XMarkIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
-import type { ProjectData, ProjectCategory, ProjectExtentionImage } from "../../../constants/projectData";
+import type { ProjectData, ProjectCategory, ProjectExtentionImage, CustomSectionItem } from "../../../constants/projectData";
 import { adminService } from "../../../services/admin.service";
 import { projectService } from "../../../services/project.service";
 
@@ -58,10 +59,11 @@ const defaultFormData: ProjectFormData = {
   extentionDescription: "",
   extentionImages: [],
   floorplans: [],
+  customSections: [],
   highlights: [],
 };
 
-type TabType = "basic" | "overview" | "location" | "extention" | "floorplan" | "gallery";
+type TabType = "basic" | "overview" | "location" | "extention" | "floorplan" | "gallery" | "custom";
 
 // Image preview component
 const ImagePreview = ({
@@ -128,6 +130,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   const extentionImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const floorplanImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const galleryImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const customImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   // Fetch project data when in edit mode
   useEffect(() => {
@@ -159,6 +162,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
             extentionDescription: project.extentionDescription || "",
             extentionImages: project.extentionImages || [],
             floorplans: project.floorplans || [],
+            customSections: project.customSections || [],
             highlights: project.highlights || [],
           });
         }
@@ -180,6 +184,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     { id: "extention", label: "Tiện ích", icon: BuildingOfficeIcon },
     { id: "floorplan", label: "Mặt bằng", icon: Squares2X2Icon },
     { id: "gallery", label: "Thư viện ảnh", icon: GalleryIcon },
+    { id: "custom", label: "Custom", icon: DocumentTextIcon },
   ];
 
   const updateField = <K extends keyof ProjectFormData>(field: K, value: ProjectFormData[K]) => {
@@ -369,6 +374,19 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         extentionDescription: formData.extentionDescription || undefined,
         extentionImages: formData.extentionImages?.filter(e => e.title || e.src),
         floorplans: formData.floorplans.filter(f => f.floorPlanImage.some(img => img.src)),
+        customSections: formData.customSections
+          ?.filter(cs => cs.customTitle)
+          .map(cs => ({
+            customTitle: cs.customTitle,
+            customDes: cs.customDes || undefined,
+            contents: cs.contents
+              ?.filter(c => c.contentTitle || c.contentDes || c.images.some(img => img.src))
+              .map(c => ({
+                contentTitle: c.contentTitle,
+                contentDes: c.contentDes,
+                images: c.images.filter(img => img.src),
+              })),
+          })),
         highlights: formData.highlights,
       };
 
@@ -986,6 +1004,411 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     </div>
   );
 
+  const renderCustom = () => {
+    const customSections = formData.customSections || [];
+
+    const addCustomSection = () => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: [
+          ...(prev.customSections || []),
+          { customTitle: "", customDes: "", contents: [] },
+        ],
+      }));
+    };
+
+    const removeCustomSection = (sectionIndex: number) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).filter((_, i) => i !== sectionIndex),
+      }));
+    };
+
+    const updateCustomSectionField = (sectionIndex: number, field: "customTitle" | "customDes", value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).map((cs, i) =>
+          i === sectionIndex ? { ...cs, [field]: value } : cs
+        ),
+      }));
+    };
+
+    const addContentToSection = (sectionIndex: number) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).map((cs, i) =>
+          i === sectionIndex
+            ? { ...cs, contents: [...(cs.contents || []), { contentTitle: "", contentDes: "", images: [] }] }
+            : cs
+        ),
+      }));
+    };
+
+    const removeContentFromSection = (sectionIndex: number, contentIndex: number) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).map((cs, i) =>
+          i === sectionIndex
+            ? { ...cs, contents: (cs.contents || []).filter((_, ci) => ci !== contentIndex) }
+            : cs
+        ),
+      }));
+    };
+
+    const updateContentField = (sectionIndex: number, contentIndex: number, field: "contentTitle" | "contentDes", value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).map((cs, si) =>
+          si === sectionIndex
+            ? {
+                ...cs,
+                contents: (cs.contents || []).map((c, ci) =>
+                  ci === contentIndex ? { ...c, [field]: value } : c
+                ),
+              }
+            : cs
+        ),
+      }));
+    };
+
+    const addImageToContent = (sectionIndex: number, contentIndex: number) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).map((cs, si) =>
+          si === sectionIndex
+            ? {
+                ...cs,
+                contents: (cs.contents || []).map((c, ci) =>
+                  ci === contentIndex
+                    ? { ...c, images: [...(c.images || []), { src: "", alt: "" }] }
+                    : c
+                ),
+              }
+            : cs
+        ),
+      }));
+    };
+
+    const updateContentImage = (sectionIndex: number, contentIndex: number, imageIndex: number, field: "src" | "alt", value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        customSections: (prev.customSections || []).map((cs, si) =>
+          si === sectionIndex
+            ? {
+                ...cs,
+                contents: (cs.contents || []).map((c, ci) =>
+                  ci === contentIndex
+                    ? {
+                        ...c,
+                        images: (c.images || []).map((img, ii) =>
+                          ii === imageIndex ? { ...img, [field]: value } : img
+                        ),
+                      }
+                    : c
+                ),
+              }
+            : cs
+        ),
+      }));
+    };
+
+    const handleCustomImageUpload = async (
+      sectionIndex: number,
+      contentIndex: number,
+      imageIndex: number,
+      folder: string,
+      onSuccess: (url: string) => void,
+      inputKey: string
+    ) => {
+      const file = customImageInputRefs.current[inputKey]?.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        toast.error("Chỉ cho phép upload file hình ảnh");
+        return;
+      }
+
+      try {
+        setUploadingImages((prev) => ({ ...prev, [inputKey]: true }));
+
+        const presign = await adminService.getPresignedUrl({
+          fileName: file.name,
+          contentType: file.type,
+          folder,
+        });
+
+        await fetch(presign.uploadUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": file.type,
+          },
+          body: file,
+        });
+
+        const createdAsset = await adminService.createAsset({
+          key: presign.key,
+          url: presign.publicUrl,
+          contentType: file.type,
+          size: file.size,
+          type: "IMAGE",
+        });
+
+        onSuccess(createdAsset?.url ?? presign.publicUrl);
+        toast.success("Upload ảnh thành công");
+        if (customImageInputRefs.current[inputKey]) {
+          customImageInputRefs.current[inputKey]!.value = "";
+        }
+      } catch {
+        toast.error("Upload ảnh thất bại");
+      } finally {
+        setUploadingImages((prev) => ({ ...prev, [inputKey]: false }));
+      }
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Header with Add Button */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-800">Custom Sections</h3>
+          <button
+            type="button"
+            onClick={addCustomSection}
+            className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Thêm Custom Section
+          </button>
+        </div>
+
+        {/* Custom Sections List */}
+        {customSections.length === 0 ? (
+          <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center">
+            <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-300" />
+            <p className="mt-2 text-gray-500">Chưa có custom section nào.</p>
+            <p className="text-sm text-gray-400">Bấm "Thêm Custom Section" để tạo.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {customSections.map((customSection, sectionIndex) => (
+              <div key={sectionIndex} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                {/* Section Header */}
+                <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-4">
+                  <h4 className="font-semibold text-gray-700">Custom Section {sectionIndex + 1}</h4>
+                  <button
+                    type="button"
+                    onClick={() => removeCustomSection(sectionIndex)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* Custom Title */}
+                <div className="mb-4">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Tiêu đề Custom
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    placeholder="Layout tổng thể của dự án"
+                    value={customSection.customTitle || ""}
+                    onChange={(e) => updateCustomSectionField(sectionIndex, "customTitle", e.target.value)}
+                  />
+                </div>
+
+                {/* Custom Description */}
+                <div className="mb-6">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Mô tả Custom
+                  </label>
+                  <textarea
+                    className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    placeholder="Nhập mô tả custom section"
+                    rows={3}
+                    value={customSection.customDes || ""}
+                    onChange={(e) => updateCustomSectionField(sectionIndex, "customDes", e.target.value)}
+                  />
+                </div>
+
+                {/* Contents */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Danh sách Content
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => addContentToSection(sectionIndex)}
+                      className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-200"
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                      Thêm Content
+                    </button>
+                  </div>
+
+                  {(customSection.contents || []).map((content, contentIndex) => (
+                    <div
+                      key={contentIndex}
+                      className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <h5 className="font-medium text-gray-700">Content {contentIndex + 1}</h5>
+                        <button
+                          type="button"
+                          onClick={() => removeContentFromSection(sectionIndex, contentIndex)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      {/* Content Title */}
+                      <div className="mb-3">
+                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                          Tiêu đề Content
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                          placeholder="LAYOUT Tòa S1"
+                          value={content.contentTitle || ""}
+                          onChange={(e) =>
+                            updateContentField(sectionIndex, contentIndex, "contentTitle", e.target.value)
+                          }
+                        />
+                      </div>
+
+                      {/* Content Description */}
+                      <div className="mb-4">
+                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                          Mô tả Content
+                        </label>
+                        <textarea
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                          placeholder="Nhập mô tả content"
+                          rows={2}
+                          value={content.contentDes || ""}
+                          onChange={(e) =>
+                            updateContentField(sectionIndex, contentIndex, "contentDes", e.target.value)
+                          }
+                        />
+                      </div>
+
+                      {/* Images */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-medium text-gray-600">
+                            Hình ảnh
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addImageToContent(sectionIndex, contentIndex)}
+                            className="inline-flex items-center gap-1 rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-300"
+                          >
+                            <PlusIcon className="h-3 w-3" />
+                            Thêm ảnh
+                          </button>
+                        </div>
+
+                        {content.images?.map((image, imageIndex) => {
+                          const inputKey = `custom-${sectionIndex}-${contentIndex}-${imageIndex}`;
+                          return (
+                            <div
+                              key={imageIndex}
+                              className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-white p-3"
+                            >
+                              <div className="flex items-start gap-2">
+                                <div className="flex-1">
+                                  {image.src ? (
+                                    <ImagePreview
+                                      src={image.src}
+                                      alt={image.alt}
+                                      height="h-32"
+                                      onRemove={() =>
+                                        updateContentImage(sectionIndex, contentIndex, imageIndex, "src", "")
+                                      }
+                                    />
+                                  ) : (
+                                    <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-4">
+                                      <label className="cursor-pointer inline-flex flex-col items-center gap-1 text-sm text-gray-500 hover:text-amber-600">
+                                        <CloudArrowUpIcon className="h-6 w-6" />
+                                        <span>Tải ảnh lên</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          ref={(el) => {
+                                            customImageInputRefs.current[inputKey] = el;
+                                          }}
+                                          onChange={() =>
+                                            handleCustomImageUpload(
+                                              sectionIndex,
+                                              contentIndex,
+                                              imageIndex,
+                                              `projects/custom/${sectionIndex}/${contentIndex}`,
+                                              (url: string) =>
+                                                updateContentImage(
+                                                  sectionIndex,
+                                                  contentIndex,
+                                                  imageIndex,
+                                                  "src",
+                                                  url
+                                                ),
+                                              inputKey
+                                            )
+                                          }
+                                        />
+                                      </label>
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    updateContentImage(sectionIndex, contentIndex, imageIndex, "src", "")
+                                  }
+                                  className="text-gray-400 hover:text-red-500"
+                                >
+                                  <XMarkIcon className="h-5 w-5" />
+                                </button>
+                              </div>
+                              <input
+                                type="text"
+                                className="w-full rounded-lg border bg-white border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                placeholder="Mô tả ảnh (alt)"
+                                value={image.alt || ""}
+                                onChange={(e) =>
+                                  updateContentImage(
+                                    sectionIndex,
+                                    contentIndex,
+                                    imageIndex,
+                                    "alt",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  {(customSection.contents || []).length === 0 && (
+                    <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm">
+                      Chưa có content nào.
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderGallery = () => (
     <div className="space-y-6">
       <div>
@@ -1083,6 +1506,8 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         return renderFloorplan();
       case "gallery":
         return renderGallery();
+      case "custom":
+        return renderCustom();
       default:
         return null;
     }

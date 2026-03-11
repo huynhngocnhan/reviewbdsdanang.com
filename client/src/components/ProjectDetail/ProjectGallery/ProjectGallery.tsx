@@ -20,7 +20,7 @@ const ProjectGallery: React.FC<Props> = ({ project }) => {
 
       <div className="relative h-[200px] w-full overflow-hidden sm:h-[300px] lg:h-[300px]">
         {hasGallery ? (
-          <div className="absolute left-0 top-2 w-max animate-gallery-infinite sm:top-4 lg:top-6">
+          <div className="absolute left-0 top-2 w-max animate-gallery-infinite sm:top-4 lg:top-6" style={{ overflowX: 'hidden' }}>
             <div className="flex items-start gap-2 px-3 sm:gap-3 sm:px-4">
               {loopImages.map((image, index) => (
                 <article

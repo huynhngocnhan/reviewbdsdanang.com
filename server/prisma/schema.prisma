@@ -31,6 +31,7 @@ enum SectionType {
   PROGRESS
   FAQ
   CTA
+  CUSTOM
 }
 
 enum AssetProvider {
@@ -220,6 +221,9 @@ model Project {
 
   /// Mặt bằng (vd: [{description, floorPlanImage}])
   floorplans Json?
+
+  /// Custom Sections (vd: [{customTitle, customDes, contents: [{contentTitle, contentDes, images}]}])
+  customSections Json?
 
   /// Admin tạo dự án
   createdByAdminId String
