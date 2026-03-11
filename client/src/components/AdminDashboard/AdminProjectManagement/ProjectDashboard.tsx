@@ -49,8 +49,6 @@ const ProjectDashboard = () => {
       }
 
       const response = await projectService.getProjects({ limit: 100 });
-      console.log(response);
-      
 
       if (response.success && response.data) {
         // Transform API data to match component format

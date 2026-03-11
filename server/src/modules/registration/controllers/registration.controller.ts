@@ -11,24 +11,26 @@ export class RegistrationController {
     try {
       const { fullname, email, phonenum, project, note } = req.body;
 
-      // Validate required fields
-      if (!fullname || !email || !phonenum) {
+      // Validate required fields (fullname and phonenum are required, email is optional)
+      if (!fullname || !phonenum) {
         return res.status(400).json({
-          message: "Vui lòng nhập đầy đủ thông tin (họ tên, email, số điện thoại)",
+          message: "Vui lòng nhập đầy đủ thông tin (họ tên, số điện thoại)",
         });
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({
-          message: "Email không hợp lệ",
-        });
+      // Validate email format only if provided (email is optional)
+      if (email && email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({
+            message: "Email không hợp lệ",
+          });
+        }
       }
 
       const report = await registrationService.register({
         fullname: fullname.trim(),
-        email: email.trim().toLowerCase(),
+        email: email?.trim() || null,
         phonenum: phonenum.trim(),
         project: project?.trim(),
         note: note?.trim(),

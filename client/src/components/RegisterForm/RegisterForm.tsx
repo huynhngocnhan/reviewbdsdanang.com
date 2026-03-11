@@ -102,16 +102,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ projects }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-          {/* Email */}
+          {/* Email - Optional */}
           <div className="relative">
             <label htmlFor="email" className={labelClasses}>
-              *Địa chỉ Email
+              Địa chỉ Email (Tuỳ chọn)
             </label>
             <input
               type="email"
               id="email"
               name="email"
-              required
               className={inputClasses}
               value={formData.email}
               onChange={handleChange}

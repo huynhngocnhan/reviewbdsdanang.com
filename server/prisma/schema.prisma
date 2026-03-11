@@ -283,8 +283,8 @@ model Report {
   id        String       @id @default(uuid())
   /// Họ và tên khách hàng
   fullname  String
-  /// Email khách hàng
-  email     String
+  /// Email khách hàng (optional - nếu có sẽ nhận được auto-reply)
+  email     String?
   /// Số điện thoại khách hàng
   phonenum  String
   /// Dự án khách hàng quan tâm

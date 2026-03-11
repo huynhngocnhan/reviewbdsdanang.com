@@ -17,17 +17,17 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@reviewbdsdanang.com";
 
 interface RegisterEmailData {
   fullname: string;
-  email: string;
+  email: string | null;
   phonenum: string;
-  project: string;
-  note: string;
+  project?: string;
+  note?: string;
 }
 
 /**
  * Gửi email thông báo cho admin khi có khách hàng đăng ký tư vấn
  */
 export async function sendAdminNotification(data: RegisterEmailData): Promise<void> {
-  const subject = `📢 Yêu cầu tư vấn mới từ: ${data.fullname}`;
+  const subject = `📩 Yêu cầu tư vấn mới từ: ${data.fullname}`;
 
   const htmlContent = `
     <div style="margin:0; padding:0; width:100%; background:#f5f5f5;">
@@ -59,7 +59,7 @@ export async function sendAdminNotification(data: RegisterEmailData): Promise<vo
                       </tr>
                       <tr>
                         <td style="padding:10px 12px; border:1px solid #fde68a; background:#fffbeb; width:160px; font-weight:700; color:#92400e; border-top:none;">Email:</td>
-                        <td style="padding:10px 12px; border:1px solid #fde68a; border-left:none; background:#ffffff; border-top:none;">${data.email}</td>
+                        <td style="padding:10px 12px; border:1px solid #fde68a; border-left:none; background:#ffffff; border-top:none;">${data.email || "Không có"}</td>
                       </tr>
                       <tr>
                         <td style="padding:10px 12px; border:1px solid #fde68a; background:#fffbeb; width:160px; font-weight:700; color:#92400e; border-top:none;">Số điện thoại:</td>
@@ -107,9 +107,15 @@ export async function sendAdminNotification(data: RegisterEmailData): Promise<vo
 
 /**
  * Gửi email tự động cho khách hàng (auto-reply)
+ * Chỉ gọi khi data.email có giá trị
  */
 export async function sendAutoReply(data: RegisterEmailData): Promise<void> {
-  const subject = "📧(No Reply) Xác nhận đăng ký tư vấn - reviewbdsdanang.com";
+  if (!data.email) {
+    console.warn("Cannot send auto-reply: email is missing");
+    return;
+  }
+
+  const subject = "✅[no-reply] Xác nhận đăng ký tư vấn - reviewbdsdanang.com";
 
   const htmlContent = `
     <div style="margin:0; padding:0; width:100%; background:#f5f5f5;">

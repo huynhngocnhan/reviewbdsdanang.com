@@ -3,7 +3,7 @@ import { sendAdminNotification, sendAutoReply } from "../../../lib/email";
 
 interface RegisterData {
   fullname: string;
-  email: string;
+  email: string | null;
   phonenum: string;
   project?: string;
   note?: string;
@@ -29,15 +29,17 @@ export class RegistrationService {
       },
     });
 
-    // 2. Gửi email thông báo cho admin (không chờ đợi)
+    // 2. Gửi email thông báo cho admin (luôn gửi, không chờ đợi)
     sendAdminNotification(data).catch((error) => {
       console.error("Failed to send admin notification email:", error);
     });
 
-    // 3. Gửi email auto-reply cho khách hàng (không chờ đợi)
-    sendAutoReply(data).catch((error) => {
-      console.error("Failed to send auto-reply email:", error);
-    });
+    // 3. Gửi email auto-reply cho khách hàng CHỈ KHI có email (không chờ đợi)
+    if (data.email) {
+      sendAutoReply(data).catch((error) => {
+        console.error("Failed to send auto-reply email:", error);
+      });
+    }
 
     return report;
   }
