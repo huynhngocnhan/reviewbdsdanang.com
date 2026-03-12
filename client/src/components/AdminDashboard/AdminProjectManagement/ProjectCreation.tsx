@@ -14,7 +14,7 @@ import {
   XMarkIcon,
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
-import type { ProjectData, ProjectCategory, ProjectExtentionImage, CustomSectionItem } from "../../../constants/projectData";
+import type { ProjectData, ProjectCategory, ProjectExtentionImage } from "../../../constants/projectData";
 import { adminService } from "../../../services/admin.service";
 import { projectService } from "../../../services/project.service";
 
@@ -1113,9 +1113,9 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     };
 
     const handleCustomImageUpload = async (
-      sectionIndex: number,
-      contentIndex: number,
-      imageIndex: number,
+      _sectionIndex: number,
+      _contentIndex: number,
+      _imageIndex: number,
       folder: string,
       onSuccess: (url: string) => void,
       inputKey: string

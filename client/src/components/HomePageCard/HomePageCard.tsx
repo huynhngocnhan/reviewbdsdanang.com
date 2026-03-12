@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type React from "react";
 import { Divider } from "antd";
-import { Link } from "react-router-dom";
 import type { ProjectData, ProjectCategory } from "../../constants/projectData";
 
 type Props = {
