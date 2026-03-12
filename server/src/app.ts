@@ -10,7 +10,14 @@ import registrationRoutes from "./modules/registration/routes/registration.route
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://reviewbdsdanang.com",
+    "https://www.reviewbdsdanang.com"
+  ],
+  credentials: true,
+}));
 app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 
