@@ -7,12 +7,13 @@ const VideoBanner: React.FC = () => {
         autoPlay
         muted
         loop
+        preload="auto"
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source
           src="https://pub-a9b8df18947f4374831f1b23a3452a21.r2.dev/banners/f04507dc-b036-4a4b-bd7d-e53329194578.mp4"
-          type="video/webm"
+          type="video/mp4"
         />
         Your browser does not support the video tag.
       </video>
