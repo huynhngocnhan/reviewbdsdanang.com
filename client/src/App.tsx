@@ -23,7 +23,7 @@ const App: React.FC = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      <ContactOverlay phoneNumber="0901830909" zaloUrl="https://zalo.me/0901830909" />
+      <ContactOverlay phoneNumber="0901830909" zaloUrl="https://zalo.me/0901830909" tiktokUrl="https://www.tiktok.com/@reviewbdsdanang.com"/>
     </BrowserRouter>
   );
 };

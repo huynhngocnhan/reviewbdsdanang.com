@@ -9,8 +9,8 @@ const ProjectLocate: React.FC<Props> = ({ project }) => {
   return (
 
     <div className="px-4 sm:px-6 lg:px-12 space-y-4 text-center mt-4 lg:mt-8 max-w-7xl mx-auto">
-          <h2 data-aos="flip-left"
-    data-aos-duration="800"
+    <h2 data-aos="zoom-in-down"
+    data-aos-duration="600"
     data-aos-delay="200" 
     className="text-2xl sm:text-3xl font-extrabold text-amber-800 uppercase tracking-tight">Vị trí {project.title}</h2>
           <p className="text-gray-700 leading-relaxed  mx-auto "> {project.locationDescription} </p>

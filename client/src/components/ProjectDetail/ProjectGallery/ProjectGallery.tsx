@@ -11,7 +11,7 @@ const ProjectGallery: React.FC<Props> = ({ project }) => {
   const loopImages = [...images, ...images, ...images];
 
   return (
-    <section className="pt-4 lg:pt-8 ">
+    <section id="gallery" className="pt-4 lg:pt-8 scroll-mt-20">
       <h2 data-aos="fade-left"
     data-aos-duration="800"
     data-aos-delay="200" className="mb-4 text-center text-xl font-extrabold uppercase tracking-tight text-amber-800 sm:mb-6 sm:text-2xl lg:text-3xl">

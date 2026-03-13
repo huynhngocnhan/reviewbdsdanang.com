@@ -15,10 +15,10 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
       ? projectData
       : projectData.filter((item) => item.category === activeFilter);
 
-  const buttonBaseClass = "px-3 py-2 text-xs font-medium rounded-2xl transition-colors sm:px-6 sm:py-3 sm:text-sm sm:rounded-3xl";
-  const buttonActiveClass = "border-red-600 bg-yellow-600/90 text-white";
+  const buttonBaseClass = "px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 sm:px-6 sm:py-3 sm:text-base sm:rounded-2xl w-full sm:w-auto";
+  const buttonActiveClass = "bg-[#8F6552] text-white border-none shadow-lg";
   const buttonInactiveClass =
-    "border-gray-400 bg-gray-300 text-gray-800 hover:border-gray-500";
+    "bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700";
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 bg-gray-100/90">
