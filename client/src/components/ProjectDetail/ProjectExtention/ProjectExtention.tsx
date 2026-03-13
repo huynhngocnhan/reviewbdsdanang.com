@@ -20,7 +20,7 @@ const ProjectExtention: React.FC<Props> = ({ project }) => {
         data-aos-delay="200" 
         className="justify-center mb-8 sm:mb-10 text-center">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-amber-800 uppercase tracking-tight">Tiện ích nổi bật</h2>
-        <p className="mx-auto mt-2 max-w-3xl text-gray-600">
+        <p className="mx-auto mt-2 max-w-6xl text-gray-600">
           {project.extentionDescription ??
             "Những đặc quyền nâng tầm trải nghiệm sống và giá trị khai thác."}
         </p>

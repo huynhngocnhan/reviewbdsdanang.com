@@ -89,45 +89,41 @@ const ProjectDetail: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
           <div className="absolute inset-x-0 bottom-0">
-            <div className="max-w-6xl mx-auto px-4 md:px-8 sm:px-4 pb-10">
-              <div className="max-w-4xl">
-                <p className="text-amber-300/90 font-semibold tracking-wide text-sm">
-                  {project.locationText}
-                </p>
-                <h1 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                  {project.title}
-                </h1>
-                <p className="mt-3 text-white/85 text-base sm:text-lg">
-                  {project.subtitle}
-                </p>
+          <div className="max-w-6xl mx-auto px-4 pb-10 lg:ml-24 xl:ml-32 2xl:ml-40">
+  <div className="max-w-4xl">
 
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {project.highlights.map((h) => (
-                    <span
-                      key={h}
-                      className="rounded-full bg-amber-500/15 border border-amber-300/40 px-3 py-1 text-xs font-semibold text-amber-100"
-                    >
-                      {h}
-                    </span>
-                  ))}
-                </div>
+    <p className="text-amber-300/90 font-semibold tracking-wide text-sm">
+      {project.locationText}
+    </p>
 
-                <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <a
-                    href="#register"
-                    className="inline-flex items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-sm font-bold text-white hover:bg-amber-600 duration-300 transition "
-                  >
-                    Đăng ký tư vấn
-                  </a>
-                  <a
-                    href="#gallery"
-                    className="inline-flex items-center justify-center rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white border border-white/20 hover:bg-white/15 duration-300 transition "
-                  >
-                    Xem thư viện ảnh
-                  </a>
-                </div>
-              </div>
+    <h1 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+      {project.title}
+    </h1>
+
+    <p className="mt-3 text-white/85 text-base sm:text-lg">
+      {project.subtitle}
+    </p>
+
+    <div className="mt-5 flex flex-wrap gap-2">
+      {project.highlights.map((h) => (
+        <span
+          key={h}
+          className="rounded-full bg-amber-500/15 border border-amber-300/40 px-3 py-1 text-xs font-semibold text-amber-100"
+        >
+          {h}
+        </span>
+      ))}
+    </div>
+
+    <div className="mt-6 flex flex-col sm:flex-row gap-3"> 
+      <a href="#register" className="inline-flex items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-sm font-bold text-white hover:bg-amber-600 duration-300 transition " >
+         Đăng ký tư vấn </a>
+          <a href="#gallery" className="inline-flex items-center justify-center rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white border border-white/20 hover:bg-white/15 duration-300 transition " > 
+          Xem thư viện ảnh </a>
             </div>
+      </div>
+    </div>
+
           </div>
         </div>
       </section>
@@ -135,7 +131,7 @@ const ProjectDetail: React.FC = () => {
       <main className="w-full pt-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-amber-800 uppercase tracking-tight">
-            {project.title}
+            Dự án {project.title}
           </h2>
           <p className="mt-4 text-gray-700 leading-relaxed max-w-4xl mx-auto italic">
             {project.intro}
