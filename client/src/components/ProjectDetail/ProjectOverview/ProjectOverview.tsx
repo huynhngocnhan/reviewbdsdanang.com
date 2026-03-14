@@ -5,6 +5,7 @@ type Props = {
   project: ProjectData;
 };
 
+
 const ProjectOverview: React.FC<Props> = ({ project }) => {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:gap-8 items-stretch mb-8 lg:mb-12">
@@ -14,8 +15,8 @@ const ProjectOverview: React.FC<Props> = ({ project }) => {
         className="lg:col-span-5 relative group"
       >
         <div className="relative px-2.5 lg:px-0">
-    <div className="relative overflow-hidden rounded-md md:rounded-s-none shadow-2xl min-h-[300px] sm:min-h-[500px] lg:min-h-[600px] h-full">
-
+      <div className="relative overflow-hidden rounded-md md:rounded-s-none shadow-2xl min-h-[300px] sm:min-h-[500px] lg:min-h-[600px] h-full">
+    
       <img
         src={project.heroImage}
         alt={project.title}
@@ -23,7 +24,6 @@ const ProjectOverview: React.FC<Props> = ({ project }) => {
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-
     </div>
   </div>
       </div>

@@ -133,7 +133,7 @@ const ProjectDetail: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl font-extrabold text-amber-800 uppercase tracking-tight">
             Dự án {project.title}
           </h2>
-          <p className="mt-4 text-gray-700 leading-relaxed max-w-4xl mx-auto italic">
+          <p className="mt-4 text-gray-700 leading-relaxed mx-auto italic border-l-4 border-amber-500 pl-4">
             {project.intro}
           </p>
         </div>
