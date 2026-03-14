@@ -359,7 +359,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         title: formData.title,
         subtitle: formData.subtitle || undefined,
         shortDescription: formData.shortDescription,
-        longDescription: formData.intro || undefined,
+        intro: formData.intro || undefined,
         category: formData.category,
         projectType: formData.projectType || undefined,
         city: "Đà Nẵng", // Default city
