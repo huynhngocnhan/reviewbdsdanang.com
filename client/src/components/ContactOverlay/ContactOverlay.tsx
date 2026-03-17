@@ -5,12 +5,14 @@ type ContactOverlayProps = {
   phoneNumber?: string;
   zaloUrl?: string;
   tiktokUrl?: string;
+  facebookUrl?: string;
 };
 
 const ContactOverlay: React.FC<ContactOverlayProps> = ({
   phoneNumber = "0900000000",
   zaloUrl = "https://zalo.me/0900000000",
   tiktokUrl = "https://www.tiktok.com/@reviewbdsdanang.com",
+  facebookUrl = "https://www.facebook.com/Tienquangvilla"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,6 +38,15 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({
       bg: "bg-[#0068FF]",
       ring: "hover:ring-blue-300",
       icon: <span className="text-xs font-bold tracking-tight">Zalo</span>,
+    },
+    {
+      label: "Facebook",
+      href: facebookUrl,
+      target: "_blank",
+      delay: "delay-[60ms]",
+      bg: "bg-[#0068FF]",
+      ring: "hover:ring-blue-300",
+      icon: <span className="text-xs font-bold tracking-tight">Fb</span>,
     },
     {
       label: "Gọi điện",
@@ -98,11 +109,9 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({
             <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" className="h-6 w-6 fill-current text-white" aria-hidden="true">
-            <circle cx="5" cy="12" r="2" />
-            <circle cx="12" cy="12" r="2" />
-            <circle cx="19" cy="12" r="2" />
-          </svg>
+          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <path d="M6.62 10.79a15.466 15.466 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.85 21 3 13.15 3 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z" />
+        </svg>
         )}
       </button>
     </div>
