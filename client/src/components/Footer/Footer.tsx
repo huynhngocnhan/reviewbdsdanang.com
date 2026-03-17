@@ -65,6 +65,11 @@ const Footer: React.FC = () => {
       .slice(0, 5);
   }, [profile?.mediaLinks]);
 
+  function formatPhone(phone: string) {
+  const cleaned = phone.replace(/\D/g, "");
+  return cleaned.replace(/(\d{4})(\d{2})(\d{4})/, "$1 $2 $3");
+}
+
   return (
     <footer className="border-t border-amber-100 bg-white">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
@@ -93,9 +98,13 @@ const Footer: React.FC = () => {
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">{tagline}</p>
 
               <div className="mt-5 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <ContactChip href={`tel:${phone.replace(/\s+/g, "")}`}>{phone}</ContactChip>
-                <ContactChip href={`mailto:${email}`}>{email}</ContactChip>
-                <ContactChip>{address}</ContactChip>
+                <ContactChip href={`tel:${phone.replace(/\s+/g, "")}`}>📞 {formatPhone(phone)}</ContactChip>
+                <ContactChip href={`mailto:${email}`}>📧 {email}</ContactChip>
+                <ContactChip
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+                >
+                  📍 {address}
+                </ContactChip>
               </div>
             </div>
 
@@ -141,7 +150,7 @@ const ContactChip: React.FC<React.PropsWithChildren<{ href?: string }>> = ({ hre
   if (!href) return <span className={cls}>{children}</span>;
 
   return (
-    <a href={href} className={`${cls} transition hover:border-amber-300 hover:bg-amber-50`}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={`${cls} transition hover:border-amber-300 hover:bg-amber-50`}>
       {children}
     </a>
   );
