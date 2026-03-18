@@ -18,7 +18,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
   const buttonBaseClass = "px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 sm:px-6 sm:py-3 sm:text-base sm:rounded-2xl w-full sm:w-auto";
   const buttonActiveClass = "bg-[#8F6552] text-white border-none shadow-lg";
   const buttonInactiveClass =
-    "bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700";
+    "bg-white text-gray-700 border border-gray-300 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700";
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 bg-gray-100/90">
@@ -36,6 +36,14 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
           data-aos-delay="100"
           className="flex flex-wrap justify-center gap-2 sm:gap-4"
         >
+          <button
+            onClick={() => setActiveFilter("all")}
+            className={`${buttonBaseClass} ${
+              activeFilter === "all" ? buttonActiveClass : buttonInactiveClass
+            }`}
+          >
+            Tất cả dự án
+          </button>
           <button
             onClick={() => setActiveFilter("SUN")}
             className={`${buttonBaseClass} ${
@@ -70,8 +78,9 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
           </p>
         ) : (
           filteredProjects.map((item, index) => (
-            <div
+            <a
               key={item.id}
+              href={`/project/${item.slug}`}
               data-aos="fade-up"
               data-aos-duration="800"
               data-aos-delay={index * 100}
@@ -107,7 +116,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
                   </span>
                 </a>
               </div>
-            </div>
+            </a>
           ))
         )}
       </div>
