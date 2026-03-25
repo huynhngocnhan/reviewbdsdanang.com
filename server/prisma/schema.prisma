@@ -190,6 +190,26 @@ model Project {
   /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"]) - matching mockup
   highlights String[] @default([])
 
+  /// [NEW] Có hiển thị dự án ở trang chủ hay không
+  /// - Admin bật/tắt để tránh trang chủ hiển thị quá nhiều dự án
+  showOnHome Boolean @default(false)
+
+  /// [NEW] Thứ tự ưu tiên hiển thị trên trang chủ (số nhỏ lên trước)
+  /// - Có thể để null nếu không cần ưu tiên
+  homeOrder Int?
+
+  /// [NEW] Cấu hình sticky menu theo anchor (overlay trái/phải, danh sách mục)
+  stickyMenu Json?
+
+  /// [NEW] Hero mini-form lấy SĐT + nhu cầu
+  heroLeadForm Json?
+
+  /// [NEW] Floating CTA mở rộng (ngoài phone/zalo mặc định)
+  floatingCtas Json?
+
+  /// [NEW] SEO head mở rộng + JSON-LD
+  seoHead Json?
+
   /// Hero image cho section tổng quan
   heroImage String?
 
@@ -219,8 +239,41 @@ model Project {
   /// Tiện ích - hình ảnh (vd: [{src, alt, title, description}])
   extentionImages Json?
 
-  /// Mặt bằng (vd: [{description, floorPlanImage}])
+  /// Mặt bằng (legacy) (vd: [{description, floorPlanImage}])
   floorplans Json?
+
+  /// [NEW] Lý do chọn mua (vd: [{title, description, icon, image}])
+  reasonToBuy Json?
+
+  /// [NEW] Chính sách bán hàng (vd: {title, bullets:[], media:[{type:"image|pdf",src}], cta})
+  salesPolicy Json?
+
+  /// [NEW] Mặt bằng tổng quan (vd: [{src, alt, title}])
+  floorplanMaster Json?
+
+  /// [NEW] Mặt bằng tầng (vd: [{floor, images:[{src, alt}]}])
+  floorplanByFloor Json?
+
+  /// [NEW] Loại căn hộ (vd: [{name, area, description, images:[{src, alt}]}])
+  unitLayouts Json?
+
+  /// [NEW] Tiến độ dự án theo mốc thời gian (vd: [{label, date, description}])
+  progressMilestones Json?
+
+  /// [NEW] Tiến độ dự án - gallery (vd: [{src, alt, capturedAt}])
+  progressGallery Json?
+
+  /// [NEW] Tiến độ dự án - video YouTube URL (embed/watch)
+  progressVideoUrl String?
+
+  /// [NEW] FAQ (vd: [{question, answer}])
+  faqs Json?
+
+  /// [NEW] Pháp lý bổ sung (vd: [{title, value, fileUrl}])
+  legalInfo Json?
+
+  /// [NEW] Disclaimer quảng cáo
+  advertisingDisclaimer String?
 
   /// Custom Sections (vd: [{customTitle, customDes, contents: [{contentTitle, contentDes, images}]}])
   customSections Json?
@@ -239,6 +292,7 @@ model Project {
   @@index([status])
   @@index([category])
   @@index([city, district])
+  @@index([showOnHome, homeOrder]) // [NEW] hỗ trợ query trang chủ nhanh hơn
 }
 
 model ProjectSection {

@@ -9,7 +9,7 @@ type ContactOverlayProps = {
 };
 
 const ContactOverlay: React.FC<ContactOverlayProps> = ({
-  phoneNumber = "0900000000",
+  phoneNumber = "0938885879",
   zaloUrl = "https://zalo.me/0900000000",
   tiktokUrl = "https://www.tiktok.com/@reviewbdsdanang.com",
   facebookUrl = "https://www.facebook.com/Tienquangvilla"
@@ -103,9 +103,9 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({
           relative flex h-14 w-14 items-center justify-center rounded-full shadow-xl
           transition-all duration-300 hover:scale-110
           ${isOpen
-            ? "bg-[#8F6552] rotate-90"
-            : "bg-[#8F6552] hover:bg-[#7a5444]"
-          }
+        ? "bg-[#8F6552] rotate-90"
+        : "bg-[#ef4444] hover:bg-red-600"
+      }
         `}
       >
         {/* Ping ring khi đóng */}
@@ -113,11 +113,11 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#8F6552]/40" />
         )}
         {isOpen ? (
-          <svg viewBox="0 0 24 24" className="h-6 w-6 fill-current text-white" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="h-6 w-6 " aria-hidden="true">
             <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white" aria-hidden="true">
           <path d="M6.62 10.79a15.466 15.466 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.85 21 3 13.15 3 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z" />
         </svg>
         )}

@@ -80,7 +80,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
           filteredProjects.map((item, index) => (
             <a
               key={item.id}
-              href={`/project/${item.slug}`}
+              href={`/du-an/${item.slug}`}
               data-aos="fade-up"
               data-aos-duration="800"
               data-aos-delay={index * 100}
@@ -107,7 +107,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
                   {item.shortDescription}
                 </p>
                 <a
-                  href={`/project/${item.slug}`}
+                  href={`/du-an-v2/${item.slug}`}
                   className="group inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-700 font-medium text-sm py-2 px-4 rounded-lg border border-amber-500/50 hover:border-amber-500 hover:bg-amber-50 transition-all duration-300 hover:scale-105 hover:shadow-md"
                 >
                   Xem chi tiết
