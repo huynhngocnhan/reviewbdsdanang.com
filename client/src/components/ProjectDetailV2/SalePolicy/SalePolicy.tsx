@@ -1,5 +1,6 @@
 import type React from "react";
 import type { ProjectData } from "../../../constants/projectData";
+import ZoomableImage from "../../ZoomableImage";
 
 type Props = {
   project: ProjectData;
@@ -24,13 +25,12 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
         </div>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-<div className="overflow-hidden rounded-2xl shadow-2xl">
-            <img
-              src={project.salePolicy?.policyImage || project.coverImage}
-              alt={`${project.title} - Chính sách bán hàng`}
-              className="w-full h-full object-cover min-h-[600px]"
-            />
-          </div>
+          <ZoomableImage
+            src={project.salePolicy?.policyImage || project.coverImage}
+            alt={`${project.title} - Chính sách bán hàng`}
+            className="rounded-2xl shadow-2xl"
+            imageClassName="min-h-[400px] lg:min-h-[600px]"
+          />
           
           <div className="flex flex-col gap-4 justify-between">
             <div className="rounded-2xl border-2 border-[#C96B5B] bg-[#F9F3EC] p-5 sm:p-7 shadow-xl">

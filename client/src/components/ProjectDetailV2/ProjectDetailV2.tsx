@@ -11,6 +11,8 @@ import ReasonToBuy from "./ReasonToBuy/ReasonToBuy";
 import SalePolicy from "./SalePolicy/SalePolicy";
 import LeadForm from "./LeadForm/LeadForm";
 import ProjectLocationV2 from "./ProjectLocationV2/ProjectLocationV2";
+import LeftOverlay from "../LeftOverlay/LeftOverlay";
+
 
 const ProjectDetailV2: React.FC = () => {
   const { slug } = useParams();
@@ -149,6 +151,7 @@ const ProjectDetailV2: React.FC = () => {
             <RegisterForm projects={registerProjects} />
           </section>
       </main>
+      <LeftOverlay projectTitle={project.title} projectImage={project.coverImage} />
 
       <Footer />
     </div>

@@ -34,6 +34,12 @@ const RegisterModalForm: React.FC<Props> = ({
     }
   }, [isOpen]);
 
+  const todayLabel = new Date().toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
   if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -84,8 +90,8 @@ const RegisterModalForm: React.FC<Props> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="p-6 sm:p-8 md:p-10">
-            <h3 className="text-2xl font-extrabold text-[#5C4033]">Bảng giá hôm nay</h3>
-            <p className="mt-2 text-sm text-[#7A5A43]">Thông tin của quý khách sẽ được bảo mật theo <span className="text-[#5C4033]">theo chính sách và quyền riêng tư</span></p>
+            <h3 className="text-2xl text-center font-extrabold text-[#5C4033]">Bảng giá hôm nay {todayLabel}</h3>
+            <p className="mt-2 text-sm text-center text-[#7A5A43]">Thông tin của quý khách sẽ được bảo mật theo <span className="font-extrabold text-[#8A6A4F] underline decoration-2 underline-offset-2">chính sách và quyền riêng tư</span></p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <input
@@ -95,7 +101,7 @@ const RegisterModalForm: React.FC<Props> = ({
                 placeholder="Họ và tên"
                 value={formData.fullname}
                 onChange={handleChange}
-                className="h-12 w-full rounded-xl border border-[#D8C3AD] bg-white px-4 text-[#5C4033] outline-none focus:border-[#8A6A4F]"
+                className="h-10 w-full rounded-xl border border-[#D8C3AD] bg-white px-4 text-[#5C4033] outline-none focus:border-[#8A6A4F]"
               />
               <input
                 type="tel"
@@ -104,7 +110,7 @@ const RegisterModalForm: React.FC<Props> = ({
                 placeholder="Số điện thoại"
                 value={formData.phonenum}
                 onChange={handleChange}
-                className="h-12 w-full rounded-xl border border-[#D8C3AD] bg-white px-4 text-[#5C4033] outline-none focus:border-[#8A6A4F]"
+                className="h-10 w-full rounded-xl border border-[#D8C3AD] bg-white px-4 text-[#5C4033] outline-none focus:border-[#8A6A4F]"
               />
               <input
                 type="email"
@@ -112,15 +118,19 @@ const RegisterModalForm: React.FC<Props> = ({
                 placeholder="Email (không bắt buộc)"
                 value={formData.email}
                 onChange={handleChange}
-                className="h-12 w-full rounded-xl border border-[#D8C3AD] bg-white px-4 text-[#5C4033] outline-none focus:border-[#8A6A4F]"
+                className="h-10 w-full rounded-xl border border-[#D8C3AD] bg-white px-4 text-[#5C4033] outline-none focus:border-[#8A6A4F]"
               />
               <button
                 type="submit"
                 disabled={loading}
                 className="h-12 w-full rounded-xl bg-[#8A6A4F] font-bold text-white transition hover:bg-[#735743] disabled:opacity-60"
               >
-                {loading ? "Đang gửi..." : "Đăng ký tư vấn"}
+                {loading ? "Đang gửi..." : "Đăng ký nhận bảng giá"}
               </button>
+
+              <p className="w-full rounded-lg bg-[#EADBCB] px-3 py-2 text-center text-sm font-semibold text-[#5C4033]">
+                Hotline: 093 888 5879
+              </p>
 
               {message && (
                 <p className={`text-sm ${message.type === "success" ? "text-emerald-700" : "text-red-700"}`}>

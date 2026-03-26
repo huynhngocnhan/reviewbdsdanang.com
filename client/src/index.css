@@ -108,6 +108,19 @@ body {
   animation: floatBtn 1.5s ease-in-out infinite;
 }
 
+@keyframes floatX {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-6px); /* sang trái */
+  }
+}
+
+.btn-float-x {
+  animation: floatX 1.5s ease-in-out infinite;
+}
+
 @keyframes zoomText {
   0%, 100% {
     transform: scale(1);
