@@ -11,7 +11,10 @@ import ReasonToBuy from "./ReasonToBuy/ReasonToBuy";
 import SalePolicy from "./SalePolicy/SalePolicy";
 import LeadForm from "./LeadForm/LeadForm";
 import ProjectLocationV2 from "./ProjectLocationV2/ProjectLocationV2";
+import FloorPlanV2 from "./FloorPlan/FloorPlanV2";
+import FullWidthForm from "../FullWidthForm/FullWidthForm";
 import LeftOverlay from "../LeftOverlay/LeftOverlay";
+import ApartmentDesign from "./ApartmentDesign/ApartmentDesign";
 
 
 const ProjectDetailV2: React.FC = () => {
@@ -146,6 +149,15 @@ const ProjectDetailV2: React.FC = () => {
         </section>
         <section className="bg-[#8A6A4F] py-10">
           <ProjectLocationV2 project={project} />
+        </section>
+        <section>
+          <FloorPlanV2 project={project} />
+        </section>
+        <section>
+          <FullWidthForm project={project} />
+        </section>
+        <section className="bg-[#8A6A4F] py-4">
+          <ApartmentDesign project={project} />
         </section>
           <section id="register" >
             <RegisterForm projects={registerProjects} />

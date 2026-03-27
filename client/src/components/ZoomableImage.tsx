@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   src: string;
@@ -36,28 +37,30 @@ const ZoomableImage: React.FC<Props> = ({
         )}
       </button>
 
-      {isPreviewOpen && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
-          onClick={() => setIsPreviewOpen(false)}
-        >
-          <button
-            type="button"
+      {isPreviewOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 p-4"
             onClick={() => setIsPreviewOpen(false)}
-            className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xl font-bold text-[#17372F] hover:bg-white"
-            aria-label="Đóng ảnh phóng to"
           >
-            ×
-          </button>
+            <button
+              type="button"
+              onClick={() => setIsPreviewOpen(false)}
+              className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xl font-bold text-[#17372F] hover:bg-white"
+              aria-label="Đóng ảnh phóng to"
+            >
+              ×
+            </button>
 
-          <img
-            src={src}
-            alt={`${alt} (phóng to)`}
-            className="max-h-[90vh] w-auto max-w-[95vw] rounded-xl object-contain shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
+            <img
+              src={src}
+              alt={`${alt} (phóng to)`}
+              className="max-h-[90vh] w-auto max-w-[95vw] rounded-xl object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>,
+          document.body,
+        )}
     </>
   );
 };
