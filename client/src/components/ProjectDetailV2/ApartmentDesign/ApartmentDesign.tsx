@@ -2,6 +2,7 @@ import { useState } from "react";
 import type React from "react";
 
 import type { ProjectData } from "../../../constants/projectData";
+import ApartmentForm from "../../ApartmentForm/ApartmentForm";
 
 type Props = {
   project: ProjectData;
@@ -10,6 +11,7 @@ type Props = {
 type ApartmentDesignItem = {
   title: string;
   badge: string;
+  price: string;
   image: string;
 };
 
@@ -35,36 +37,42 @@ const apartmentDesignMock: {
     {
       title: "Studio",
       badge: "Studio",
+      price: "5,1 tỷ/căn",
       image:
         "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80",
     },
     {
       title: "1 Phòng ngủ",
       badge: "1PN",
+      price: "5,2 tỷ/căn",
       image:
         "https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=1200&q=80",
     },
     {
       title: "2 Phòng ngủ",
       badge: "2PN",
+      price: "5,3 tỷ/căn",
       image:
         "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
     },
     {
       title: "3 Phòng ngủ",
       badge: "3PN",
+      price: "5,4 tỷ/căn",
       image:
         "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
     },
     {
       title: "3PN Lift",
       badge: "3PNL",
+      price: "5,1 tỷ/căn",
       image:
         "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
     },
     {
       title: "4 Phòng ngủ",
       badge: "4PN",
+      price: "5,1 tỷ/căn",
       image:
         "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80",
     },
@@ -75,7 +83,8 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
   const [selectedImage, setSelectedImage] = useState<ApartmentDesignItem | null>(null);
   const { apartmentDesignDes, items } = apartmentDesignMock;
 
-  return (    <section className="text-white" aria-labelledby="apartment-design-title">
+  return (
+    <section className="text-white" aria-labelledby="apartment-design-title">
       <div className="mx-auto max-w-6xl px-4 py-14">
         <header className="text-center">
           <p className="text-lg font-semibold uppercase tracking-[0.28em] text-white">Thiết kế căn hộ</p>
@@ -83,7 +92,7 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
             id="apartment-design-title"
             className="mt-3 text-4xl font-extrabold uppercase text-[#ffe228] sm:text-5xl"
           >
-            {project.title}
+            {project.title} 
           </h2>
           <p className="mx-auto mt-4 max-w-3xl text-base text-white/90 sm:text-lg">
             {apartmentDesignDes.description}
@@ -103,7 +112,7 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
           {items.map((item) => (
             <article
               key={`${item.title}-${item.badge}`}
-              className="group relative overflow-hidden bg-emerald-800 rounded-xl shadow-[0_18px_40px_rgba(0,0,0,0.25)]"
+              className="group relative overflow-hidden rounded-xl bg-[#17372F]/40 shadow-[0_18px_40px_rgba(0,0,0,0.25)]"
             >
               <div className="absolute left-4 top-4 z-10 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#2C2C2C] shadow-lg">
                 {item.badge}
@@ -128,14 +137,23 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
               </button>
 
               <div className="px-5 pb-6 pt-4">
-                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm text-white/70">
+                <h3>
+                  <span className="flex justify-between text-lg font-semibold uppercase text-white">
+                    {item.title}
+                    <span className="rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1 text-sm text-white/90">
+                      {item.price}
+                    </span>
+                  </span>
+                </h3>
+                <p className="mt-2 text-sm text-white/90">
                   Thiết kế tối ưu ánh sáng tự nhiên và công năng, phù hợp đa dạng nhu cầu sử dụng.
                 </p>
               </div>
             </article>
           ))}
         </div>
+
+        <ApartmentForm apartmentOptions={items} project={project}/>
       </div>
 
       {selectedImage && (
@@ -144,10 +162,10 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
             <button
               type="button"
               onClick={() => setSelectedImage(null)}
-              className="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20"
+              className="absolute right-4 top-4 rounded-full bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-white/20"
               aria-label="Đóng ảnh"
             >
-              Đóng
+              X
             </button>
 
             <img

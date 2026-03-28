@@ -17,6 +17,18 @@ export interface ProjectExtentionImage {
   description: string;
 }
 
+export interface HandoverStandardItem {
+  subtitle: string;
+  title?: string;
+  des: string;
+  imgUrl: string;
+}
+
+export interface HandoverStandardData {
+  des: string;
+  items: HandoverStandardItem[];
+}
+
 export interface FloorplanCategory {
   description: string;
   floorPlanImage: ProjectGallery[];
@@ -80,6 +92,7 @@ export interface ProjectData {
   gallery: ProjectGallery[];
   extentionDescription?: string;
   extentionImages?: ProjectExtentionImage[];
+  handoverStandard?: HandoverStandardData;
   floorplans: FloorplanCategory[];
   customSections?: CustomSectionItem[];
   salePolicy?: SalePolicyData;
@@ -162,6 +175,35 @@ export const MOCK_PROJECTS: ProjectData[] = [
         description: "Không gian tiếp khách sang trọng, ngắm toàn cảnh thành phố.",
       },
     ],
+    handoverStandard: {
+      des: "Tiêu chuẩn bàn giao được hoàn thiện tỉ mỉ theo định hướng sống cao cấp, ưu tiên vật liệu bền vững, thẩm mỹ hiện đại và tối ưu công năng cho từng không gian.",
+      items: [
+        {
+          subtitle: "Không gian",
+          title: "Phòng khách",
+          des: "Phòng khách được bàn giao trần thạch cao giật cấp, hệ đèn âm trần và bề mặt hoàn thiện đồng bộ, mang lại cảm giác sang trọng và thoáng rộng.",
+          imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+        },
+        {
+          subtitle: "Không gian",
+          title: "Phòng bếp",
+          des: "Khu bếp trang bị hệ tủ trên - dưới, mặt đá bếp chống bám bẩn và khu vực chờ thiết bị âm tủ, đảm bảo thẩm mỹ và công năng sử dụng.",
+          imgUrl: "https://images.unsplash.com/photo-1556912167-f556f1f39d24?auto=format&fit=crop&w=1400&q=80",
+        },
+        {
+          subtitle: "Không gian",
+          title: "Phòng ngủ",
+          des: "Không gian phòng ngủ chú trọng ánh sáng tự nhiên, cửa kính lớn và bề mặt hoàn thiện ấm áp để nâng cao trải nghiệm nghỉ ngơi.",
+          imgUrl: "https://images.unsplash.com/photo-1616594039964-3f3b4f5dc68b?auto=format&fit=crop&w=1400&q=80",
+        },
+        {
+          subtitle: "Hệ vật liệu",
+          title: "Kính Low-E",
+          des: "Hệ cửa kính Low-E giúp hạn chế tia UV, giảm hấp thụ nhiệt và tăng hiệu quả cách âm cho không gian sống yên tĩnh.",
+          imgUrl: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=1400&q=80",
+        },
+      ],
+    },
     floorplans: [
       {
         description: "Mặt bằng căn hộ được tối ưu công năng, đón gió và ánh sáng tự nhiên cho không gian sống thoáng đãng.",
@@ -250,6 +292,23 @@ Dự án phù hợp với nhóm khách hàng ưu tiên thanh khoản, khả năn
         description: "Tổ hợp tiện ích cộng đồng với thiết kế hiện đại, phục vụ cư dân đa thế hệ.",
       },
     ],
+    handoverStandard: {
+      des: "Dự án định hình tiêu chuẩn bàn giao theo phong cách tinh gọn hiện đại, chú trọng vật liệu hoàn thiện và trải nghiệm sử dụng thực tế cho cư dân trẻ.",
+      items: [
+        {
+          subtitle: "Không gian",
+          title: "Phòng khách",
+          des: "Không gian tiếp khách bố trí mở, liên thông ban công và khu bếp để tối ưu kết nối gia đình.",
+          imgUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80",
+        },
+        {
+          subtitle: "Không gian",
+          title: "Phòng vệ sinh",
+          des: "Thiết bị vệ sinh cao cấp, bố trí khoa học và dễ bảo trì trong quá trình sử dụng lâu dài.",
+          imgUrl: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1400&q=80",
+        },
+      ],
+    },
     floorplans: [
       {
         description: "Các phương án mặt bằng mẫu đang được cập nhật chi tiết theo từng dòng sản phẩm.",

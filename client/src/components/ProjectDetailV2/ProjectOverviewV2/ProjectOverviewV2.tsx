@@ -43,7 +43,7 @@ const ProjectOverviewV2: React.FC<Props> = ({ project }) => {
               >
                 {project.title}
               </h2>
-              <p className="mt-4 border-l-4 text-base md:text-[15px] border-[#A67C52] pl-4 text-[#6B4E3D] italic leading-relaxed">
+              <p className="whitespace-pre-line mt-4 border-l-4 text-base md:text-[15px] border-[#A67C52] pl-4 text-[#6B4E3D] italic leading-relaxed">
                 {project.intro}
               </p>
             </header>

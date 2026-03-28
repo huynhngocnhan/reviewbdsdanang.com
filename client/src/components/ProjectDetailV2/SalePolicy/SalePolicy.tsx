@@ -11,13 +11,11 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
     <section className="w-full py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 tracking-wide uppercase">
+          <h2 className="text-2xl text-gray-900 sm:text-3xl font-bold uppercase tracking-[0.2em]">
             Chính sách bán hàng
           </h2>
-          <h3 className="font-['Montserrat'] mt-2 text-2xl sm:text-3xl font-extrabold text-gray-700 tracking-tight">
-            <span className="bg-gradient-to-b from-amber-500 to-amber-600 bg-clip-text text-transparent">
+          <h3 className=" bg-gradient-to-b from-amber-500 to-amber-600 bg-clip-text text-transparent mt-2 text-4xl sm:text-5xl font-extrabold uppercase tracking-tight">
               {project.title}
-            </span>
           </h3>
           <p className="mt-4 max-w-5xl font-semibold mx-auto text-[#6B4E3D] leading-relaxed">
             Dự án áp dụng chính sách bán hàng và hỗ trợ tài chính linh hoạt dành cho khách hàng. Bao gồm các phương thức thanh toán, ưu đãi và chương trình hỗ trợ lãi suất theo từng giai đoạn. Chi tiết chính sách và bảng ưu đãi được trình bày trong phần thông tin bên dưới.

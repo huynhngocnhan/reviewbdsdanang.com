@@ -25,8 +25,8 @@ enum SectionType {
   OVERVIEW
   LOCATION
   GALLERY // Phối cảnh
-  EXTENTION
-  FLOORPLAN
+  EXTENTION // tiện ích
+  FLOORPLAN // mặt bằng
   PRICE
   PROGRESS
   FAQ

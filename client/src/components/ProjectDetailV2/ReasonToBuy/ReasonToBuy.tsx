@@ -17,7 +17,7 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
   const mockProject = MOCK_PROJECTS.find((p) => p.slug === project.slug);
 
   const reasonToBuyTitle =
-    project.reasonToBuyTitle || mockProject?.reasonToBuyTitle || "Giá trị cốt lõi của dự án";
+    project.reasonToBuyTitle || mockProject?.reasonToBuyTitle || "Giá trị cốt lõi";
   const reasonToBuyDescription =
     project.reasonToBuyDescription ||
     mockProject?.reasonToBuyDescription ||
@@ -59,14 +59,14 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
     <section className="w-full bg-transparent py-8 md:py-10" id="reason-to-buy">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h2 className="font-['Montserrat'] text-[#faf5f2] text-3xl sm:text-4xl font-extrabold tracking-tight">
-            {reasonToBuyTitle} <span className="text-[#f9de2b]">{project.title}</span>
+          <h2 className="text-2xl text-white sm:text-3xl font-extrabold uppercase tracking-[0.16em]">
+            {reasonToBuyTitle} <span className="text-4xl lg:text-5xl font-extrabold text-[#f9de2b]">{project.title}</span>
           </h2>
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-8 lg:mt-10 lg:grid-cols-2 lg:gap-10 items-start">
           <div className="rounded-2xl p-4 sm:p-7 text-[#6B4E3D]">
-            <p className="whitespace-pre-line text-base sm:text-lg leading-8 italic text-gray-100">{reasonToBuyDescription}</p>
+            <p className="whitespace-pre-line text-lg lg:text-base leading-8 italic text-gray-100">{reasonToBuyDescription}</p>
 
             <div className="mt-6 rounded-2xl border border-[#C8A889] bg-[#E9D9C8] p-5 sm:p-6 shadow-xl">
               <h3 className="text-xl sm:text-2xl font-bold text-[#5C4033] uppercase tracking-wide">

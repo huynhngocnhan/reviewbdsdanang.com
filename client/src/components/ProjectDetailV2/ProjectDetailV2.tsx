@@ -15,7 +15,8 @@ import FloorPlanV2 from "./FloorPlan/FloorPlanV2";
 import FullWidthForm from "../FullWidthForm/FullWidthForm";
 import LeftOverlay from "../LeftOverlay/LeftOverlay";
 import ApartmentDesign from "./ApartmentDesign/ApartmentDesign";
-
+import ProjectExtentionV2 from "./ProjectExtentionV2/ProjectExtentionV2";
+import HandoverStandard from "./HandoverStandard/HandoverStandard";
 
 const ProjectDetailV2: React.FC = () => {
   const { slug } = useParams();
@@ -79,7 +80,7 @@ const ProjectDetailV2: React.FC = () => {
       <Header />
 
       <section className="relative">
-        <div className="relative h-[80vh] min-h-[480px] w-full overflow-hidden">
+        <div className="relative h-[90vh] min-h-screen w-full overflow-hidden">
           <img
             src={project.coverImage}
             alt={project.title}
@@ -88,7 +89,7 @@ const ProjectDetailV2: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
           <div className="absolute inset-x-0 bottom-0">
-            <div className="max-w-6xl mx-auto px-4 pb-10 lg:ml-24 xl:ml-32 2xl:ml-40">
+            <div className="max-w-6xl mx-auto px-4 pb-20 lg:ml-24 xl:ml-32 2xl:ml-40">
               <div className="max-w-4xl">
                 <p className="text-amber-300/90 font-semibold tracking-wide text-sm">
                   {project.locationText}
@@ -132,7 +133,7 @@ const ProjectDetailV2: React.FC = () => {
       </section>
 
       <main className="w-full bg-[#F3E8DC]">
-        <section className="bg-[#8A6A4F] py-10">
+        <section className="bg-[#876347] py-10">
           <ReasonToBuy project={project} />
         </section>
 
@@ -140,14 +141,14 @@ const ProjectDetailV2: React.FC = () => {
           <SalePolicy project={project} />
         </section>
 
-        <section className="bg-[#8A6A4F]">
+        <section>
           <LeadForm project={project} projectOptions={registerProjects} />
         </section>
 
         <section className="bg-[#F3E8DC] py-12">
           <ProjectOverviewV2 project={project} />
         </section>
-        <section className="bg-[#8A6A4F] py-10">
+        <section className="bg-[#876347] py-10">
           <ProjectLocationV2 project={project} />
         </section>
         <section>
@@ -156,10 +157,16 @@ const ProjectDetailV2: React.FC = () => {
         <section>
           <FullWidthForm project={project} />
         </section>
-        <section className="bg-[#8A6A4F] py-4">
+        <section className="bg-[#876347] py-4">
           <ApartmentDesign project={project} />
         </section>
-          <section id="register" >
+        <section className="bg-[#876347]">
+          <ProjectExtentionV2 project={project} />
+        </section>
+        <section className="bg-[#F3E8DC] py-12">
+          <HandoverStandard project={project} />
+        </section>
+        <section id="register" >
             <RegisterForm projects={registerProjects} />
           </section>
       </main>

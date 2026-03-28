@@ -19,8 +19,8 @@ const FloorPlanV2: React.FC<Props> = ({ project }) => {
           >
             Mặt bằng tổng quan <span className="text-4xl md:text-5xl text-[#c76b25]">{project.title}</span>
           </h2>
-          <p className="mx-auto mt-3 max-w-5xl text-sm sm:text-base leading-relaxed text-[#6B4E3D]">
-            {project.floorplans?.map((plan) => plan.description).join(" ")}
+          <p className="mx-auto mt-3 max-w-5xl whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#6B4E3D]">
+            {project.floorplans?.map((plan) => plan.description).join("\n")}
           </p>
         </header>
 

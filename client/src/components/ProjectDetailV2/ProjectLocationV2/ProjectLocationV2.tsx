@@ -77,7 +77,7 @@ const ProjectLocationV2: React.FC<Props> = ({ project }) => {
               {project.title}
             </h3>
 
-            <p className="mt-6 text-white leading-relaxed text-base">{project.locationDescription}</p>
+            <p className="mt-6 whitespace-pre-line text-white leading-relaxed text-base">{project.locationDescription}</p>
 
               <a
                 href={project.location360Url}
