@@ -29,6 +29,57 @@ export interface HandoverStandardData {
   items: HandoverStandardItem[];
 }
 
+export interface ProjectProgressData {
+  des: string;
+  youtubeUrl: string;
+}
+
+export const MOCK_PROJECT_PROGRESS: ProjectProgressData = {
+  des: "Dự án đang được triển khai theo đúng kế hoạch với các hạng mục nền móng, kết cấu và hoàn thiện được giám sát chặt chẽ. Tiến độ thực tế sẽ được cập nhật định kỳ bằng video để khách hàng theo dõi trực quan.",
+  youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+};
+
+export const MOCK_HANDOVER_STANDARD: HandoverStandardData = {
+  des: "Tiêu chuẩn bàn giao mẫu khi chưa có dữ liệu API. Nội thất và vật liệu có thể thay đổi theo từng loại căn hộ và chính sách cập nhật từ chủ đầu tư.",
+  items: [
+    {
+      subtitle: "Không gian",
+      title: "Phòng khách",
+      des: "Bàn giao trần thạch cao, sơn hoàn thiện, hệ đèn âm trần cơ bản và điểm chờ điều hòa theo thiết kế.",
+      imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+    },
+    {
+      subtitle: "Không gian",
+      title: "Phòng ngủ",
+      des: "Sàn hoàn thiện đồng bộ, cửa phòng tiêu chuẩn, bố trí hợp lý đón sáng và thông gió tự nhiên.",
+      imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+    },
+    {
+      subtitle: "Khu chức năng",
+      title: "Phòng bếp",
+      des: "Bàn giao hệ tủ bếp trên dưới, mặt đá bếp, chậu rửa và các điểm chờ thiết bị điện gia dụng.",
+      imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+    },{
+      subtitle: "Không gian",
+      title: "Phòng khách",
+      des: "Bàn giao trần thạch cao, sơn hoàn thiện, hệ đèn âm trần cơ bản và điểm chờ điều hòa theo thiết kế.",
+      imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+    },
+    {
+      subtitle: "Không gian",
+      title: "Phòng ngủ",
+      des: "Sàn hoàn thiện đồng bộ, cửa phòng tiêu chuẩn, bố trí hợp lý đón sáng và thông gió tự nhiên.",
+      imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+    },
+    {
+      subtitle: "Khu chức năng",
+      title: "Phòng bếp",
+      des: "Bàn giao hệ tủ bếp trên dưới, mặt đá bếp, chậu rửa và các điểm chờ thiết bị điện gia dụng.",
+      imgUrl: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=1400&q=80",
+    },
+  ],
+};
+
 export interface FloorplanCategory {
   description: string;
   floorPlanImage: ProjectGallery[];
@@ -93,6 +144,7 @@ export interface ProjectData {
   extentionDescription?: string;
   extentionImages?: ProjectExtentionImage[];
   handoverStandard?: HandoverStandardData;
+  progress?: ProjectProgressData;
   floorplans: FloorplanCategory[];
   customSections?: CustomSectionItem[];
   salePolicy?: SalePolicyData;

@@ -16,8 +16,7 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
 
   const mockProject = MOCK_PROJECTS.find((p) => p.slug === project.slug);
 
-  const reasonToBuyTitle =
-    project.reasonToBuyTitle || mockProject?.reasonToBuyTitle || "Giá trị cốt lõi";
+  const reasonToBuyTitle = project.reasonToBuyTitle || mockProject?.reasonToBuyTitle || "Giá trị cốt lõi";
   const reasonToBuyDescription =
     project.reasonToBuyDescription ||
     mockProject?.reasonToBuyDescription ||
@@ -32,10 +31,9 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
 ✨Chủ đầu tư uy tín, quy hoạch đồng bộ, tiện ích nội khu chất lượng cao.
 ✨Sản phẩm phù hợp cả nhu cầu an cư sang trọng và đầu tư dài hạn.
 ⏳ Trong bất động sản, thời điểm là TẤT CẢ. Người chiến thắng luôn là người đi trước.`;
-  const reasonToBuyImage =
-    project.reasonToBuyImage || mockProject?.reasonToBuyImage || project.heroImage;
+  const reasonToBuyImage = project.reasonToBuyImage || mockProject?.reasonToBuyImage || project.heroImage;
   const reasonToBuyImageAlt =
-    project.reasonToBuyImageAlt || mockProject?.reasonToBuyImageAlt || project.title;
+    project.reasonToBuyImageAlt || mockProject?.reasonToBuyImageAlt || `Lý do nên đầu tư ${project.title}`;
 
   const handleChange = (field: "name" | "phone", value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -56,38 +54,65 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
   };
 
   return (
-    <section className="w-full bg-transparent py-8 md:py-10" id="reason-to-buy">
+    <section
+      id="reason-to-buy"
+      aria-labelledby="reason-to-buy-title"
+      className="w-full bg-transparent py-8 md:py-10"
+      itemScope
+      itemType="https://schema.org/WebPageElement"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl text-white sm:text-3xl font-extrabold uppercase tracking-[0.16em]">
-            {reasonToBuyTitle} <span className="text-4xl lg:text-5xl font-extrabold text-[#f9de2b]">{project.title}</span>
+        <header className="mb-8 text-center">
+          <h2
+            id="reason-to-buy-title"
+            className="text-2xl font-extrabold uppercase tracking-[0.16em] text-white sm:text-3xl lg:text-4xl"
+            itemProp="name"
+          >
+            {reasonToBuyTitle}
+            <span className="mt-3 block text-4xl font-extrabold text-[#f9de2b] sm:text-5xl lg:text-6xl">{project.title}</span>
           </h2>
-        </div>
+        </header>
 
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:mt-10 lg:grid-cols-2 lg:gap-10 items-start">
-          <div className="rounded-2xl p-4 sm:p-7 text-[#6B4E3D]">
-            <p className="whitespace-pre-line text-lg lg:text-base leading-8 italic text-gray-100">{reasonToBuyDescription}</p>
+        <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:mt-10 lg:grid-cols-2 lg:gap-10">
+          <article className="rounded-2xl p-4 text-[#6B4E3D] sm:p-7" itemProp="description">
+            <p className="whitespace-pre-line text-lg italic leading-8 text-gray-100 lg:text-base">{reasonToBuyDescription}</p>
 
-            <div className="mt-6 rounded-2xl border border-[#C8A889] bg-[#E9D9C8] p-5 sm:p-6 shadow-xl">
-              <h3 className="text-xl sm:text-2xl font-bold text-[#5C4033] uppercase tracking-wide">
-                Đăng ký nhận tư vấn
-              </h3>
-              <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => handleChange("name", e.target.value)}
-                    placeholder="Họ và tên"
-                    className="h-10 w-full rounded-xl border border-[#C8A889] bg-[#F7EFE6] px-4 text-[#5C4033] placeholder:text-[#9A7B5E] outline-none transition focus:border-[#8A6A4F]"
-                  />
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleChange("phone", e.target.value)}
-                    placeholder="Số điện thoại"
-                    className="h-10 w-full rounded-xl border border-[#C8A889] bg-[#F7EFE6] px-4 text-[#5C4033] placeholder:text-[#9A7B5E] outline-none transition focus:border-[#8A6A4F]"
-                  />
+            <div className="mt-6 rounded-2xl border border-[#C8A889] bg-[#E9D9C8] p-5 shadow-xl sm:p-6">
+              <h3 className="text-xl font-bold uppercase tracking-wide text-[#5C4033] sm:text-2xl">Đăng ký nhận tư vấn</h3>
+              <form className="mt-4 space-y-3" onSubmit={handleSubmit} noValidate aria-label="Form đăng ký nhận tư vấn dự án">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="reason-name" className="sr-only">
+                      Họ và tên
+                    </label>
+                    <input
+                      id="reason-name"
+                      name="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => handleChange("name", e.target.value)}
+                      placeholder="Họ và tên"
+                      autoComplete="name"
+                      required
+                      className="h-10 w-full rounded-xl border border-[#C8A889] bg-[#F7EFE6] px-4 text-[#5C4033] placeholder:text-[#9A7B5E] outline-none transition focus:border-[#8A6A4F]"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="reason-phone" className="sr-only">
+                      Số điện thoại
+                    </label>
+                    <input
+                      id="reason-phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleChange("phone", e.target.value)}
+                      placeholder="Số điện thoại"
+                      autoComplete="tel"
+                      required
+                      className="h-10 w-full rounded-xl border border-[#C8A889] bg-[#F7EFE6] px-4 text-[#5C4033] placeholder:text-[#9A7B5E] outline-none transition focus:border-[#8A6A4F]"
+                    />
+                  </div>
                 </div>
                 <button
                   type="submit"
@@ -97,25 +122,26 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
                 </button>
               </form>
 
-              {submitted && (
-                <p className="mt-3 text-sm font-medium text-emerald-700">
-                  Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.
-                </p>
-              )}
+              {submitted && <p className="mt-3 text-sm font-medium text-emerald-700">Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.</p>}
 
               {!submitted && formData.phone && !isValidPhone(formData.phone) && (
-                <p className="mt-3 text-sm font-medium text-amber-700">
-                  Số điện thoại chưa đúng định dạng Việt Nam.
-                </p>
+                <p className="mt-3 text-sm font-medium text-amber-700">Số điện thoại chưa đúng định dạng Việt Nam.</p>
               )}
             </div>
-          </div>
+          </article>
 
-          <div className="space-y-5">
+          <figure className="space-y-5">
             <div className="overflow-hidden rounded-lg shadow-2xl">
-              <img src={reasonToBuyImage} alt={reasonToBuyImageAlt} className="h-[500px] lg:h-[700px] w-full object-cover" />
+              <img
+                src={reasonToBuyImage}
+                alt={reasonToBuyImageAlt}
+                className="h-[500px] w-full object-cover lg:h-[700px]"
+                loading="lazy"
+                decoding="async"
+                itemProp="image"
+              />
             </div>
-          </div>
+          </figure>
         </div>
       </div>
     </section>

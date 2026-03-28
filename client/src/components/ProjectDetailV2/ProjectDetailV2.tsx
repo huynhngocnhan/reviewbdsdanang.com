@@ -17,6 +17,7 @@ import LeftOverlay from "../LeftOverlay/LeftOverlay";
 import ApartmentDesign from "./ApartmentDesign/ApartmentDesign";
 import ProjectExtentionV2 from "./ProjectExtentionV2/ProjectExtentionV2";
 import HandoverStandard from "./HandoverStandard/HandoverStandard";
+import ProjectProgress from "./ProjectProgress/ProjectProgress";
 
 const ProjectDetailV2: React.FC = () => {
   const { slug } = useParams();
@@ -163,8 +164,14 @@ const ProjectDetailV2: React.FC = () => {
         <section className="bg-[#876347]">
           <ProjectExtentionV2 project={project} />
         </section>
-        <section className="bg-[#F3E8DC] py-12">
+        <section className="">
           <HandoverStandard project={project} />
+        </section>
+        <section>
+          <FullWidthForm project={project} />
+        </section>
+        <section className="bg-[#876347]">
+          <ProjectProgress project={project} />
         </section>
         <section id="register" >
             <RegisterForm projects={registerProjects} />
