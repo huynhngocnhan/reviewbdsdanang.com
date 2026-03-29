@@ -96,12 +96,12 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
                 )}
 
                 {introItem.imgUrl ? (
-                  <figure className="mt-6 overflow-hidden rounded-sm border border-[#17372F]/15">
+                  <figure className="mt-6 overflow-hidden rounded-lg border border-[#17372F]/15">
                     <ZoomableImage
                       src={introItem.imgUrl}
                       alt={getItemAlt(projectTitle, introItem.subtitle, introItem.title)}
                       className="h-48 w-full sm:h-56"
-                      imageClassName="h-48 w-full object-cover sm:h-56"
+                      imageClassName="h-48 w-full rounded-lg object-cover sm:h-56"
                       showHoverOverlay={false}
                     />
                     <figcaption className="sr-only">{`${getSafeText(introItem.subtitle, "Hạng mục")} - ${getDisplayTitle(introItem.subtitle, introItem.title)}`}</figcaption>
@@ -128,12 +128,12 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
               </div>
 
               {heroItem.imgUrl ? (
-                <figure className="mt-5 overflow-hidden rounded-sm border border-[#17372F]/15">
+                <figure className="mt-5 overflow-hidden rounded-lg border border-[#17372F]/15">
                   <ZoomableImage
                     src={heroItem.imgUrl}
                     alt={getItemAlt(projectTitle, heroItem.subtitle, heroItem.title)}
                     className="h-[300px] w-full sm:h-[380px] lg:h-[430px]"
-                    imageClassName="h-[300px] w-full object-cover transition duration-700 hover:scale-105 sm:h-[380px] lg:h-[430px]"
+                    imageClassName="h-[300px] w-full rounded-lg object-cover transition duration-700 hover:scale-105 sm:h-[380px] lg:h-[430px]"
                     showHoverOverlay={false}
                   />
                   <figcaption className="sr-only">{`${getSafeText(heroItem.subtitle, "Hạng mục")} - ${getDisplayTitle(heroItem.subtitle, heroItem.title)}`}</figcaption>
@@ -163,7 +163,7 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
               return (
                 <article
                   key={`${subtitle}-${title}-${index + 2}`}
-                  className={`border border-[#17372F]/15 bg-[#17372F]/[0.04] p-4 sm:p-5 ${spanClass}`}
+                  className={`border rounded-lg border-[#17372F]/15 bg-[#17372F]/[0.04] p-4 sm:p-5 ${spanClass}`}
                   itemProp="itemListElement"
                   itemScope
                   itemType="https://schema.org/Thing"
@@ -189,12 +189,12 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
                     )}
 
                     {item.imgUrl ? (
-                      <figure className="overflow-hidden rounded-sm border border-[#17372F]/15">
+                      <figure className="overflow-hidden rounded-lg border border-[#17372F]/15">
                         <ZoomableImage
                           src={item.imgUrl}
                           alt={getItemAlt(projectTitle, item.subtitle, item.title)}
                           className="h-64 w-full md:h-72"
-                          imageClassName="h-64 w-full object-cover transition duration-700 hover:scale-105 md:h-72"
+                          imageClassName="h-64 w-full rounded-lg object-cover transition duration-700 hover:scale-105 md:h-72"
                           showHoverOverlay={false}
                         />
                         <figcaption className="sr-only">{`${subtitle} - ${title}`}</figcaption>

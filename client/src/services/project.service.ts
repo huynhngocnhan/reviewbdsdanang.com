@@ -56,6 +56,8 @@ interface ProjectInput {
   handoverTime?: string;
   // Matching mockup: highlights (not highlightTags)
   highlights?: string[];
+  showOnHome?: boolean;
+  homeOrder?: number;
   heroImage?: string;
   specs?: ProjectSpec[];
   coverImage?: string;
