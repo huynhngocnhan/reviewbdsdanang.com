@@ -1,4 +1,3 @@
-import type React from "react";
 import { useState } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import RegisterModalForm from "../../RegisterModalForm/RegisterModalForm";
@@ -8,7 +7,7 @@ type Props = {
   project: ProjectData;
 };
 
-const ProjectOverviewV2: React.FC<Props> = ({ project }) => {
+const ProjectOverviewV2 = ({ project }: Props) => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   return (
@@ -16,9 +15,16 @@ const ProjectOverviewV2: React.FC<Props> = ({ project }) => {
       <section
         className="mx-auto mb-10 w-full max-w-8xl px-4 sm:px-8 lg:mb-16"
         aria-labelledby="project-overview-title"
+        itemScope
+        itemType="https://schema.org/SingleFamilyResidence"
       >
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-11 lg:gap-8">
-          <article data-aos="fade-right" data-aos-duration="800" className="lg:col-span-6">
+          <article
+            data-aos="fade-right"
+            data-aos-duration="800"
+            className="lg:col-span-6"
+            aria-label={`Hình ảnh tổng quan dự án ${project.title}`}
+          >
             <ZoomableImage
               src={project.heroImage}
               alt={`Tổng quan phối cảnh dự án ${project.title}`}
@@ -39,11 +45,15 @@ const ProjectOverviewV2: React.FC<Props> = ({ project }) => {
               </p>
               <h2
                 id="project-overview-title"
+                itemProp="name"
                 className="mt-2 text-2xl font-extrabold uppercase tracking-tight text-[#5C4033] sm:text-4xl"
               >
                 {project.title}
               </h2>
-              <p className="whitespace-pre-line mt-4 border-l-4 text-base md:text-[15px] border-[#A67C52] pl-4 text-[#6B4E3D] italic leading-relaxed">
+              <p
+                itemProp="description"
+                className="whitespace-pre-line mt-4 border-l-4 text-base md:text-[15px] border-[#A67C52] pl-4 text-[#6B4E3D] italic leading-relaxed"
+              >
                 {project.intro}
               </p>
             </header>
@@ -69,6 +79,7 @@ const ProjectOverviewV2: React.FC<Props> = ({ project }) => {
                 type="button"
                 onClick={() => setIsRegisterModalOpen(true)}
                 className="btn-float w-full rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-red-700 sm:w-auto"
+                aria-label={`Đăng ký nhận thông tin dự án ${project.title}`}
               >
                 Đăng ký nhận thông tin dự án
               </button>

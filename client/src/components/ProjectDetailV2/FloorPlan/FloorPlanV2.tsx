@@ -1,4 +1,4 @@
-import type React from "react";
+import { useMemo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
@@ -6,21 +6,41 @@ type Props = {
   project: ProjectData;
 };
 
-const FloorPlanV2: React.FC<Props> = ({ project }) => {
-  const floorPlanImages = (project.floorplans ?? []).flatMap((plan) => plan.floorPlanImage ?? []);
+const FloorPlanV2 = ({ project }: Props) => {
+  const floorPlanImages = useMemo(
+    () => (project.floorplans ?? []).flatMap((plan) => plan.floorPlanImage ?? []),
+    [project.floorplans],
+  );
+  const floorPlanDescription = useMemo(
+    () =>
+      (project.floorplans ?? [])
+        .map((plan) => plan.description)
+        .filter(Boolean)
+        .join("\n"),
+    [project.floorplans],
+  );
 
   return (
-    <section className="w-full bg-gray-100 py-10 md:py-14" aria-labelledby="floorplan-title">
+    <section
+      className="w-full bg-gray-100 py-10 md:py-14"
+      aria-labelledby="floorplan-title"
+      itemScope
+      itemType="https://schema.org/ImageGallery"
+    >
       <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-10">
         <header className="mb-6 text-center">
           <h2
             id="floorplan-title"
+            itemProp="name"
             className="flex flex-col items-center justify-center text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-gray-800"
           >
             Mặt bằng tổng quan <span className="text-4xl md:text-5xl text-[#c76b25]">{project.title}</span>
           </h2>
-          <p className="mx-auto mt-3 max-w-5xl whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#6B4E3D]">
-            {project.floorplans?.map((plan) => plan.description).join("\n")}
+          <p
+            itemProp="description"
+            className="mx-auto mt-3 max-w-5xl whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#6B4E3D]"
+          >
+            {floorPlanDescription}
           </p>
         </header>
 

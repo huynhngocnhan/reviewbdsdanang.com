@@ -1,5 +1,4 @@
-import { useState } from "react";
-import type React from "react";
+import { useMemo, useState } from "react";
 
 import type { ProjectData } from "../../../constants/projectData";
 import ApartmentForm from "../../ApartmentForm/ApartmentForm";
@@ -79,27 +78,38 @@ const apartmentDesignMock: {
   ],
 };
 
-const ApartmentDesign: React.FC<Props> = ({ project }) => {
+const ApartmentDesign = ({ project }: Props) => {
   const [selectedImage, setSelectedImage] = useState<ApartmentDesignItem | null>(null);
   const { apartmentDesignDes, items } = apartmentDesignMock;
+  const apartmentHighlights = useMemo(() => apartmentDesignDes.highlights, [apartmentDesignDes.highlights]);
+  const apartmentItems = useMemo(() => items, [items]);
 
   return (
-    <section className="text-white" aria-labelledby="apartment-design-title">
+    <section
+      className="text-white"
+      aria-labelledby="apartment-design-title"
+      itemScope
+      itemType="https://schema.org/ItemList"
+    >
       <div className="mx-auto max-w-6xl px-4 py-14">
         <header className="text-center">
           <p className="text-lg font-semibold uppercase tracking-[0.28em] text-white">Thiết kế căn hộ</p>
           <h2
             id="apartment-design-title"
+            itemProp="name"
             className="mt-3 text-4xl font-extrabold uppercase text-[#ffe228] sm:text-5xl"
           >
-            {project.title} 
+            {project.title}
           </h2>
-          <p className="mx-auto mt-4 max-w-3xl text-base text-white/90 sm:text-lg">
+          <p
+            itemProp="description"
+            className="mx-auto mt-4 max-w-3xl text-base text-white/90 sm:text-lg"
+          >
             {apartmentDesignDes.description}
           </p>
 
-          <ul className="mx-auto mt-6 grid max-w-4xl gap-2 text-left text-sm text-white sm:grid-cols-2">
-            {apartmentDesignDes.highlights.map((highlight) => (
+          <ul className="mx-auto mt-6 grid max-w-4xl gap-2 text-left text-sm text-white sm:grid-cols-2" aria-label={`Ưu điểm thiết kế căn hộ ${project.title}`}>
+            {apartmentHighlights.map((highlight) => (
               <li key={highlight} className="flex items-start gap-2">
                 <span className="mt-1 inline-flex h-2 w-2 flex-shrink-0 rounded-full bg-amber-400" />
                 <span>{highlight}</span>
@@ -109,11 +119,15 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
         </header>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+          {apartmentItems.map((item, index) => (
             <article
               key={`${item.title}-${item.badge}`}
               className="group relative overflow-hidden rounded-xl bg-[#17372F]/40 shadow-[0_18px_40px_rgba(0,0,0,0.25)]"
+              itemProp="itemListElement"
+              itemScope
+              itemType="https://schema.org/Product"
             >
+              <meta itemProp="position" content={String(index + 1)} />
               <div className="absolute left-4 top-4 z-10 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#2C2C2C] shadow-lg">
                 {item.badge}
               </div>
@@ -127,8 +141,10 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
                 <img
                   src={item.image}
                   alt={`Thiết kế căn hộ ${item.title}`}
+                  itemProp="image"
                   className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 transition group-hover:opacity-60" />
                 <span className="absolute bottom-4 left-4 inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
@@ -137,12 +153,10 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
               </button>
 
               <div className="px-5 pb-6 pt-4">
-                <h3>
-                  <span className="flex justify-between text-lg font-semibold uppercase text-white">
-                    {item.title}
-                    <span className="rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1 text-sm text-white/90">
-                      {item.price}
-                    </span>
+                <h3 className="flex justify-between text-lg font-semibold uppercase text-white" itemProp="name">
+                  <span>{item.title}</span>
+                  <span className="rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1 text-sm text-white/90">
+                    {item.price}
                   </span>
                 </h3>
                 <p className="mt-2 text-sm text-white/90">
@@ -153,12 +167,17 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
           ))}
         </div>
 
-        <ApartmentForm apartmentOptions={items} project={project}/>
+        <ApartmentForm apartmentOptions={apartmentItems} project={project} />
       </div>
 
       {selectedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 py-10">
-          <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-[#111D18] shadow-2xl">
+          <div
+            className="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-[#111D18] shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Ảnh thiết kế ${selectedImage.title}`}
+          >
             <button
               type="button"
               onClick={() => setSelectedImage(null)}
@@ -172,6 +191,7 @@ const ApartmentDesign: React.FC<Props> = ({ project }) => {
               src={selectedImage.image}
               alt={selectedImage.title}
               className="h-[70vh] w-full object-contain bg-black"
+              decoding="async"
             />
 
             <div className="px-6 py-4">

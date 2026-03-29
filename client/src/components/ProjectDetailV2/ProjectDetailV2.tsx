@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -18,24 +17,55 @@ import ApartmentDesign from "./ApartmentDesign/ApartmentDesign";
 import ProjectExtentionV2 from "./ProjectExtentionV2/ProjectExtentionV2";
 import HandoverStandard from "./HandoverStandard/HandoverStandard";
 import ProjectProgress from "./ProjectProgress/ProjectProgress";
+import TabBarOverlay from "../TabBarOverlay/TabBarOverlay";
 
-const ProjectDetailV2: React.FC = () => {
+const projectTabs = [
+  { id: "reason-to-buy", label: "Giá trị cốt lõi" },
+  { id: "sale-policy", label: "Chính sách bán hàng" },
+  { id: "lead-form", label: "Tư vấn đăng ký" },
+  { id: "overview", label: "Tổng quan dự án" },
+  { id: "location", label: "Vị trí dự án" },
+  { id: "floorplan", label: "Mặt bằng tổng quan" },
+  { id: "apartment-design", label: "Thiết kế căn hộ" },
+  { id: "utilities", label: " Hệ tiện ích" },
+  { id: "handover", label: "Tiêu chuẩn bàn giao" },
+  { id: "progress", label: "Tiến độ" },
+  { id: "register", label: "Liên hệ" },
+];
+
+const ProjectDetailV2 = () => {
   const { slug } = useParams();
   const [project, setProject] = useState<ProjectData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => true);
   const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
   useEffect(() => {
-    setLoading(true);
+    let isMounted = true;
+
+    Promise.resolve().then(() => {
+      if (isMounted) setLoading(true);
+    });
+
     projectService
       .getProjectBySlug(slug!)
       .then((res) => {
+        if (!isMounted) return;
         if (res.success && res.data) {
           setProject(res.data);
+        } else {
+          setProject(null);
         }
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (isMounted) setProject(null);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [slug]);
 
   useEffect(() => {
@@ -49,7 +79,8 @@ const ProjectDetailV2: React.FC = () => {
       .catch(() => {});
   }, []);
 
-  const registerProjects = allProjects.map((p) => p.title);
+  const registerProjects = useMemo(() => allProjects.map((p) => p.title), [allProjects]);
+  const projectHighlights = useMemo(() => project?.highlights ?? [], [project]);
 
   if (loading) {
     return (
@@ -80,12 +111,14 @@ const ProjectDetailV2: React.FC = () => {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <section className="relative">
+      <section className="relative" aria-labelledby="project-hero-title">
         <div className="relative h-[90vh] min-h-screen w-full overflow-hidden">
           <img
             src={project.coverImage}
             alt={project.title}
             className="h-full w-full object-cover shadow-lg"
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
@@ -96,14 +129,17 @@ const ProjectDetailV2: React.FC = () => {
                   {project.locationText}
                 </p>
 
-                <h1 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                <h1
+                  id="project-hero-title"
+                  className="mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight"
+                >
                   {project.title}
                 </h1>
 
                 <p className="mt-3 text-white/85 text-base sm:text-lg">{project.subtitle}</p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {project.highlights.map((h) => (
+                  {projectHighlights.map((h) => (
                     <span
                       key={h}
                       className="rounded-full bg-amber-500/15 border border-amber-300/40 px-3 py-1 text-xs font-semibold text-amber-100"
@@ -121,7 +157,7 @@ const ProjectDetailV2: React.FC = () => {
                     Đăng ký tư vấn
                   </a>
                   <a
-                    href="#gallery"
+                    href="#project-content"
                     className="inline-flex items-center justify-center rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white border border-white/20 hover:bg-white/15 duration-300 transition"
                   >
                     Xem thư viện ảnh
@@ -133,44 +169,44 @@ const ProjectDetailV2: React.FC = () => {
         </div>
       </section>
 
-      <main className="w-full bg-[#F3E8DC]">
-        <section className="bg-[#876347] py-10">
+      <main id="project-content" className="w-full bg-[#F3E8DC]">
+        <section id="reason-to-buy" className="bg-[#876347] py-10">
           <ReasonToBuy project={project} />
         </section>
 
-        <section>
+        <section id="sale-policy">
           <SalePolicy project={project} />
         </section>
 
-        <section>
+        <section id="lead-form">
           <LeadForm project={project} projectOptions={registerProjects} />
         </section>
 
-        <section className="bg-[#F3E8DC] py-12">
+        <section id="overview" className="bg-[#F3E8DC] py-12">
           <ProjectOverviewV2 project={project} />
         </section>
-        <section className="bg-[#876347] py-10">
+        <section id="location" className="bg-[#876347] py-10">
           <ProjectLocationV2 project={project} />
         </section>
-        <section>
+        <section id="floorplan">
           <FloorPlanV2 project={project} />
         </section>
         <section>
           <FullWidthForm project={project} />
         </section>
-        <section className="bg-[#876347] py-4">
+        <section id="apartment-design" className="bg-[#876347] py-4">
           <ApartmentDesign project={project} />
         </section>
-        <section className="bg-[#876347]">
+        <section id="utilities" className="bg-[#876347]">
           <ProjectExtentionV2 project={project} />
         </section>
-        <section className="">
+        <section id="handover">
           <HandoverStandard project={project} />
         </section>
         <section>
           <FullWidthForm project={project} />
         </section>
-        <section className="bg-[#876347]">
+        <section id="progress" className="bg-[#876347]">
           <ProjectProgress project={project} />
         </section>
         <section id="register" >
@@ -178,7 +214,7 @@ const ProjectDetailV2: React.FC = () => {
           </section>
       </main>
       <LeftOverlay projectTitle={project.title} projectImage={project.coverImage} />
-
+      <TabBarOverlay items={projectTabs} />
       <Footer />
     </div>
   );

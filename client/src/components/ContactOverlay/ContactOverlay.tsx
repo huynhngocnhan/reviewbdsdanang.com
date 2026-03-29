@@ -72,7 +72,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({
   ];
 
   return (
-    <div className="fixed bottom-5 right-5 z-[1000] flex flex-col items-end gap-3">
+    <div className="fixed bottom-5 right-2 z-[1000] flex flex-col items-end gap-3">
       {/* Contact icons */}
       {contacts.map((item, i) => (
         <a
@@ -103,14 +103,14 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({
           relative flex h-14 w-14 items-center justify-center rounded-full shadow-xl
           transition-all duration-300 hover:scale-110
           ${isOpen
-        ? "bg-[#8F6552] rotate-90"
+        ? "bg-[#eb6d2e] rotate-90"
         : "bg-[#ef4444] hover:bg-red-600"
       }
         `}
       >
         {/* Ping ring khi đóng */}
         {!isOpen && (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#8F6552]/40" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600" />
         )}
         {isOpen ? (
           <svg viewBox="0 0 24 24" className="h-6 w-6 " aria-hidden="true">

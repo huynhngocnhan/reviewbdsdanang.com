@@ -1,4 +1,4 @@
-import type React from "react";
+import { useMemo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
@@ -64,15 +64,28 @@ const nearbyGroups: NearbyGroup[] = [
   },
 ];
 
-const ProjectLocationV2: React.FC<Props> = ({ project }) => {
+const ProjectLocationV2 = ({ project }: Props) => {
   const locationVisual = project.locationImage || project.coverImage;
+  const trafficItems = useMemo(
+    () => nearbyGroups.flatMap((group) => group.trafficItems ?? []),
+    [],
+  );
+  const hasTrafficItems = trafficItems.length > 0;
 
   return (
-    <section className="relative overflow-hidden py-8 md:py-16">
+    <section
+      className="relative overflow-hidden py-8 md:py-16"
+      aria-labelledby="project-location-title"
+    >
       <div className="relative mx-auto max-w-8xl px-4 sm:px-6 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           <div className="lg:col-span-5 text-white">
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-wide uppercase">Vị trí dự án</h2>
+            <h2
+              id="project-location-title"
+              className="text-3xl sm:text-4xl font-extrabold tracking-wide uppercase"
+            >
+              Vị trí dự án
+            </h2>
             <h3 className="mt-2 text-4xl sm:text-5xl font-black text-[#f9de2b] uppercase leading-tight">
               {project.title}
             </h3>
@@ -82,7 +95,8 @@ const ProjectLocationV2: React.FC<Props> = ({ project }) => {
               <a
                 href={project.location360Url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label={`Xem vị trí 360 độ của dự án ${project.title}`}
                 className="mt-5 inline-flex items-center rounded-xl bg-[#f9de2b] px-4 py-2.5 text-[#17372F] font-bold hover:bg-[#efd24b] transition"
               >
                 Xem vị trí 360°
@@ -98,7 +112,7 @@ const ProjectLocationV2: React.FC<Props> = ({ project }) => {
           />
         </div>
 
-        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Khoảng cách tiện ích theo thời gian di chuyển">
           {nearbyGroups.map((group) => (
             <div key={group.minute} className="text-white min-w-0">
               <p className="text-5xl font-black text-white">
@@ -114,20 +128,26 @@ const ProjectLocationV2: React.FC<Props> = ({ project }) => {
           ))}
         </div>
 
-        {nearbyGroups.some((group) => group.trafficItems?.length) && (
+        {hasTrafficItems && (
           <div className="mt-10">
             <h3 className="text-3xl sm:text-4xl font-extrabold uppercase text-white">
               Các tuyến giao thông huyết mạch:
             </h3>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {nearbyGroups.flatMap((group) => group.trafficItems ?? []).map((item) => (
+              {trafficItems.map((item) => (
                 <article
                   key={item.title}
                   className="overflow-hidden rounded-md bg-[#17372F]/40 text-white shadow-lg"
                 >
                   <div className="relative h-44">
-                    <img src={item.url} alt={item.title} className="h-full w-full object-cover" />
+                    <img
+                      src={item.url}
+                      alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                   </div>
 
