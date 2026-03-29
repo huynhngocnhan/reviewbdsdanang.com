@@ -18,6 +18,7 @@ import ProjectExtentionV2 from "./ProjectExtentionV2/ProjectExtentionV2";
 import HandoverStandard from "./HandoverStandard/HandoverStandard";
 import ProjectProgress from "./ProjectProgress/ProjectProgress";
 import TabBarOverlay from "../TabBarOverlay/TabBarOverlay";
+import ContactOverlay from "../ContactOverlay/ContactOverlay";
 
 const projectTabs = [
   { id: "reason-to-buy", label: "Giá trị cốt lõi" },
@@ -213,6 +214,7 @@ const ProjectDetailV2 = () => {
             <RegisterForm projects={registerProjects} />
           </section>
       </main>
+      <ContactOverlay phoneNumber="0938885879" zaloUrl="https://zalo.me/0901830909" tiktokUrl="https://www.tiktok.com/@reviewbdsdanang.com"/>
       <LeftOverlay projectTitle={project.title} projectImage={project.coverImage} />
       <TabBarOverlay items={projectTabs} />
       <Footer />

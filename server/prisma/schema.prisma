@@ -170,6 +170,12 @@ model Project {
   locationImage String?
   /// Google Maps embed URL
   mapEmbedUrl String?
+  /// V2 - URL vị trí 360
+  location360Url String?
+  /// V2 - nhóm tiện ích theo phút di chuyển
+  nearbyGroups Json?
+  /// V2 - hạ tầng giao thông lân cận
+  nearbyTrafficItems Json?
 
   /// Toạ độ bản đồ (tuỳ chọn)
   lat Decimal? @db.Decimal(10, 7)
@@ -238,21 +244,44 @@ model Project {
   extentionDescription String?
   /// Tiện ích - hình ảnh (vd: [{src, alt, title, description}])
   extentionImages Json?
+  /// V2 - điểm đến/tiện ích kết nối
+  extentionDestinations Json?
 
   /// Mặt bằng (legacy) (vd: [{description, floorPlanImage}])
   floorplans Json?
 
-  /// [NEW] Lý do chọn mua (vd: [{title, description, icon, image}])
+  /// [NEW] Lý do chọn mua (legacy JSON)
   reasonToBuy Json?
+  /// V2 - tiêu đề section lý do chọn mua
+  reasonToBuyTitle String?
+  /// V2 - mô tả lý do chọn mua
+  reasonToBuyDescription String?
+  /// V2 - ảnh lý do chọn mua
+  reasonToBuyImage String?
+  /// V2 - alt ảnh lý do chọn mua
+  reasonToBuyImageAlt String?
 
-  /// [NEW] Chính sách bán hàng (vd: {title, bullets:[], media:[{type:"image|pdf",src}], cta})
+  /// [NEW] Chính sách bán hàng (legacy JSON)
   salesPolicy Json?
+  /// V2 - chính sách bán hàng chuẩn theo UI hiện tại
+  salePolicy Json?
+  /// V2 - mô tả ngắn chính sách bán hàng
+  salePolicyDes String?
+  /// V2 - ảnh chính sách bán hàng
+  salePolicyImg String?
+  /// V2 - alt ảnh chính sách bán hàng
+  salePolicyAlt String?
+  /// V2 - danh sách mô tả chi tiết chính sách
+  salePolicyDescriptionDetails Json?
 
   /// [NEW] Mặt bằng tổng quan (vd: [{src, alt, title}])
   floorplanMaster Json?
 
   /// [NEW] Mặt bằng tầng (vd: [{floor, images:[{src, alt}]}])
   floorplanByFloor Json?
+
+  /// V2 - thiết kế căn hộ
+  apartmentDesign Json?
 
   /// [NEW] Loại căn hộ (vd: [{name, area, description, images:[{src, alt}]}])
   unitLayouts Json?
@@ -265,6 +294,12 @@ model Project {
 
   /// [NEW] Tiến độ dự án - video YouTube URL (embed/watch)
   progressVideoUrl String?
+  /// V2 - tiến độ dự án
+  progress Json?
+  /// V2 - mô tả tiến độ dự án
+  progressDescription String?
+  /// V2 - video tiến độ YouTube
+  progressYoutubeUrl String?
 
   /// [NEW] FAQ (vd: [{question, answer}])
   faqs Json?
