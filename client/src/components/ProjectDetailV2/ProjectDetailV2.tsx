@@ -161,7 +161,7 @@ const ProjectDetailV2 = () => {
                     href="#project-content"
                     className="inline-flex items-center justify-center rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white border border-white/20 hover:bg-white/15 duration-300 transition"
                   >
-                    Xem thư viện ảnh
+                    Xem thông tin chi tiết
                   </a>
                 </div>
               </div>

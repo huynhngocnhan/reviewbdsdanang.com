@@ -1,7 +1,6 @@
-import { useMemo } from "react";
 import type React from "react";
 import ZoomableImage from "../../ZoomableImage";
-import type { ProjectData } from "../../../constants/projectData";
+import type { ProjectData, ExtentionDestination } from "../../../constants/projectData";
 
 type Props = {
   project: ProjectData;
@@ -43,17 +42,14 @@ const fallbackDestinations: Destination[] = [
 const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
   const amenities = project.extentionImages ?? [];
 
-  const nearbyDestinations = useMemo<Destination[]>(() => {
-    if (project.gallery.length >= 4) {
-      return project.gallery.slice(0, 4).map((item, index) => ({
-        title: `Tiện ích kết nối ${index + 1}`,
-        description: "Không gian tiện ích mở rộng nằm trong hệ sinh thái sống đa trải nghiệm.",
-        image: item.src,
-      }));
-    }
-
-    return fallbackDestinations;
-  }, [project.gallery]);
+  // Lấy từ project.extentionDestinations (từ form admin), fallback sang mock
+  const nearbyDestinations: Destination[] = (project.extentionDestinations?.length ?? 0) > 0
+    ? project.extentionDestinations!.map((d: ExtentionDestination) => ({
+        title: d.des?.split("\n")[0] ?? "",
+        description: d.des ?? "",
+        image: d.img ?? "",
+      }))
+    : fallbackDestinations;
 
   return (
     <section className="text-white" aria-labelledby="project-extension-title">

@@ -3,7 +3,6 @@ import NotFound from "./pages/NotFound";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProjectDetail from "./components/ProjectDetail/ProjectDetail";
 import ProjectDetailV2 from "./components/ProjectDetailV2/ProjectDetailV2";
-import ContactOverlay from "./components/ContactOverlay/ContactOverlay";
 import AdminLogin from "./components/AdminLogin/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import TopProgressBar from "./components/TopProgressBar";

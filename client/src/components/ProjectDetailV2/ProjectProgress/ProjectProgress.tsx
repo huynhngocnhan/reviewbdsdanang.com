@@ -20,9 +20,9 @@ const getYouTubeEmbedUrl = (url: string) => {
 };
 
 const ProjectProgress: React.FC<Props> = ({ project }) => {
-  const progress = project.progress ?? MOCK_PROJECT_PROGRESS;
-  const description = progress.des?.trim() || MOCK_PROJECT_PROGRESS.des;
-  const youtubeUrl = progress.youtubeUrl?.trim() || MOCK_PROJECT_PROGRESS.youtubeUrl;
+  // Lấy từ form admin (progressDescription, progressYoutubeUrl), fallback sang mock
+  const description = project.progressDescription?.trim() || MOCK_PROJECT_PROGRESS.des;
+  const youtubeUrl = project.progressYoutubeUrl?.trim() || MOCK_PROJECT_PROGRESS.youtubeUrl;
   const embedUrl = getYouTubeEmbedUrl(youtubeUrl);
 
   if (!description && !embedUrl) {

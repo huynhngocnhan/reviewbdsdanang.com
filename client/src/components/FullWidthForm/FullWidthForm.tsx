@@ -1,11 +1,67 @@
-import type React from "react";
+import { useState } from "react";
 import type { ProjectData } from "../../constants/projectData";
+import { api } from "../../api/client";
 
 type Props = {
   project: ProjectData;
 };
 
+type FormData = {
+  fullname: string;
+  phonenum: string;
+};
+
 const FullWidthForm: React.FC<Props> = ({ project }) => {
+  const [formData, setFormData] = useState<FormData>({
+    fullname: "",
+    phonenum: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const isValidPhone = (value: string) => /^(0|\+84)[0-9]{9,10}$/.test(value.trim());
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrorMsg("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!formData.fullname.trim()) {
+      setErrorMsg("Vui lòng nhập họ và tên.");
+      return;
+    }
+
+    if (!isValidPhone(formData.phonenum)) {
+      setErrorMsg("Số điện thoại chưa đúng định dạng Việt Nam.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      await api.post("/registrations", {
+        fullname: formData.fullname.trim(),
+        phonenum: formData.phonenum.trim(),
+        project: project.title,
+      });
+
+      setSubmitted(true);
+      setFormData({ fullname: "", phonenum: "" });
+    } catch (err) {
+      console.error("Registration error:", err);
+      const error = err as { response?: { data?: { message?: string } } };
+      setErrorMsg(error.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section
       className="w-full bg-[#17372F] py-10 sm:py-14"
@@ -21,32 +77,49 @@ const FullWidthForm: React.FC<Props> = ({ project }) => {
           </h2>
         </header>
 
-        <form className="mx-auto mt-8 max-w-5xl" action="#" method="post">
+        <form className="mx-auto mt-8 max-w-5xl" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <input
               type="text"
               name="fullname"
               required
               placeholder="Họ và Tên *"
-              className="h-10 rounded-sm border border-black/20 bg-white px-4 text-base text-[#2f2f2f] outline-none focus:border-[#f59e0b]"
+              value={formData.fullname}
+              onChange={handleChange}
+              className="h-10 rounded-md border border-black/20 bg-white px-4 text-base text-[#2f2f2f] outline-none focus:border-[#f59e0b]"
               autoComplete="name"
             />
             <input
               type="tel"
-              name="phone"
+              name="phonenum"
               required
               placeholder="Số điện thoại *"
-              className="h-10 rounded-sm border border-black/20 bg-white px-4 text-base text-[#2f2f2f] outline-none focus:border-[#f59e0b]"
+              value={formData.phonenum}
+              onChange={handleChange}
+              className="h-10 rounded-md border border-black/20 bg-white px-4 text-base text-[#2f2f2f] outline-none focus:border-[#f59e0b]"
               autoComplete="tel"
             />
             <button
               type="submit"
-              className="h-10 rounded-sm bg-[#f7931e] px-5 text-base font-extrabold uppercase tracking-wide text-white transition hover:bg-[#e58212]"
+              disabled={loading}
+              className="h-10 rounded-md bg-[#f7931e] px-5 text-base font-extrabold uppercase tracking-wide text-white transition hover:bg-[#e58212] disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Đăng ký ngay
+              {loading ? "Đang gửi..." : "Đăng ký ngay"}
             </button>
           </div>
         </form>
+
+        {submitted && (
+          <p className="mx-auto mt-4 max-w-5xl text-center text-sm font-medium text-emerald-400">
+            Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.
+          </p>
+        )}
+
+        {errorMsg && (
+          <p className="mx-auto mt-4 max-w-5xl text-center text-sm font-medium text-red-400">
+            {errorMsg}
+          </p>
+        )}
 
         <p className="mx-auto mt-6 text-center text-base text-white/95">
           Lưu ý: Khi gửi thông tin, bạn đồng ý với

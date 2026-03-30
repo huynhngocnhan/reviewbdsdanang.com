@@ -307,6 +307,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
             progressYoutubeUrl: project.progressYoutubeUrl || "",
           });
         }
+        
       } catch (error) {
         console.error("Error fetching project:", error);
         toast.error("Không thể tải thông tin dự án");
@@ -338,6 +339,10 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       // Auto-generate slug when title changes
       if (field === "title" && typeof value === "string") {
         updated.slug = generateSlug(value);
+      }
+      // Auto-generate mapEmbedUrl when locationText changes
+      if (field === "locationText" && typeof value === "string") {
+        updated.mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(value)}&output=embed`;
       }
       return updated;
     });
@@ -778,7 +783,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">
-          Chủ đầu tư <span className="text-red-500">*</span>
+          Category <span className="text-red-500">*</span>
         </label>
         <select
           value={formData.category}
@@ -922,7 +927,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         <textarea
           value={formData.reasonToBuyDescription || ""}
           onChange={(e) => updateField("reasonToBuyDescription", e.target.value)}
-          rows={6}
+          rows={10}
           className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
         />
       </div>
@@ -1228,13 +1233,13 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ nhúng</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ nhúng <span className="text-xs text-gray-400">(auto-gen từ địa chỉ)</span></label>
         <input
           type="url"
           value={formData.mapEmbedUrl}
-          onChange={(e) => updateField("mapEmbedUrl", e.target.value)}
-          placeholder="https://www.google.com/maps?q=Da%20Nang&output=embed"
-          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
+          readOnly
+          placeholder="Auto từ địa chỉ..."
+          className="w-full rounded-xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed"
         />
       </div>
 
@@ -1245,7 +1250,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           value={formData.location360Url || ""}
           onChange={(e) => updateField("location360Url", e.target.value)}
           placeholder="https://kuula.co/post/..."
-          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
+          className="w-full rounded-xl border text-gray-700 border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
         />
         {formData.mapEmbedUrl && (
           <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
@@ -1264,7 +1269,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div className="space-y-3 rounded-xl border border-gray-200 p-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-gray-700">Khoảng thời gian tới các địa điểm nổi bật (khoảng 4-5 items)</p>
+          <p className="text-sm font-semibold text-gray-700">Khoảng thời gian tới các địa điểm nổi bật (4 items để hiển thị tốt hơn)</p>
           <button type="button" onClick={addNearbyGroup} className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800">
             <PlusIcon className="h-3 w-3 text-gray-800" /> Thêm
           </button>
@@ -1287,7 +1292,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
                 value={group.description}
                 onChange={(e) => updateNearbyGroup(index, "description", e.target.value)}
                 placeholder="Mô tả tiện ích trong số phút tương ứng"
-                rows={2}
+                rows={4}
                 className="rounded-lg border border-gray-300 text-gray-800 bg-white px-3 py-2 text-sm"
               />
               <button type="button" onClick={() => removeNearbyGroup(index)} className="rounded-lg p-2 text-red-500">
@@ -1300,7 +1305,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div className="space-y-3 rounded-xl border border-gray-200 p-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-gray-700">Các đô thị liền kề (đẹp nhất là 5 items)</p>
+          <p className="text-sm font-semibold text-gray-700">Các đô thị liền kề (đẹp nhất là 4 items)</p>
           <button type="button" onClick={addNearbyTrafficItem} className="inline-flex text-gray-800 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs">
             <PlusIcon className="h-3 w-3 text-gray-800" /> Thêm
           </button>
@@ -1390,7 +1395,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         <textarea
           value={formData.extentionDescription || ""}
           onChange={(e) => updateField("extentionDescription", e.target.value)}
-          rows={3}
+          rows={6}
           placeholder="Chuỗi tiện ích nội khu được quy hoạch theo tiêu chuẩn nghỉ dưỡng..."
           className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
         />
@@ -1488,8 +1493,8 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
                 value={dest.des}
                 onChange={(e) => updateExtentionDestination(index, "des", e.target.value)}
                 rows={2}
-                placeholder="Mô tả tiện ích xung quanh"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+                placeholder="vd: Vincom: Không gian mua sắm - giải trí đa tầng"
+                className="w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
               />
 
               <input
@@ -1629,14 +1634,14 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
                 value={item.name}
                 onChange={(e) => updateApartmentItem(index, "name", e.target.value)}
                 placeholder="Tên căn hộ (VD: Studio, 4PN)"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+                className="w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
               />
               <input
                 type="text"
                 value={item.label || ""}
                 onChange={(e) => updateApartmentItem(index, "label", e.target.value)}
                 placeholder="Nhãn hiển thị (VD: Studio, 1PN)"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+                className="w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
               />
             </div>
 
@@ -1645,7 +1650,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
               value={item.price}
               onChange={(e) => updateApartmentItem(index, "price", e.target.value)}
               placeholder="Khoảng giá (VD: 3.2 tỷ/căn)"
-              className="mb-2 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+              className="mb-2 w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
             />
 
             <textarea
@@ -1653,7 +1658,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
               onChange={(e) => updateApartmentItem(index, "description", e.target.value)}
               placeholder="Mô tả căn hộ"
               rows={2}
-              className="mb-2 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+              className="mb-2 w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
             />
 
             <input

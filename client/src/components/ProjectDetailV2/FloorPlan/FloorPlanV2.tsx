@@ -7,10 +7,20 @@ type Props = {
 };
 
 const FloorPlanV2 = ({ project }: Props) => {
-  const floorPlanImages = useMemo(
-    () => (project.floorplans ?? []).flatMap((plan) => plan.floorPlanImage ?? []),
+  // Create a flattened array with category info for correct display
+  const floorPlanWithCategory = useMemo(
+    () =>
+      (project.floorplans ?? []).flatMap((plan, categoryIndex) =>
+        (plan.floorPlanImage ?? []).map((image, imageIndex) => ({
+          image,
+          categoryIndex,
+          imageIndex,
+          categoryDescription: plan.description,
+        }))
+      ),
     [project.floorplans],
   );
+
   const floorPlanDescription = useMemo(
     () =>
       (project.floorplans ?? [])
@@ -44,19 +54,19 @@ const FloorPlanV2 = ({ project }: Props) => {
           </p>
         </header>
 
-        {floorPlanImages.length > 0 ? (
+        {floorPlanWithCategory.length > 0 ? (
           <div className="space-y-4">
-            {floorPlanImages.map((image, index) => (
-              <figure key={`${image.src}-${index}`} className="overflow-hidden rounded-md border shadow-xl">
+            {floorPlanWithCategory.map(({ image, categoryIndex, imageIndex }, globalIndex) => (
+              <figure key={`${image.src}-${categoryIndex}-${imageIndex}`} className="overflow-hidden rounded-md border shadow-xl">
                 <ZoomableImage
                   src={image.src}
-                  alt={image.alt || `Sơ đồ mặt bằng ${index + 1} dự án ${project.title}`}
+                  alt={image.alt || `Sơ đồ mặt bằng ${globalIndex + 1} dự án ${project.title}`}
                   className="w-full"
                   imageClassName="w-full object-contain"
                   showHoverOverlay={false}
                 />
                 <figcaption className="px-4 py-3 text-center text-sm text-[#6B4E3D]">
-                  Sơ đồ mặt bằng {index + 1} - {project.title}
+                  Sơ đồ mặt bằng {project.title}{image.alt ? ` - ${image.alt}` : ""}
                 </figcaption>
               </figure>
             ))}

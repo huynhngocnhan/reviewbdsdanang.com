@@ -1,27 +1,82 @@
-import { useMemo } from "react";
+import { useState } from "react";
 import type React from "react";
-import type { ProjectData } from "../../constants/projectData";
-
-type ApartmentOption = {
-  title: string;
-  badge: string;
-  price: string;
-};
+import type { ProjectData, ApartmentItem } from "../../constants/projectData";
+import { api } from "../../api/client";
 
 type Props = {
-  apartmentOptions: ApartmentOption[];
+  apartmentOptions: ApartmentItem[];
   project: ProjectData;
 };
 
+type FormData = {
+  fullname: string;
+  apartmentType: string;
+  phonenum: string;
+};
+
 const ApartmentForm: React.FC<Props> = ({ apartmentOptions, project }) => {
-  const selectOptions = useMemo(
-    () =>
-      apartmentOptions.map((item) => ({
-        value: item.badge,
-        label: `${item.title} (${item.badge}) - ${item.price}`,
-      })),
-    [apartmentOptions],
-  );
+  const [formData, setFormData] = useState<FormData>({
+    fullname: "",
+    apartmentType: "",
+    phonenum: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const isValidPhone = (value: string) => /^(0|\+84)[0-9]{9,10}$/.test(value.trim());
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrorMsg("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!formData.fullname.trim()) {
+      setErrorMsg("Vui lòng nhập họ và tên.");
+      return;
+    }
+
+    if (!formData.apartmentType) {
+      setErrorMsg("Vui lòng chọn loại căn hộ quan tâm.");
+      return;
+    }
+
+    if (!isValidPhone(formData.phonenum)) {
+      setErrorMsg("Số điện thoại chưa đúng định dạng Việt Nam.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      // Tìm apartment item được chọn để lấy thông tin đầy đủ
+      const selectedApartment = apartmentOptions.find((item) => item.label === formData.apartmentType);
+      const note = selectedApartment
+        ? `Căn hộ: ${selectedApartment.name} (${selectedApartment.label}) - ${selectedApartment.price}`
+        : formData.apartmentType;
+
+      await api.post("/registrations", {
+        fullname: formData.fullname.trim(),
+        phonenum: formData.phonenum.trim(),
+        project: project.title,
+        note,
+      });
+
+      setSubmitted(true);
+      setFormData({ fullname: "", apartmentType: "", phonenum: "" });
+    } catch (err) {
+      console.error("Registration error:", err);
+      const error = err as { response?: { data?: { message?: string } } };
+      setErrorMsg(error.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="mt-12" aria-labelledby="apartment-form-title">
@@ -42,7 +97,7 @@ const ApartmentForm: React.FC<Props> = ({ apartmentOptions, project }) => {
             </p>
           </header>
 
-          <form className="mt-8 grid gap-4 lg:grid-cols-[1.3fr_1fr_auto]" action="#" method="post">
+          <form className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_1fr_1fr_auto]" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="apartmentType" className="mb-2 block text-sm font-semibold text-slate-700">
                 Chọn loại căn hộ quan tâm
@@ -51,44 +106,76 @@ const ApartmentForm: React.FC<Props> = ({ apartmentOptions, project }) => {
                 id="apartmentType"
                 name="apartmentType"
                 required
-                defaultValue=""
+                value={formData.apartmentType}
+                onChange={handleChange}
                 className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-800 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
               >
                 <option value="" disabled>
-                  Lựa chọn căn hộ anh/chị quan tâm
+                  Căn hộ anh/chị quan tâm..
                 </option>
-                {selectOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                {apartmentOptions.map((item) => (
+                  <option key={item.label} value={item.label}>
+                    {item.name} ({item.label}) - {item.price}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="phone" className="mb-2 block text-sm font-semibold text-slate-700">
+              <label htmlFor="fullname" className="mb-2 block text-sm font-semibold text-slate-700">
+                Họ và tên
+              </label>
+              <input
+                id="fullname"
+                name="fullname"
+                type="text"
+                required
+                value={formData.fullname}
+                onChange={handleChange}
+                placeholder="Họ và tên của anh/chị"
+                autoComplete="name"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phonenum" className="mb-2 block text-sm font-semibold text-slate-700">
                 Số điện thoại (Zalo)
               </label>
               <input
-                id="phone"
-                name="phone"
+                id="phonenum"
+                name="phonenum"
                 type="tel"
                 inputMode="numeric"
                 autoComplete="tel"
-                placeholder="Nhập số điện thoại của anh/chị"
-                pattern="(\\+84|0)[0-9]{9,10}"
                 required
+                value={formData.phonenum}
+                onChange={handleChange}
+                placeholder="Số điện thoại của anh/chị"
                 className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
               />
             </div>
 
             <button
               type="submit"
-              className=" mt-7 inline-flex h-12 items-center justify-center rounded-xl bg-gradient-to-r from-red-600 to-red-500 px-8 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-red-300 lg:mt-[1.7rem]"
+              disabled={loading}
+              className="mt-7 inline-flex h-12 items-center justify-center rounded-xl bg-gradient-to-r from-red-600 to-red-500 px-8 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:opacity-60 disabled:cursor-not-allowed lg:mt-[1.7rem]"
             >
-              <span className="text-zoom">Tải xuống ngay</span>
+              <span className="text-zoom">{loading ? "Đang gửi..." : "Tải xuống ngay"}</span>
             </button>
           </form>
+
+          {submitted && (
+            <p className="mt-4 text-center text-sm font-medium text-emerald-700">
+              Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.
+            </p>
+          )}
+
+          {errorMsg && (
+            <p className="mt-4 text-center text-sm font-medium text-red-600">
+              {errorMsg}
+            </p>
+          )}
 
           <p className="mt-4 text-center text-xs text-slate-600 sm:text-sm">
             Thông tin của anh/chị được bảo mật và chỉ dùng để gửi tài liệu dự án theo yêu cầu.

@@ -204,6 +204,9 @@ model Project {
   /// - Có thể để null nếu không cần ưu tiên
   homeOrder Int?
 
+  /// [NEW] Đánh dấu là dự án nổi bật (hiển thị filter "Dự án nổi bật" ở trang chủ)
+  isFeatured Boolean @default(false)
+
   /// [NEW] Cấu hình sticky menu theo anchor (overlay trái/phải, danh sách mục)
   stickyMenu Json?
 
@@ -282,6 +285,9 @@ model Project {
 
   /// V2 - thiết kế căn hộ
   apartmentDesign Json?
+
+  /// V2 - tiêu chuẩn bàn giao (vd: { des: "string", items: [{subtitle, title, des, imgUrl}] })
+  handoverStandard Json?
 
   /// [NEW] Loại căn hộ (vd: [{name, area, description, images:[{src, alt}]}])
   unitLayouts Json?

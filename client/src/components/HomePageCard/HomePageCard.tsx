@@ -3,17 +3,25 @@ import type React from "react";
 import { Divider } from "antd";
 import type { ProjectData, ProjectCategory } from "../../constants/projectData";
 
+type FilterType = ProjectCategory | "all" | "featured";
+
 type Props = {
   projectData: ProjectData[];
 };
 
 const HomePageCard: React.FC<Props> = ({ projectData }) => {
-  const [activeFilter, setActiveFilter] = useState<ProjectCategory | "all">("all");
+  const [activeFilter, setActiveFilter] = useState<FilterType>("featured");
 
-  const filteredProjects =
-    activeFilter === "all"
-      ? projectData
-      : projectData.filter((item) => item.category === activeFilter);
+  const filteredProjects = (() => {
+    switch (activeFilter) {
+      case "featured":
+        return projectData.filter((item) => item.isFeatured);
+      case "all":
+        return projectData;
+      default:
+        return projectData.filter((item) => item.category === activeFilter);
+    }
+  })();
 
   const buttonBaseClass = "px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 sm:px-6 sm:py-3 sm:text-base sm:rounded-2xl w-full sm:w-auto";
   const buttonActiveClass = "bg-[#8F6552] text-white border-none shadow-lg";
@@ -37,6 +45,14 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
           className="flex flex-wrap justify-center gap-2 sm:gap-4"
         >
           <button
+            onClick={() => setActiveFilter("featured")}
+            className={`${buttonBaseClass} ${
+              activeFilter === "featured" ? buttonActiveClass : buttonInactiveClass
+            }`}
+          >
+            Dự án nổi bật
+          </button>
+          <button
             onClick={() => setActiveFilter("all")}
             className={`${buttonBaseClass} ${
               activeFilter === "all" ? buttonActiveClass : buttonInactiveClass
@@ -50,7 +66,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
               activeFilter === "SUN" ? buttonActiveClass : buttonInactiveClass
             }`}
           >
-            Dự án của Sun Group
+            Dự án Sun Group
           </button>
           <button
             onClick={() => setActiveFilter("VIN")}
@@ -58,7 +74,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
               activeFilter === "VIN" ? buttonActiveClass : buttonInactiveClass
             }`}
           >
-            Dự án của Vin Home
+            Dự án Vin Home
           </button>
           <button
             onClick={() => setActiveFilter("OTHER")}
@@ -80,7 +96,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
           filteredProjects.map((item, index) => (
             <a
               key={item.id}
-              href={`/du-an/${item.slug}`}
+              href={`/du-an-v2/${item.slug}`}
               data-aos="fade-up"
               data-aos-duration="800"
               data-aos-delay={index * 100}
@@ -106,15 +122,14 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
                 <p className="text-sm text-gray-700 mb-3 line-clamp-3">
                   {item.shortDescription}
                 </p>
-                <a
-                  href={`/du-an-v2/${item.slug}`}
+                <span
                   className="group inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-700 font-medium text-sm py-2 px-4 rounded-lg border border-amber-500/50 hover:border-amber-500 hover:bg-amber-50 transition-all duration-300 hover:scale-105 hover:shadow-md"
                 >
                   Xem chi tiết
                   <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
                     →
                   </span>
-                </a>
+                </span>
               </div>
             </a>
           ))

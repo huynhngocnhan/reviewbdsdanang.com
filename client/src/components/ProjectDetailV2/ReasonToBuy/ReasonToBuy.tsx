@@ -2,6 +2,8 @@ import type React from "react";
 import { useState } from "react";
 import { MOCK_PROJECTS } from "../../../constants/projectData";
 import type { ProjectData } from "../../../constants/projectData";
+import ZoomableImage from "../../ZoomableImage";
+import { api } from "../../../api/client";
 
 type Props = {
   project: ProjectData;
@@ -13,6 +15,8 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
     phone: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const mockProject = MOCK_PROJECTS.find((p) => p.slug === project.slug);
 
@@ -37,20 +41,43 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
 
   const handleChange = (field: "name" | "phone", value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrorMsg("");
   };
 
   const isValidPhone = (value: string) => /^(0|\+84)[0-9]{9,10}$/.test(value.trim());
 
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !isValidPhone(formData.phone)) {
-      setSubmitted(false);
+    if (!formData.name.trim()) {
+      setErrorMsg("Vui lòng nhập họ và tên.");
       return;
     }
 
-    setSubmitted(true);
-    setFormData({ name: "", phone: "" });
+    if (!isValidPhone(formData.phone)) {
+      setErrorMsg("Số điện thoại chưa đúng định dạng Việt Nam.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      await api.post("/registrations", {
+        fullname: formData.name.trim(),
+        phonenum: formData.phone.trim(),
+        project: project.title,
+      });
+
+      setSubmitted(true);
+      setFormData({ name: "", phone: "" });
+    } catch (err) {
+      console.error("Registration error:", err);
+      const error = err as { response?: { data?: { message?: string } } };
+      setErrorMsg(error.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,30 +143,32 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
                 </div>
                 <button
                   type="submit"
-                  className="h-12 w-full rounded-xl bg-[#8A6A4F] font-bold uppercase tracking-wide text-white transition hover:bg-[#735743]"
+                  disabled={loading}
+                  className="h-12 w-full rounded-xl bg-[#8A6A4F] font-bold uppercase tracking-wide text-white transition hover:bg-[#735743] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <span className="text-zoom">Nhận tư vấn ngay</span>
+                  <span className="text-zoom">{loading ? "Đang gửi..." : "Nhận tư vấn ngay"}</span>
                 </button>
               </form>
 
-              {submitted && <p className="mt-3 text-sm font-medium text-emerald-700">Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.</p>}
+              {submitted && (
+                <p className="mt-3 text-sm font-medium text-emerald-700">Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.</p>
+              )}
 
-              {!submitted && formData.phone && !isValidPhone(formData.phone) && (
-                <p className="mt-3 text-sm font-medium text-amber-700">Số điện thoại chưa đúng định dạng Việt Nam.</p>
+              {errorMsg && (
+                <p className="mt-3 text-sm font-medium text-red-600">{errorMsg}</p>
               )}
             </div>
           </article>
 
           <figure className="space-y-5">
-            <div className="overflow-hidden rounded-lg shadow-2xl">
-              <img
-                src={reasonToBuyImage}
-                alt={reasonToBuyImageAlt}
-                className="h-[500px] w-full object-cover lg:h-[700px]"
-                loading="lazy"
-                decoding="async"
-                itemProp="image"
+            <div className="overflow-hidden">
+              <ZoomableImage
+              src={reasonToBuyImage}
+              alt={reasonToBuyImageAlt}
+              className="h-full w-full rounded-lg shadow-2xl lg:h-full"
+              imageClassName="h-full w-full  lg:h-full"
               />
+                
             </div>
           </figure>
         </div>

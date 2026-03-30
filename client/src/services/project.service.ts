@@ -1,5 +1,28 @@
 import { api } from "../api/client";
-import type { ProjectData, ProjectSpec, ProjectGallery, ProjectExtentionImage, FloorplanCategory } from "../constants/projectData";
+import type {
+  ProjectData,
+  ProjectSpec,
+  ProjectGallery,
+  ProjectExtentionImage,
+  FloorplanCategory,
+  SeoHead,
+  FaqItem,
+  LegalInfoItem,
+  ProgressMilestone,
+  ProgressGalleryItem,
+  UnitLayoutItem,
+  FloorplanMasterItem,
+  FloorplanByFloorItem,
+  StickyMenuConfig,
+  HeroLeadForm,
+  FloatingCta,
+  NearbyGroup,
+  NearbyTrafficItem,
+  ApartmentDesign,
+  ExtentionDestination,
+  HandoverStandard,
+  CustomSectionData,
+} from "../constants/projectData";
 
 // API Response types
 type ApiResponse<T> = {
@@ -29,8 +52,9 @@ type ProjectQueryParams = {
   limit?: number;
 };
 
-// Create/Update input type (matching server DTO and mockup format)
+// Create/Update input type — matches backend CreateProjectDto fully (V2)
 interface ProjectInput {
+  // Basic
   slug: string;
   title: string;
   subtitle?: string;
@@ -40,6 +64,8 @@ interface ProjectInput {
   category: "SUN" | "VIN" | "OTHER";
   developerName?: string;
   projectType?: string;
+
+  // Location
   city?: string;
   district?: string;
   address?: string;
@@ -47,31 +73,91 @@ interface ProjectInput {
   locationDescription?: string;
   locationImage?: string;
   mapEmbedUrl?: string;
+  location360Url?: string;
   lat?: number;
   lng?: number;
+
+  // Nearby
+  nearbyGroups?: NearbyGroup[];
+  nearbyTrafficItems?: NearbyTrafficItem[];
+
+  // Price & legal
   priceFrom?: number;
   priceTo?: number;
   priceUnit?: string;
   legal?: string;
   handoverTime?: string;
-  // Matching mockup: highlights (not highlightTags)
+
+  // Content sections
   highlights?: string[];
-  showOnHome?: boolean;
-  homeOrder?: number;
   heroImage?: string;
   specs?: ProjectSpec[];
+  gallery?: ProjectGallery[];
+
+  // Extention
+  extentionDescription?: string;
+  extentionImages?: ProjectExtentionImage[];
+  extentionDestinations?: ExtentionDestination[];
+
+  // Floorplan
+  floorplans?: FloorplanCategory[];
+  floorplanMaster?: FloorplanMasterItem[];
+  floorplanByFloor?: FloorplanByFloorItem[];
+
+  // Custom sections
+  customSections?: CustomSectionData[];
+
+  // Reason to buy
+  reasonToBuy?: Record<string, unknown>;
+  reasonToBuyTitle?: string;
+  reasonToBuyDescription?: string;
+  reasonToBuyImage?: string;
+  reasonToBuyImageAlt?: string;
+
+  // Sale policy
+  salePolicy?: Record<string, unknown>;
+  salePolicyDes?: string;
+  salePolicyImg?: string;
+  salePolicyAlt?: string;
+  salePolicyDescriptionDetails?: string[];
+
+  // Apartment design
+  apartmentDesign?: ApartmentDesign;
+
+  // Handover standard
+  handoverStandard?: HandoverStandard;
+
+  // Progress
+  progress?: Record<string, unknown>;
+  progressDescription?: string;
+  progressYoutubeUrl?: string;
+  progressMilestones?: ProgressMilestone[];
+  progressGallery?: ProgressGalleryItem[];
+  progressVideoUrl?: string;
+
+  // FAQ / Legal / Disclaimer
+  faqs?: FaqItem[];
+  legalInfo?: LegalInfoItem[];
+  advertisingDisclaimer?: string;
+
+  // Unit layouts
+  unitLayouts?: UnitLayoutItem[];
+
+  // UI/UX config
+  showOnHome?: boolean;
+  homeOrder?: number;
+  isFeatured?: boolean;
+  stickyMenu?: StickyMenuConfig;
+  heroLeadForm?: HeroLeadForm;
+  floatingCtas?: FloatingCta[];
+
+  // SEO
   coverImage?: string;
   coverAssetId?: string;
   ogAssetId?: string;
   metaTitle?: string;
   metaDescription?: string;
-  // Gallery section
-  gallery?: ProjectGallery[];
-  // Extention section
-  extentionDescription?: string;
-  extentionImages?: ProjectExtentionImage[];
-  // Floorplan section
-  floorplans?: FloorplanCategory[];
+  seoHead?: SeoHead;
 }
 
 export const projectService = {

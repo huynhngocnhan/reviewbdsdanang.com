@@ -2,6 +2,61 @@ import type React from "react";
 import type { ProjectData, SalePolicyItem } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
+/** Quill renders nested lists as sibling <ul>/<ol> after a <li> that has already closed.
+ *  e.g.  <ol><li>Hỗ trợ vay vốn:</li></ol><ul><li>Vay 70%...</li></ul>
+ *  This collects moves first (to avoid DOM mutation during iteration),
+ *  then applies them — moving every <ul>/<ol> after a <li> inside that <li>.
+ *  Only strips layout-breaking styles; keeps color/font styles. */
+function sanitizeQuillHtml(html: string): string {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const container = doc.body;
+
+    // Get top-level children only (Element nodes, not text nodes)
+    const topLevel = Array.from(container.childNodes).filter(
+      (n): n is Element => n.nodeType === Node.ELEMENT_NODE
+    );
+
+    // Step 1: collect all moves (so DOM is not mutated during iteration)
+    const moves: Array<{ child: Element; parent: Element }> = [];
+    for (const node of topLevel) {
+      if (["UL", "OL"].includes(node.nodeName)) {
+        const prev = node.previousElementSibling;
+        if (prev?.nodeName === "LI") {
+          moves.push({ child: node, parent: prev });
+        }
+      }
+    }
+
+    // Step 2: apply moves
+    for (const { child, parent } of moves) {
+      child.remove();
+      parent.appendChild(child);
+    }
+
+    // Step 3: strip layout styles; preserve color and font styles
+    const allWithStyle = container.querySelectorAll("[style]");
+    allWithStyle.forEach((el) => {
+      const style = el.getAttribute("style") || "";
+      // Extract only color / background-color declarations
+      const colorParts = style
+        .split(";")
+        .map((s) => s.trim())
+        .filter((s) => /^(color|background(?:-color)?)\s*:/i.test(s));
+      if (colorParts.length > 0) {
+        el.setAttribute("style", colorParts.join("; ") + ";");
+      } else {
+        el.removeAttribute("style");
+      }
+    });
+
+    return container.innerHTML;
+  } catch {
+    return html.replace(/\s+style="[^"]*"/g, "");
+  }
+}
+
 type Props = {
   project: ProjectData;
 };
@@ -30,9 +85,6 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
 
   const heading = policy?.heading || "Chính sách bán hàng";
   const subheading = policy?.subheading || project.title;
-  const description =
-    policy?.description ||
-    "Dự án áp dụng chính sách bán hàng và hỗ trợ tài chính linh hoạt dành cho khách hàng. Bao gồm các phương thức thanh toán, ưu đãi và chương trình hỗ trợ lãi suất theo từng giai đoạn. Chi tiết chính sách và bảng ưu đãi được trình bày trong phần thông tin bên dưới.";
   const items = policy?.items && policy.items.length > 0 ? policy.items : fallbackItems;
   const footerNote =
     policy?.footerNote ||
@@ -57,40 +109,50 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
             {subheading}
           </p>
           <p className="mx-auto mt-4 max-w-5xl font-semibold leading-relaxed text-[#6B4E3D]" itemProp="description">
-            {description}
+          Chính sách bán hàng và ưu đãi có thể được cập nhật theo từng giai đoạn. Quý khách vui lòng liên hệ để được cung cấp thông tin chi tiết và phù hợp nhu cầu.
           </p>
         </header>
 
-        <div className="mt-8 grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8">
+        <div className="mt-8 flex flex-col items-center gap-6">
           <ZoomableImage
-            src={policy?.policyImage || project.coverImage}
-            alt={`${project.title} - Chính sách bán hàng`}
-            className="rounded-2xl shadow-2xl"
-            imageClassName="min-h-[400px] lg:min-h-[600px]"
+            src={project.salePolicyImg || policy?.policyImage || project.coverImage}
+            alt={project.salePolicyAlt || `${project.title} - Chính sách bán hàng`}
+            className="w-full max-w-3xl rounded-2xl shadow-2xl"
+            imageClassName="min-h-[300px]"
           />
 
-          <div className="flex flex-col justify-between gap-4">
+          <div className="w-full max-w-3xl">
             <article className="rounded-2xl border-2 border-[#C96B5B] bg-[#F9F3EC] p-5 shadow-xl sm:p-7">
-              <ul className="space-y-4 leading-relaxed text-[#3D2B1F]">
-                {items.map((item, index) => (
-                  <li key={`${item.title}-${index}`} itemProp="itemListElement" itemScope itemType="https://schema.org/Offer">
-                    <p>
-                      <span className="font-semibold">• {item.title}:</span>{" "}
-                      {item.value ? <span itemProp="description">{item.value}</span> : null}
-                    </p>
+              {project.salePolicyDes ? (
+                <div
+                  className="max-w-2xl space-y-2 leading-relaxed text-[#3D2B1F]
+                    [&_ul]:ml-8 [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:space-y-2 [&_ol]:space-y-4
+                    [&_li]:leading-relaxed [&_strong]:font-semibold"
+                  itemProp="description"
+                  dangerouslySetInnerHTML={{ __html: sanitizeQuillHtml(project.salePolicyDes) }}
+                />
+              ) : (
+                <ul className=" max-w-2xl space-y-4 leading-relaxed text-[#3D2B1F]">
+                  {items.map((item, index) => (
+                    <li key={`${item.title}-${index}`} itemProp="itemListElement" itemScope itemType="https://schema.org/Offer">
+                      <p>
+                        <span className="font-semibold">• {item.title}:</span>{" "}
+                        {item.value ? <span itemProp="description">{item.value}</span> : null}
+                      </p>
 
-                    {item.subItems && item.subItems.length > 0 ? (
-                      <ul className="ml-6 mt-2 list-disc space-y-1">
-                        {item.subItems.map((subItem, subIndex) => (
-                          <li key={`${item.title}-sub-${subIndex}`}>
-                            <span itemProp="description">{subItem}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
+                      {item.subItems && item.subItems.length > 0 ? (
+                        <ul className="ml-6 mt-2 list-disc space-y-1">
+                          {item.subItems.map((subItem, subIndex) => (
+                            <li key={`${item.title}-sub-${subIndex}`}>
+                              <span itemProp="description">{subItem}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </article>
 
             <div className="px-2">

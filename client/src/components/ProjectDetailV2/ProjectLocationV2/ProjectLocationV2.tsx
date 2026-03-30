@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
@@ -6,71 +5,9 @@ type Props = {
   project: ProjectData;
 };
 
-type NearbyTrafficItem = {
-  url: string;
-  title: string;
-  des: string;
-};
-
-type NearbyGroup = {
-  minute: string;
-  places: string[];
-  trafficItems?: NearbyTrafficItem[];
-};
-
-const nearbyGroups: NearbyGroup[] = [
-  {
-    minute: "05",
-    places: ["Công viên trung tâm", "Trung tâm thương mại", "Trường học quốc tế"],
-    trafficItems: [
-      {
-        url: "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?auto=format&fit=crop&w=1200&q=80",
-        title: "CẦU TỨ LIÊN",
-        des: "Chính thức khởi công tháng 05/2025 và dự kiến hoàn thành trong năm 2027.",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=1200&q=80",
-        title: "TRUNG TÂM HỘI CHỢ TRIỂN LÃM QUỐC GIA",
-        des: "Triển lãm Thành tựu Đất nước 80 năm tại Trung tâm Triển lãm Việt Nam (Grand Expo).",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1465447142348-e9952c393450?auto=format&fit=crop&w=1200&q=80",
-        title: "CAO TỐC KẾT NỐI VỚI SÂN BAY GIA BÌNH",
-        des: "Tuyến kết nối sân bay Gia Bình (Bắc Ninh) với Hà Nội, tăng năng lực giao thông khu vực.",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1200&q=80",
-        title: "TUYẾN ĐƯỜNG SẮT KẾT NỐI HÀ NỘI - QUẢNG NINH",
-        des: "Dự án đường sắt liên vùng, tăng liên kết giao thương và giảm tải giao thông đường bộ.",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80",
-        title: "TUYẾN METRO SỐ 4",
-        des: "Tuyến metro đô thị trọng điểm, góp phần hoàn thiện mạng lưới giao thông Hà Nội.",
-      },
-    ],
-  },
-  {
-    minute: "10",
-    places: ["Trung tâm thành phố", "Bệnh viện quốc tế", "Khu hành chính"],
-  },
-  {
-    minute: "20",
-    places: ["Sân bay quốc tế", "Ga trung tâm"],
-  },
-  {
-    minute: "30",
-    places: ["Khu du lịch ven biển", "Vùng tiện ích mở rộng"],
-  },
-];
-
 const ProjectLocationV2 = ({ project }: Props) => {
-  const locationVisual = project.locationImage || project.coverImage;
-  const trafficItems = useMemo(
-    () => nearbyGroups.flatMap((group) => group.trafficItems ?? []),
-    [],
-  );
-  const hasTrafficItems = trafficItems.length > 0;
+  const nearbyGroups = project.nearbyGroups || [];
+  const nearbyTrafficItems = project.nearbyTrafficItems || [];
 
   return (
     <section
@@ -90,70 +27,95 @@ const ProjectLocationV2 = ({ project }: Props) => {
               {project.title}
             </h3>
 
-            <p className="mt-6 whitespace-pre-line text-white leading-relaxed text-base">{project.locationDescription}</p>
+            <p className="mt-6 whitespace-pre-line text-white leading-relaxed text-base">
+              {project.locationDescription}
+            </p>
 
-              <a
-                href={project.location360Url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Xem vị trí 360 độ của dự án ${project.title}`}
-                className="mt-5 inline-flex items-center rounded-xl bg-[#f9de2b] px-4 py-2.5 text-[#17372F] font-bold hover:bg-[#efd24b] transition"
-              >
-                Xem vị trí 360°
-              </a>
-
+            <div className="space-x-4">
+              {project.location360Url && (
+                <a
+                  href={project.location360Url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Xem vị trí 360 độ của dự án ${project.title}`}
+                  className="mt-5 inline-flex items-center rounded-xl bg-[#f9de2b] px-4 py-2.5 text-[#17372F] font-bold hover:bg-[#efd24b] transition"
+                >
+                  Xem vị trí 360°
+                </a>
+              )}
+            </div>
           </div>
 
           <ZoomableImage
-            src={locationVisual}
+            src={project.locationImage || project.coverImage}
             alt={`${project.title} - vị trí dự án`}
             className="lg:col-span-7 rounded-2xl border border-white/20 shadow-2xl"
             imageClassName="min-h-[450px]"
           />
-        </div>
 
-        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Khoảng cách tiện ích theo thời gian di chuyển">
-          {nearbyGroups.map((group) => (
-            <div key={group.minute} className="text-white min-w-0">
-              <p className="text-5xl font-black text-white">
-                {group.minute}
-                <span className="text-[#f9de2b] text-xl font-bold tracking-wide uppercase"> PHÚT</span>
-              </p>
-              <ul className="mt-3 space-y-2 text-white/90 text-sm sm:text-base">
-                {group.places.map((place) => (
-                  <li key={place}>• {place}</li>
-                ))}
-              </ul>
+          {project.mapEmbedUrl && (
+            <div className="mt-4 lg:col-span-7 overflow-hidden rounded-2xl border border-white/20">
+              <iframe
+                src={project.mapEmbedUrl}
+                width="100%"
+                height="400"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`Bản đồ vị trí dự án ${project.title}`}
+              />
             </div>
-          ))}
+          )}
+
+          {nearbyGroups.length > 0 && (
+            <div className="mt-4 lg:col-span-5 grid grid-cols-2 gap-4 content-start" aria-label="Khoảng cách tiện ích theo thời gian di chuyển">
+              {nearbyGroups.map((group, index) => (
+                <div key={`${group.minute}-${index}`} className="text-white min-w-0">
+                  <p className="text-5xl lg:text-6xl font-black text-white">
+                    {group.minute}
+                    <span className="text-[#f9de2b] text-2xl lg:text-3xl font-extrabold tracking-wide uppercase"> PHÚT</span>
+                  </p>
+                  {group.description && (
+                    <p className="mt-2 text-white/90 text-sm whitespace-pre-line leading-relaxed">
+                      {group.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {hasTrafficItems && (
+        {nearbyTrafficItems.length > 0 && (
           <div className="mt-10">
             <h3 className="text-3xl sm:text-4xl font-extrabold uppercase text-white">
               Các tuyến giao thông huyết mạch:
             </h3>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {trafficItems.map((item) => (
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {nearbyTrafficItems.map((item, index) => (
                 <article
-                  key={item.title}
+                  key={`${item.title}-${index}`}
                   className="overflow-hidden rounded-md bg-[#17372F]/40 text-white shadow-lg"
                 >
-                  <div className="relative h-44">
-                    <img
-                      src={item.url}
-                      alt={item.title}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-                  </div>
-
+                  {item.img && (
+                    <div className="relative h-44">
+                      <img
+                        src={item.img}
+                        alt={item.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                    </div>
+                  )}
                   <div className="p-4">
                     <h4 className="text-base font-extrabold uppercase leading-snug">{item.title}</h4>
-                    <p className="mt-2 text-sm text-white/85 leading-relaxed">{item.des}</p>
+                    {item.des && (
+                      <p className="mt-2 text-sm text-white/85 leading-relaxed">{item.des}</p>
+                    )}
                   </div>
                 </article>
               ))}

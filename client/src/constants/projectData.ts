@@ -85,21 +85,6 @@ export interface FloorplanCategory {
   floorPlanImage: ProjectGallery[];
 }
 
-export interface CustomContent {
-  contentTitle: string;
-  contentDes: string;
-  images: ProjectGallery[];
-}
-
-export interface CustomSectionData {
-  customTitle: string;
-  customDes: string;
-  contents: CustomContent[];
-}
-
-export interface CustomSectionItem extends CustomSectionData {
-  id?: string;
-}
 
 export interface SalePolicyItem {
   title: string;
@@ -117,6 +102,137 @@ export interface SalePolicyData {
   policyImage?: string;
 }
 
+// --- V2 Schema Types ---
+
+export interface SeoHead {
+  canonicalUrl?: string;
+  noIndex?: boolean;
+  noFollow?: boolean;
+  ogImage?: string;
+  schemaOrg?: Record<string, unknown>;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface LegalInfoItem {
+  title: string;
+  value: string;
+  fileUrl?: string;
+}
+
+export interface ProgressMilestone {
+  label: string;
+  date: string;
+  description: string;
+  completed?: boolean;
+}
+
+export interface ProgressGalleryItem {
+  src: string;
+  alt?: string;
+  capturedAt?: string;
+}
+
+export interface UnitLayoutItem {
+  name: string;
+  area: string;
+  description: string;
+  images?: ProjectGallery[];
+}
+
+export interface FloorplanMasterItem {
+  src: string;
+  alt?: string;
+  title?: string;
+}
+
+export interface FloorplanByFloorItem {
+  floor: string;
+  images?: ProjectGallery[];
+}
+
+export interface StickyMenuItem {
+  label: string;
+  href: string;
+}
+
+export interface StickyMenuConfig {
+  position?: "left" | "right";
+  items?: StickyMenuItem[];
+}
+
+export interface HeroLeadForm {
+  title?: string;
+  subtitle?: string;
+  enabled?: boolean;
+}
+
+export type FloatingCtaType = "phone" | "zalo" | "facebook" | "messenger" | "email" | "link";
+
+export interface FloatingCta {
+  type: FloatingCtaType;
+  label: string;
+  value: string;
+  enabled?: boolean;
+}
+
+export interface NearbyGroup {
+  minute?: string;
+  description?: string;
+}
+
+export interface NearbyTrafficItem {
+  title?: string;
+  des?: string;
+  img?: string;
+}
+
+export interface ApartmentItem {
+  name: string;
+  label: string;
+  description: string;
+  price: string;
+  image: string;
+}
+
+export interface ApartmentDesign {
+  des?: string;
+  desDetails?: string[];
+  apartmentItems?: ApartmentItem[];
+}
+
+export interface ExtentionDestination {
+  des?: string;
+  img?: string;
+}
+
+export interface HandoverItem {
+  subtitle?: string;
+  title: string;
+  des: string;
+  imgUrl?: string;
+}
+
+export interface HandoverStandard {
+  des?: string;
+  items?: HandoverItem[];
+}
+
+export interface CustomContent {
+  contentTitle: string;
+  contentDes: string;
+  images?: ProjectGallery[];
+}
+
+export interface CustomSectionData {
+  customTitle: string;
+  customDes?: string;
+  contents?: CustomContent[];
+}
+
 export interface ProjectData {
   id: string;
   slug: string;
@@ -124,6 +240,7 @@ export interface ProjectData {
   subtitle?: string;
   shortDescription: string;
   intro: string;
+  isFeatured?: boolean;
   reasonToBuyTitle?: string;
   reasonToBuyDescription?: string;
   reasonToBuyImage?: string;
@@ -135,6 +252,8 @@ export interface ProjectData {
   locationDescription: string;
   locationImage?: string;
   location360Url?: string;
+  nearbyGroups?: NearbyGroup[];
+  nearbyTrafficItems?: NearbyTrafficItem[];
   mapEmbedUrl: string;
   coverImage: string;
   subCoverImage?: string;
@@ -143,11 +262,22 @@ export interface ProjectData {
   gallery: ProjectGallery[];
   extentionDescription?: string;
   extentionImages?: ProjectExtentionImage[];
+  extentionDestinations?: ExtentionDestination[];
   handoverStandard?: HandoverStandardData;
+  apartmentDesign?: ApartmentDesign;
   progress?: ProjectProgressData;
+  // V2 Progress
+  progressDescription?: string;
+  progressYoutubeUrl?: string;
   floorplans: FloorplanCategory[];
-  customSections?: CustomSectionItem[];
+  customSections?: CustomSectionData[];
+  // Legacy
   salePolicy?: SalePolicyData;
+  // V2 Sale Policy
+  salePolicyDes?: string;
+  salePolicyImg?: string;
+  salePolicyAlt?: string;
+  salePolicyDescriptionDetails?: string[];
   highlights: string[];
 }
 
