@@ -38,14 +38,14 @@ type ProjectCreationProps = {
 };
 
 type NearbyGroupFormItem = {
-  minute: string;
-  description: string;
+  minute?: string;
+  description?: string;
 };
 
 type NearbyTrafficFormItem = {
-  title: string;
-  img: string;
-  des: string;
+  title?: string;
+  img?: string;
+  des?: string;
 };
 
 type ApartmentItemForm = {
@@ -57,14 +57,14 @@ type ApartmentItemForm = {
 };
 
 type ApartmentDesignForm = {
-  des: string;
-  desDetails: string[];
-  apartmentItems: ApartmentItemForm[];
+  des?: string;
+  desDetails?: string[];
+  apartmentItems?: ApartmentItemForm[];
 };
 
 type ExtentionDestinationForm = {
-  des: string;
-  img: string;
+  des?: string;
+  img?: string;
 };
 
 type SalePolicyLiteForm = {
@@ -134,7 +134,7 @@ const defaultFormData: ProjectFormData = {
   },
   handoverStandard: {
     des: "",
-    items: [],
+    items: [] as Array<{ subtitle: string; title: string; des: string; imgUrl: string }>,
   },
   progressDescription: "",
   progressYoutubeUrl: "",
@@ -506,7 +506,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   };
 
   const removeNearbyGroup = (index: number) => {
-    updateField("nearbyGroups", (formData.nearbyGroups || []).filter((_, i) => i !== index));
+    updateField("nearbyGroups", ((formData.nearbyGroups || []) as Array<{ minute?: string; description?: string }>).filter((_, i) => i !== index));
   };
 
   const addNearbyTrafficItem = () => {
@@ -524,27 +524,27 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   };
 
   const addApartmentDetail = () => {
-    const model = formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] };
-    updateField("apartmentDesign", { ...model, desDetails: [...model.desDetails, ""] });
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    updateField("apartmentDesign", { ...model, desDetails: [...(model.desDetails ?? []), ""] });
   };
 
   const updateApartmentDetail = (index: number, value: string) => {
-    const model = formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] };
-    const desDetails = [...model.desDetails];
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    const desDetails = [...(model.desDetails ?? [])];
     desDetails[index] = value;
     updateField("apartmentDesign", { ...model, desDetails });
   };
 
   const removeApartmentDetail = (index: number) => {
-    const model = formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] };
-    updateField("apartmentDesign", { ...model, desDetails: model.desDetails.filter((_, i) => i !== index) });
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    updateField("apartmentDesign", { ...model, desDetails: (model.desDetails ?? []).filter((_, i) => i !== index) });
   };
 
   const addApartmentItem = () => {
-    const model = formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] };
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
     updateField("apartmentDesign", {
       ...model,
-      apartmentItems: [...model.apartmentItems, { name: "", label: "", description: "", price: "", image: "" }],
+      apartmentItems: [...(model.apartmentItems ?? []), { name: "", label: "", description: "", price: "", image: "" }],
     });
   };
 
@@ -553,17 +553,17 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     field: "name" | "label" | "description" | "price" | "image",
     value: string
   ) => {
-    const model = formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] };
-    const apartmentItems = [...model.apartmentItems];
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    const apartmentItems = [...(model.apartmentItems ?? [])];
     apartmentItems[index] = { ...apartmentItems[index], [field]: value };
     updateField("apartmentDesign", { ...model, apartmentItems });
   };
 
   const removeApartmentItem = (index: number) => {
-    const model = formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] };
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
     updateField("apartmentDesign", {
       ...model,
-      apartmentItems: model.apartmentItems.filter((_, i) => i !== index),
+      apartmentItems: (model.apartmentItems ?? []).filter((_, i) => i !== index),
     });
   };
 
@@ -582,10 +582,10 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   };
 
   const addHandoverItem = () => {
-    const model = formData.handoverStandard || { des: "", items: [] };
+    const model = formData.handoverStandard ?? { des: "", items: [] };
     updateField("handoverStandard", {
       ...model,
-      items: [...(model.items || []), { subtitle: "", title: "", des: "", imgUrl: "" }],
+      items: [...(model.items ?? []), { subtitle: "", title: "", des: "", imgUrl: "" }],
     });
   };
 
@@ -594,17 +594,17 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     field: "subtitle" | "title" | "des" | "imgUrl",
     value: string
   ) => {
-    const model = formData.handoverStandard || { des: "", items: [] };
-    const items = [...(model.items || [])];
+    const model = formData.handoverStandard ?? { des: "", items: [] };
+    const items = [...(model.items ?? [])];
     items[index] = { ...items[index], [field]: value };
     updateField("handoverStandard", { ...model, items });
   };
 
   const removeHandoverItem = (index: number) => {
-    const model = formData.handoverStandard || { des: "", items: [] };
+    const model = formData.handoverStandard ?? { des: "", items: [] };
     updateField("handoverStandard", {
       ...model,
-      items: (model.items || []).filter((_, i) => i !== index),
+      items: (model.items ?? []).filter((_, i) => i !== index),
     });
   };
 
@@ -680,11 +680,11 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
             customTitle: cs.customTitle,
             customDes: cs.customDes || undefined,
             contents: cs.contents
-              ?.filter(c => c.contentTitle || c.contentDes || c.images.some(img => img.src))
+              ?.filter(c => c.contentTitle || c.contentDes || (c.images ?? []).some(img => img.src))
               .map(c => ({
                 contentTitle: c.contentTitle,
                 contentDes: c.contentDes,
-                images: c.images.filter(img => img.src),
+                images: (c.images ?? []).filter(img => img.src),
               })),
           })),
         highlights: formData.highlights,

@@ -21,15 +21,15 @@ import TabBarOverlay from "../TabBarOverlay/TabBarOverlay";
 import ContactOverlay from "../ContactOverlay/ContactOverlay";
 
 const projectTabs = [
-  { id: "reason-to-buy", label: "Giá trị cốt lõi" },
-  { id: "sale-policy", label: "Chính sách bán hàng" },
-  { id: "lead-form", label: "Tư vấn đăng ký" },
-  { id: "overview", label: "Tổng quan dự án" },
-  { id: "location", label: "Vị trí dự án" },
-  { id: "floorplan", label: "Mặt bằng tổng quan" },
-  { id: "apartment-design", label: "Thiết kế căn hộ" },
-  { id: "utilities", label: " Hệ tiện ích" },
-  { id: "handover", label: "Tiêu chuẩn bàn giao" },
+  { id: "reason-to-buy", label: "Giá trị" },
+  { id: "sale-policy", label: "Chính sách" },
+  { id: "lead-form", label: "Tư vấn"},
+  { id: "overview", label: "Tổng quan" },
+  { id: "location", label: "Vị trí" },
+  { id: "floorplan", label: "Mặt bằng" },
+  { id: "apartment-design", label: "Thiết kế" },
+  { id: "utilities", label: "Tiện ích" },
+  { id: "handover", label: "Tiêu chuẩn" },
   { id: "progress", label: "Tiến độ" },
   { id: "register", label: "Liên hệ" },
 ];

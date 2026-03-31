@@ -19,7 +19,7 @@ export interface ProjectExtentionImage {
 
 export interface HandoverStandardItem {
   subtitle: string;
-  title?: string;
+  title: string;
   des: string;
   imgUrl: string;
 }

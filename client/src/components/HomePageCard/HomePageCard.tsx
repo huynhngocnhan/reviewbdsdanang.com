@@ -96,7 +96,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
           filteredProjects.map((item, index) => (
             <a
               key={item.id}
-              href={`/du-an-v2/${item.slug}`}
+              href={`/du-an/${item.slug}`}
               data-aos="fade-up"
               data-aos-duration="800"
               data-aos-delay={index * 100}
