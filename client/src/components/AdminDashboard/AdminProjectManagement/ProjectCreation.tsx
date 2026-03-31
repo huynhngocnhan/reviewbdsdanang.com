@@ -2,6 +2,8 @@ import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 import {
   ArrowLeftIcon,
   PlusIcon,
@@ -9,7 +11,6 @@ import {
   MapPinIcon,
   BuildingOfficeIcon,
   Squares2X2Icon,
-  PhotoIcon as GalleryIcon,
   CloudArrowUpIcon,
   XMarkIcon,
   DocumentTextIcon,
@@ -36,8 +37,61 @@ type ProjectCreationProps = {
   projectId?: string; // For edit mode
 };
 
+type NearbyGroupFormItem = {
+  minute?: string;
+  description?: string;
+};
+
+type NearbyTrafficFormItem = {
+  title?: string;
+  img?: string;
+  des?: string;
+};
+
+type ApartmentItemForm = {
+  name: string;
+  label: string;
+  description: string;
+  price: string;
+  image: string;
+};
+
+type ApartmentDesignForm = {
+  des?: string;
+  desDetails?: string[];
+  apartmentItems?: ApartmentItemForm[];
+};
+
+type ExtentionDestinationForm = {
+  des?: string;
+  img?: string;
+};
+
+type SalePolicyLiteForm = {
+  des: string;
+  img: string;
+  alt: string;
+  descriptionDetails: string[];
+};
+
 type ProjectFormData = Omit<ProjectData, "id"> & {
   id?: string;
+  reasonToBuyTitle?: string;
+  reasonToBuyDescription?: string;
+  reasonToBuyImage?: string;
+  reasonToBuyImageAlt?: string;
+  salePolicyDes?: string;
+  salePolicyImg?: string;
+  salePolicyAlt?: string;
+  salePolicyDescriptionDetails?: string[];
+  location360Url?: string;
+  nearbyGroups?: NearbyGroupFormItem[];
+  nearbyTrafficItems?: NearbyTrafficFormItem[];
+  apartmentDesign?: ApartmentDesignForm;
+  extentionDestinations?: ExtentionDestinationForm[];
+  progressDescription?: string;
+  progressYoutubeUrl?: string;
+  salePolicyLite?: SalePolicyLiteForm;
 };
 
 const defaultFormData: ProjectFormData = {
@@ -58,12 +112,47 @@ const defaultFormData: ProjectFormData = {
   gallery: [],
   extentionDescription: "",
   extentionImages: [],
+  extentionDestinations: [],
   floorplans: [],
   customSections: [],
   highlights: [],
+  reasonToBuyTitle: "",
+  reasonToBuyDescription: "",
+  reasonToBuyImage: "",
+  reasonToBuyImageAlt: "",
+  salePolicyDes: "",
+  salePolicyImg: "",
+  salePolicyAlt: "",
+  salePolicyDescriptionDetails: [],
+  location360Url: "",
+  nearbyGroups: [],
+  nearbyTrafficItems: [],
+  apartmentDesign: {
+    des: "",
+    desDetails: [],
+    apartmentItems: [],
+  },
+  handoverStandard: {
+    des: "",
+    items: [] as Array<{ subtitle: string; title: string; des: string; imgUrl: string }>,
+  },
+  progressDescription: "",
+  progressYoutubeUrl: "",
 };
 
-type TabType = "basic" | "overview" | "location" | "extention" | "floorplan" | "gallery" | "custom";
+type TabType =
+  | "basic"
+  | "reason"
+  | "overview"
+  | "salePolicy"
+  | "location"
+  | "extention"
+  | "apartment"
+  | "handover"
+  | "progress"
+  | "floorplan"
+  | "gallery"
+  | "custom";
 
 // Image preview component
 const ImagePreview = ({
@@ -114,6 +203,29 @@ const UploadButton = ({
   </button>
 );
 
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ color: [] }, { background: [] }],
+    ["link", "clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "list",
+  "bullet",
+  "color",
+  "background",
+  "link",
+];
+
 const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, projectId }) => {
   const navigate = useNavigate();
   const isEditMode = !!projectId;
@@ -127,10 +239,16 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const heroImageInputRef = useRef<HTMLInputElement>(null);
   const locationImageInputRef = useRef<HTMLInputElement>(null);
+  const reasonToBuyImageInputRef = useRef<HTMLInputElement>(null);
+  const salePolicyImageInputRef = useRef<HTMLInputElement>(null);
   const extentionImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const floorplanImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const galleryImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const customImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const nearbyTrafficImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const extentionDestinationImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const apartmentItemImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const handoverItemImageInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   // Fetch project data when in edit mode
   useEffect(() => {
@@ -141,7 +259,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         setIsLoadingProject(true);
         const response = await projectService.getProjectById(projectId);
         if (response.success && response.data) {
-          const project = response.data;
+          const project = response.data as ProjectFormData;
           setFormData({
             id: project.id,
             slug: project.slug || "",
@@ -161,11 +279,35 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
             gallery: project.gallery || [],
             extentionDescription: project.extentionDescription || "",
             extentionImages: project.extentionImages || [],
+            extentionDestinations: project.extentionDestinations || [],
             floorplans: project.floorplans || [],
             customSections: project.customSections || [],
             highlights: project.highlights || [],
+            reasonToBuyTitle: project.reasonToBuyTitle || "",
+            reasonToBuyDescription: project.reasonToBuyDescription || "",
+            reasonToBuyImage: project.reasonToBuyImage || "",
+            reasonToBuyImageAlt: project.reasonToBuyImageAlt || "",
+            salePolicyDes: project.salePolicyDes || "",
+            salePolicyImg: project.salePolicyImg || "",
+            salePolicyAlt: project.salePolicyAlt || "",
+            salePolicyDescriptionDetails: project.salePolicyDescriptionDetails || [],
+            location360Url: project.location360Url || "",
+            nearbyGroups: project.nearbyGroups || [],
+            nearbyTrafficItems: project.nearbyTrafficItems || [],
+            apartmentDesign: project.apartmentDesign || {
+              des: "",
+              desDetails: [],
+              apartmentItems: [],
+            },
+            handoverStandard: project.handoverStandard || {
+              des: "",
+              items: [],
+            },
+            progressDescription: project.progressDescription || "",
+            progressYoutubeUrl: project.progressYoutubeUrl || "",
           });
         }
+        
       } catch (error) {
         console.error("Error fetching project:", error);
         toast.error("Không thể tải thông tin dự án");
@@ -178,12 +320,16 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   }, [projectId]);
 
   const tabs: { id: TabType; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
+    { id: "reason", label: "Giá trị cốt lõi", icon: DocumentTextIcon },
+    { id: "salePolicy", label: "Chính sách bán hàng", icon: DocumentTextIcon },
     { id: "basic", label: "Thông tin cơ bản", icon: BuildingOfficeIcon },
     { id: "overview", label: "Tổng quan & Specs", icon: Squares2X2Icon },
     { id: "location", label: "Vị trí", icon: MapPinIcon },
-    { id: "extention", label: "Tiện ích", icon: BuildingOfficeIcon },
     { id: "floorplan", label: "Mặt bằng", icon: Squares2X2Icon },
-    { id: "gallery", label: "Thư viện ảnh", icon: GalleryIcon },
+    { id: "apartment", label: "Thiết kế căn hộ", icon: BuildingOfficeIcon },
+    { id: "extention", label: "Tiện ích", icon: BuildingOfficeIcon },
+    { id: "handover", label: "Tiêu chuẩn bàn giao", icon: DocumentTextIcon },
+    { id: "progress", label: "Tiến độ", icon: DocumentTextIcon },
     { id: "custom", label: "Custom", icon: DocumentTextIcon },
   ];
 
@@ -193,6 +339,10 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       // Auto-generate slug when title changes
       if (field === "title" && typeof value === "string") {
         updated.slug = generateSlug(value);
+      }
+      // Auto-generate mapEmbedUrl when locationText changes
+      if (field === "locationText" && typeof value === "string") {
+        updated.mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(value)}&output=embed`;
       }
       return updated;
     });
@@ -345,10 +495,160 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     updateField("floorplans", formData.floorplans.filter((_, i) => i !== index));
   };
 
+  const addNearbyGroup = () => {
+    updateField("nearbyGroups", [...(formData.nearbyGroups || []), { minute: "", description: "" }]);
+  };
+
+  const updateNearbyGroup = (index: number, field: "minute" | "description", value: string) => {
+    const groups = [...(formData.nearbyGroups || [])];
+    groups[index] = { ...groups[index], [field]: value };
+    updateField("nearbyGroups", groups);
+  };
+
+  const removeNearbyGroup = (index: number) => {
+    updateField("nearbyGroups", ((formData.nearbyGroups || []) as Array<{ minute?: string; description?: string }>).filter((_, i) => i !== index));
+  };
+
+  const addNearbyTrafficItem = () => {
+    updateField("nearbyTrafficItems", [...(formData.nearbyTrafficItems || []), { title: "", img: "", des: "" }]);
+  };
+
+  const updateNearbyTrafficItem = (index: number, field: "title" | "img" | "des", value: string) => {
+    const items = [...(formData.nearbyTrafficItems || [])];
+    items[index] = { ...items[index], [field]: value };
+    updateField("nearbyTrafficItems", items);
+  };
+
+  const removeNearbyTrafficItem = (index: number) => {
+    updateField("nearbyTrafficItems", (formData.nearbyTrafficItems || []).filter((_, i) => i !== index));
+  };
+
+  const addApartmentDetail = () => {
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    updateField("apartmentDesign", { ...model, desDetails: [...(model.desDetails ?? []), ""] });
+  };
+
+  const updateApartmentDetail = (index: number, value: string) => {
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    const desDetails = [...(model.desDetails ?? [])];
+    desDetails[index] = value;
+    updateField("apartmentDesign", { ...model, desDetails });
+  };
+
+  const removeApartmentDetail = (index: number) => {
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    updateField("apartmentDesign", { ...model, desDetails: (model.desDetails ?? []).filter((_, i) => i !== index) });
+  };
+
+  const addApartmentItem = () => {
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    updateField("apartmentDesign", {
+      ...model,
+      apartmentItems: [...(model.apartmentItems ?? []), { name: "", label: "", description: "", price: "", image: "" }],
+    });
+  };
+
+  const updateApartmentItem = (
+    index: number,
+    field: "name" | "label" | "description" | "price" | "image",
+    value: string
+  ) => {
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    const apartmentItems = [...(model.apartmentItems ?? [])];
+    apartmentItems[index] = { ...apartmentItems[index], [field]: value };
+    updateField("apartmentDesign", { ...model, apartmentItems });
+  };
+
+  const removeApartmentItem = (index: number) => {
+    const model = formData.apartmentDesign ?? { des: "", desDetails: [] as string[], apartmentItems: [] };
+    updateField("apartmentDesign", {
+      ...model,
+      apartmentItems: (model.apartmentItems ?? []).filter((_, i) => i !== index),
+    });
+  };
+
+  const addExtentionDestination = () => {
+    updateField("extentionDestinations", [...(formData.extentionDestinations || []), { des: "", img: "" }]);
+  };
+
+  const updateExtentionDestination = (index: number, field: "des" | "img", value: string) => {
+    const destinations = [...(formData.extentionDestinations || [])];
+    destinations[index] = { ...destinations[index], [field]: value };
+    updateField("extentionDestinations", destinations);
+  };
+
+  const removeExtentionDestination = (index: number) => {
+    updateField("extentionDestinations", (formData.extentionDestinations || []).filter((_, i) => i !== index));
+  };
+
+  const addHandoverItem = () => {
+    const model = formData.handoverStandard ?? { des: "", items: [] };
+    updateField("handoverStandard", {
+      ...model,
+      items: [...(model.items ?? []), { subtitle: "", title: "", des: "", imgUrl: "" }],
+    });
+  };
+
+  const updateHandoverItem = (
+    index: number,
+    field: "subtitle" | "title" | "des" | "imgUrl",
+    value: string
+  ) => {
+    const model = formData.handoverStandard ?? { des: "", items: [] };
+    const items = [...(model.items ?? [])];
+    items[index] = { ...items[index], [field]: value };
+    updateField("handoverStandard", { ...model, items });
+  };
+
+  const removeHandoverItem = (index: number) => {
+    const model = formData.handoverStandard ?? { des: "", items: [] };
+    updateField("handoverStandard", {
+      ...model,
+      items: (model.items ?? []).filter((_, i) => i !== index),
+    });
+  };
+
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.slug || !formData.title || !formData.shortDescription) {
       toast.error("Vui lòng điền đầy đủ các trường bắt buộc (Slug, Title, Short Description)");
+      return;
+    }
+
+    const apartmentDesign = formData.apartmentDesign;
+
+    const emptyApartmentDetailIndex = (apartmentDesign?.desDetails || []).findIndex((detail) => !detail.trim());
+    if (emptyApartmentDetailIndex !== -1) {
+      toast.error(`Mô tả chi tiết căn hộ dòng ${emptyApartmentDetailIndex + 1} đang trống`);
+      return;
+    }
+
+    const emptyApartmentItemIndex = (apartmentDesign?.apartmentItems || []).findIndex(
+      (item) =>
+        !item.name?.trim() ||
+        !item.label?.trim() ||
+        !item.price?.trim() ||
+        !item.description?.trim() ||
+        !item.image?.trim()
+    );
+    if (emptyApartmentItemIndex !== -1) {
+      toast.error(`Căn hộ #${emptyApartmentItemIndex + 1} chưa điền đủ thông tin (tên, nhãn, giá, mô tả, ảnh)`);
+      return;
+    }
+
+    const emptyExtentionDestinationIndex = (formData.extentionDestinations || []).findIndex(
+      (dest) => !dest.des?.trim() || !dest.img?.trim()
+    );
+    if (emptyExtentionDestinationIndex !== -1) {
+      toast.error(`Tiện ích xung quanh #${emptyExtentionDestinationIndex + 1} chưa có đủ mô tả và ảnh`);
+      return;
+    }
+
+    const emptyHandoverItemIndex = (formData.handoverStandard?.items || []).findIndex(
+      (item) => !item.subtitle?.trim() || !item.title?.trim() || !item.des?.trim() || !item.imgUrl?.trim()
+    );
+    if (emptyHandoverItemIndex !== -1) {
+      toast.error(`Tiêu chuẩn bàn giao #${emptyHandoverItemIndex + 1} chưa điền đủ subtitle, title, mô tả, ảnh`);
       return;
     }
 
@@ -380,14 +680,30 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
             customTitle: cs.customTitle,
             customDes: cs.customDes || undefined,
             contents: cs.contents
-              ?.filter(c => c.contentTitle || c.contentDes || c.images.some(img => img.src))
+              ?.filter(c => c.contentTitle || c.contentDes || (c.images ?? []).some(img => img.src))
               .map(c => ({
                 contentTitle: c.contentTitle,
                 contentDes: c.contentDes,
-                images: c.images.filter(img => img.src),
+                images: (c.images ?? []).filter(img => img.src),
               })),
           })),
         highlights: formData.highlights,
+        reasonToBuyTitle: formData.reasonToBuyTitle || undefined,
+        reasonToBuyDescription: formData.reasonToBuyDescription || undefined,
+        reasonToBuyImage: formData.reasonToBuyImage || undefined,
+        reasonToBuyImageAlt: formData.reasonToBuyImageAlt || undefined,
+        salePolicyDes: formData.salePolicyDes || undefined,
+        salePolicyImg: formData.salePolicyImg || undefined,
+        salePolicyAlt: formData.salePolicyAlt || undefined,
+        salePolicyDescriptionDetails: formData.salePolicyDescriptionDetails?.filter(Boolean),
+        location360Url: formData.location360Url || undefined,
+        nearbyGroups: formData.nearbyGroups?.filter((g) => g.minute || g.description),
+        nearbyTrafficItems: formData.nearbyTrafficItems?.filter((i) => i.title || i.des || i.img),
+        apartmentDesign: formData.apartmentDesign,
+        extentionDestinations: formData.extentionDestinations?.filter((d) => d.des || d.img),
+        handoverStandard: formData.handoverStandard,
+        progressDescription: formData.progressDescription || undefined,
+        progressYoutubeUrl: formData.progressYoutubeUrl || undefined,
       };
 
       let response;
@@ -467,7 +783,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">
-          Chủ đầu tư <span className="text-red-500">*</span>
+          Category <span className="text-red-500">*</span>
         </label>
         <select
           value={formData.category}
@@ -493,7 +809,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">
-          Mô tả ngắn <span className="text-red-500">*</span>
+          Mô tả ngắn (hiển thị ở trang chủ) <span className="text-red-500">*</span>
         </label>
         <textarea
           value={formData.shortDescription}
@@ -505,7 +821,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Giới thiệu chi tiết</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Giới thiệu chi tiết (hiển thị phần tổng quan)</label>
         <textarea
           value={formData.intro}
           onChange={(e) => updateField("intro", e.target.value)}
@@ -548,7 +864,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Ảnh Cover</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Ảnh bìa dự án</label>
         <input
           ref={coverImageInputRef}
           type="file"
@@ -594,10 +910,167 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     </div>
   );
 
+  const renderReasonToBuy = () => (
+    <div className="space-y-6">
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Tiêu đề (ví dụ: Giá trị cốt lõi, Lý do nên đầu tư, ...)</label>
+        <input
+          type="text"
+          value={formData.reasonToBuyTitle || ""}
+          onChange={(e) => updateField("reasonToBuyTitle", e.target.value)}
+          placeholder="Giá trị cốt lõi"
+          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
+        />
+      </div>
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Mô tả</label>
+        <textarea
+          value={formData.reasonToBuyDescription || ""}
+          onChange={(e) => updateField("reasonToBuyDescription", e.target.value)}
+          rows={10}
+          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Hình ảnh</label>
+        <input
+          ref={reasonToBuyImageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              await handleImageUpload(
+                file,
+                "projects/reason-to-buy",
+                (url) => updateField("reasonToBuyImage", url),
+                "reasonToBuyImage"
+              );
+              if (reasonToBuyImageInputRef.current) reasonToBuyImageInputRef.current.value = "";
+            }
+          }}
+        />
+
+        {!formData.reasonToBuyImage ? (
+          <UploadButton
+            onClick={() => reasonToBuyImageInputRef.current?.click()}
+            isUploading={uploadingImages.reasonToBuyImage || false}
+            label="Upload ảnh lý do chọn mua"
+            hasImage={false}
+          />
+        ) : (
+          <div className="space-y-3">
+            <ImagePreview
+              src={formData.reasonToBuyImage}
+              alt={formData.reasonToBuyImageAlt || "Reason to buy preview"}
+              height="h-64"
+              onRemove={() => updateField("reasonToBuyImage", "")}
+            />
+            <UploadButton
+              onClick={() => reasonToBuyImageInputRef.current?.click()}
+              isUploading={uploadingImages.reasonToBuyImage || false}
+              label="Upload ảnh lý do chọn mua"
+              hasImage={true}
+            />
+          </div>
+        )}
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Alt ảnh</label>
+        <input
+          type="text"
+          value={formData.reasonToBuyImageAlt || ""}
+          onChange={(e) => updateField("reasonToBuyImageAlt", e.target.value)}
+          placeholder="Lý do nên đầu tư dự án"
+          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
+        />
+      </div>
+    </div>
+  );
+
+  const renderSalePolicy = () => (
+    <div className="space-y-6">
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Mô tả chính sách</label>
+        <div className="rounded-xl border border-gray-300 bg-white">
+          <ReactQuill
+            theme="snow"
+            value={formData.salePolicyDes || ""}
+            onChange={(value: string) => updateField("salePolicyDes", value)}
+            placeholder="Mô tả chính sách"
+            modules={quillModules}
+            formats={quillFormats}
+            className="text-gray-800"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Ảnh chính sách bán hàng</label>
+        <input
+          ref={salePolicyImageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              await handleImageUpload(
+                file,
+                "projects/sale-policy",
+                (url) => updateField("salePolicyImg", url),
+                "salePolicyImg"
+              );
+              if (salePolicyImageInputRef.current) salePolicyImageInputRef.current.value = "";
+            }
+          }}
+        />
+
+        {!formData.salePolicyImg ? (
+          <UploadButton
+            onClick={() => salePolicyImageInputRef.current?.click()}
+            isUploading={uploadingImages.salePolicyImg || false}
+            label="Upload ảnh chính sách"
+            hasImage={false}
+          />
+        ) : (
+          <div className="space-y-3">
+            <ImagePreview
+              src={formData.salePolicyImg}
+              alt={formData.salePolicyAlt || "Sale policy preview"}
+              height="h-64"
+              onRemove={() => updateField("salePolicyImg", "")}
+            />
+            <UploadButton
+              onClick={() => salePolicyImageInputRef.current?.click()}
+              isUploading={uploadingImages.salePolicyImg || false}
+              label="Upload ảnh chính sách"
+              hasImage={true}
+            />
+          </div>
+        )}
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Alt ảnh</label>
+        <input
+          type="text"
+          value={formData.salePolicyAlt || ""}
+          onChange={(e) => updateField("salePolicyAlt", e.target.value)}
+          placeholder="Chính sách bán hàng dự án"
+          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
+        />
+      </div>
+    </div>
+  );
+
   const renderOverview = () => (
     <div className="space-y-6">
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Ảnh Hero (Tổng quan)</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Ảnh tổng quan:</label>
         <input
           ref={heroImageInputRef}
           type="file"
@@ -642,7 +1115,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Thông tin chi tiết (Specs)</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Thông tin chi tiết (trái Key - phải Value)</label>
         <div className="space-y-4">
           {formData.specs.map((spec, index) => (
             <div key={index} className="flex gap-3">
@@ -685,7 +1158,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
   const renderLocation = () => (
     <div className="space-y-6">
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Địa chỉ hiển thị</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Địa chỉ (hiển thị trên phần ảnh bìa)</label>
         <input
           type="text"
           value={formData.locationText}
@@ -705,31 +1178,6 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
         />
       </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ nhúng</label>
-        <input
-          type="url"
-          value={formData.mapEmbedUrl}
-          onChange={(e) => updateField("mapEmbedUrl", e.target.value)}
-          placeholder="https://www.google.com/maps?q=Da%20Nang&output=embed"
-          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
-        />
-        {formData.mapEmbedUrl && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
-            <iframe
-              src={formData.mapEmbedUrl}
-              width="100%"
-              height="300"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-        )}
-      </div>
-
       {/* Location Image Upload */}
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700">Hình ảnh vị trí</label>
@@ -783,6 +1231,160 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           }}
         />
       </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ nhúng <span className="text-xs text-gray-400">(auto-gen từ địa chỉ)</span></label>
+        <input
+          type="url"
+          value={formData.mapEmbedUrl}
+          readOnly
+          placeholder="Auto từ địa chỉ..."
+          className="w-full rounded-xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed"
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">URL vị trí 360°</label>
+        <input
+          type="url"
+          value={formData.location360Url || ""}
+          onChange={(e) => updateField("location360Url", e.target.value)}
+          placeholder="https://kuula.co/post/..."
+          className="w-full rounded-xl border text-gray-700 border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
+        />
+        {formData.mapEmbedUrl && (
+          <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
+            <iframe
+              src={formData.mapEmbedUrl}
+              width="100%"
+              height="300"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-gray-200 p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-gray-700">Khoảng thời gian tới các địa điểm nổi bật (4 items để hiển thị tốt hơn)</p>
+          <button type="button" onClick={addNearbyGroup} className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800">
+            <PlusIcon className="h-3 w-3 text-gray-800" /> Thêm
+          </button>
+        </div>
+        {(formData.nearbyGroups || []).map((group, index) => (
+          <div key={index} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[160px_1fr_auto] sm:items-start">
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  value={group.minute}
+                  onChange={(e) => updateNearbyGroup(index, "minute", e.target.value)}
+                  placeholder="05"
+                  className="w-full rounded-lg border border-gray-300 text-gray-800 bg-white px-3 py-2 pr-12 text-sm"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">phút</span>
+              </div>
+              <textarea
+                value={group.description}
+                onChange={(e) => updateNearbyGroup(index, "description", e.target.value)}
+                placeholder="Mô tả tiện ích trong số phút tương ứng"
+                rows={4}
+                className="rounded-lg border border-gray-300 text-gray-800 bg-white px-3 py-2 text-sm"
+              />
+              <button type="button" onClick={() => removeNearbyGroup(index)} className="rounded-lg p-2 text-red-500">
+                <TrashIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-gray-200 p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-gray-700">Các đô thị liền kề (đẹp nhất là 4 items)</p>
+          <button type="button" onClick={addNearbyTrafficItem} className="inline-flex text-gray-800 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs">
+            <PlusIcon className="h-3 w-3 text-gray-800" /> Thêm
+          </button>
+        </div>
+        {(formData.nearbyTrafficItems || []).map((item, index) => (
+          <div key={index} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div className="grid grid-cols-1 gap-2">
+              <input
+                type="text"
+                value={item.title}
+                onChange={(e) => updateNearbyTrafficItem(index, "title", e.target.value)}
+                placeholder="Tiêu đề"
+                className="rounded-lg text-gray-800 border border-gray-300 bg-white px-3 py-2 text-sm"
+              />
+              <textarea
+                value={item.des}
+                onChange={(e) => updateNearbyTrafficItem(index, "des", e.target.value)}
+                placeholder="Mô tả"
+                rows={2}
+                className="rounded-lg text-gray-800 border border-gray-300 bg-white px-3 py-2 text-sm"
+              />
+              <div>
+                <input
+                  ref={(el) => {
+                    nearbyTrafficImageInputRefs.current[index] = el;
+                  }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      await handleImageUpload(
+                        file,
+                        `projects/nearby-traffic/${index}`,
+                        (url) => updateNearbyTrafficItem(index, "img", url),
+                        `nearbyTraffic-${index}`
+                      );
+                      if (nearbyTrafficImageInputRefs.current[index]) {
+                        nearbyTrafficImageInputRefs.current[index]!.value = "";
+                      }
+                    }
+                  }}
+                />
+                {!item.img ? (
+                  <UploadButton
+                    onClick={() => nearbyTrafficImageInputRefs.current[index]?.click()}
+                    isUploading={uploadingImages[`nearbyTraffic-${index}`] || false}
+                    label="Upload ảnh"
+                    hasImage={false}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    <ImagePreview
+                      src={item.img}
+                      alt={item.title}
+                      height="h-40"
+                      onRemove={() => updateNearbyTrafficItem(index, "img", "")}
+                    />
+                    <UploadButton
+                      onClick={() => nearbyTrafficImageInputRefs.current[index]?.click()}
+                      isUploading={uploadingImages[`nearbyTraffic-${index}`] || false}
+                      label="Thay đổi ảnh"
+                      hasImage={true}
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end">
+                <button type="button" onClick={() => removeNearbyTrafficItem(index)} className="rounded-lg p-2 text-red-500">
+                  <TrashIcon className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      
     </div>
   );
 
@@ -793,7 +1395,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         <textarea
           value={formData.extentionDescription || ""}
           onChange={(e) => updateField("extentionDescription", e.target.value)}
-          rows={3}
+          rows={6}
           placeholder="Chuỗi tiện ích nội khu được quy hoạch theo tiêu chuẩn nghỉ dưỡng..."
           className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
         />
@@ -881,6 +1483,378 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           </button>
         </div>
       </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Tiện ích xung quanh:</label>
+        <div className="space-y-4">
+          {(formData.extentionDestinations || []).map((dest, index) => (
+            <div key={index} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <textarea
+                value={dest.des}
+                onChange={(e) => updateExtentionDestination(index, "des", e.target.value)}
+                rows={2}
+                placeholder="vd: Vincom: Không gian mua sắm - giải trí đa tầng"
+                className="w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+              />
+
+              <input
+                ref={(el) => {
+                  extentionDestinationImageInputRefs.current[index] = el;
+                }}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    await handleImageUpload(
+                      file,
+                      `projects/extention-destination/${index}`,
+                      (url) => updateExtentionDestination(index, "img", url),
+                      `extentionDestination-${index}`
+                    );
+                    if (extentionDestinationImageInputRefs.current[index]) {
+                      extentionDestinationImageInputRefs.current[index]!.value = "";
+                    }
+                  }
+                }}
+              />
+
+              {!dest.img ? (
+                <UploadButton
+                  onClick={() => extentionDestinationImageInputRefs.current[index]?.click()}
+                  isUploading={uploadingImages[`extentionDestination-${index}`] || false}
+                  label="Upload ảnh tiện ích xung quanh"
+                  hasImage={false}
+                />
+              ) : (
+                <div className="mt-2 space-y-3">
+                  <ImagePreview
+                    src={dest.img}
+                    alt={dest.des || "Tiện ích xung quanh"}
+                    height="h-40"
+                    onRemove={() => updateExtentionDestination(index, "img", "")}
+                  />
+                  <UploadButton
+                    onClick={() => extentionDestinationImageInputRefs.current[index]?.click()}
+                    isUploading={uploadingImages[`extentionDestination-${index}`] || false}
+                    label="Thay đổi ảnh tiện ích xung quanh"
+                    hasImage={true}
+                  />
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => removeExtentionDestination(index)}
+                className="mt-3 rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition"
+              >
+                Xóa tiện ích xung quanh này
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addExtentionDestination}
+            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Thêm tiện ích xung quanh
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderApartment = () => (
+    <div className="space-y-6">
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Mô tả thiết kế căn hộ</label>
+        <textarea
+          value={formData.apartmentDesign?.des || ""}
+          onChange={(e) =>
+            updateField("apartmentDesign", {
+              ...(formData.apartmentDesign || { des: "", desDetails: [], apartmentItems: [] }),
+              des: e.target.value,
+            })
+          }
+          rows={4}
+          className="w-full text-gray-800 rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
+        />
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-gray-200 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-gray-700">Mô tả chi tiết (thêm từng dòng để hiển thị dưới dạng liệt kê)</p>
+            <p className="text-xs text-gray-500">
+              Ví dụ: Studio: 34.4m² – 40.3m², linh hoạt cho người độc thân
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addApartmentDetail}
+            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800"
+          >
+            <PlusIcon className="h-3 w-3" /> Thêm dòng
+          </button>
+        </div>
+        {(formData.apartmentDesign?.desDetails || []).map((detail, index) => (
+          <div key={index} className="flex gap-2">
+            <input
+              type="text"
+              value={detail}
+              onChange={(e) => updateApartmentDetail(index, e.target.value)}
+              placeholder="1PN+: 45m² – 52m², tối ưu công năng cho gia đình trẻ"
+              className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-800"
+            />
+            <button type="button" onClick={() => removeApartmentDetail(index)} className="rounded-lg p-2 text-red-500">
+              <TrashIcon className="h-5 w-5" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-gray-700">
+          <p className="text-sm font-semibold text-gray-700">Danh sách căn hộ</p>
+          <button
+            type="button"
+            onClick={addApartmentItem}
+            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs"
+          >
+            <PlusIcon className="h-3 w-3" /> Thêm căn hộ
+          </button>
+        </div>
+        {(formData.apartmentDesign?.apartmentItems || []).map((item, index) => (
+          <div key={index} className="rounded-xl border border-gray-200 p-3">
+            <div className="mb-3 grid gap-2 sm:grid-cols-2">
+              <input
+                type="text"
+                value={item.name}
+                onChange={(e) => updateApartmentItem(index, "name", e.target.value)}
+                placeholder="Tên căn hộ (VD: Studio, 4PN)"
+                className="w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+              />
+              <input
+                type="text"
+                value={item.label || ""}
+                onChange={(e) => updateApartmentItem(index, "label", e.target.value)}
+                placeholder="Nhãn hiển thị (VD: Studio, 1PN)"
+                className="w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+              />
+            </div>
+
+            <input
+              type="text"
+              value={item.price}
+              onChange={(e) => updateApartmentItem(index, "price", e.target.value)}
+              placeholder="Khoảng giá (VD: 3.2 tỷ/căn)"
+              className="mb-2 w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+            />
+
+            <textarea
+              value={item.description}
+              onChange={(e) => updateApartmentItem(index, "description", e.target.value)}
+              placeholder="Mô tả căn hộ"
+              rows={2}
+              className="mb-2 w-full text-gray-700 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+            />
+
+            <input
+              ref={(el) => {
+                apartmentItemImageInputRefs.current[index] = el;
+              }}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  await handleImageUpload(
+                    file,
+                    `projects/apartment-items/${index}`,
+                    (url) => updateApartmentItem(index, "image", url),
+                    `apartmentItem-${index}`
+                  );
+                  if (apartmentItemImageInputRefs.current[index]) {
+                    apartmentItemImageInputRefs.current[index]!.value = "";
+                  }
+                }
+              }}
+            />
+
+            {!item.image ? (
+              <UploadButton
+                onClick={() => apartmentItemImageInputRefs.current[index]?.click()}
+                isUploading={uploadingImages[`apartmentItem-${index}`] || false}
+                label="Upload ảnh căn hộ"
+                hasImage={false}
+              />
+            ) : (
+              <div className="space-y-2">
+                <ImagePreview
+                  src={item.image}
+                  alt={item.label || item.name || "Apartment item"}
+                  height="h-44"
+                  onRemove={() => updateApartmentItem(index, "image", "")}
+                />
+                <UploadButton
+                  onClick={() => apartmentItemImageInputRefs.current[index]?.click()}
+                  isUploading={uploadingImages[`apartmentItem-${index}`] || false}
+                  label="Thay đổi ảnh căn hộ"
+                  hasImage={true}
+                />
+              </div>
+            )}
+
+            <div className="mt-2 flex justify-end">
+              <button type="button" onClick={() => removeApartmentItem(index)} className="rounded-lg p-2 text-red-500">
+                <TrashIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderHandover = () => (
+    <div className="space-y-6">
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Mô tả tiêu chuẩn bàn giao</label>
+        <textarea
+          value={formData.handoverStandard?.des || ""}
+          onChange={(e) =>
+            updateField("handoverStandard", {
+              ...(formData.handoverStandard || { des: "", items: [] }),
+              des: e.target.value,
+            })
+          }
+          rows={4}
+          className="w-full text-gray-700 rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
+        />
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-gray-200 p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-gray-700">Danh sách tiêu chuẩn bàn giao</p>
+          <button
+            type="button"
+            onClick={addHandoverItem}
+            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800"
+          >
+            <PlusIcon className="h-3 w-3" /> Thêm tiêu chuẩn
+          </button>
+        </div>
+
+        {(formData.handoverStandard?.items || []).map((item, index) => (
+          <div key={index} className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div className="mb-2 grid gap-2 sm:grid-cols-2">
+              <input
+                type="text"
+                value={item.subtitle || ""}
+                onChange={(e) => updateHandoverItem(index, "subtitle", e.target.value)}
+                placeholder="Subtitle (VD: Không gian)"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800"
+              />
+              <input
+                type="text"
+                value={item.title || ""}
+                onChange={(e) => updateHandoverItem(index, "title", e.target.value)}
+                placeholder="Title (VD: Phòng bếp)"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800"
+              />
+            </div>
+
+            <textarea
+              value={item.des || ""}
+              onChange={(e) => updateHandoverItem(index, "des", e.target.value)}
+              placeholder="Mô tả tiêu chuẩn"
+              rows={2}
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800"
+            />
+
+            <input
+              ref={(el) => {
+                handoverItemImageInputRefs.current[index] = el;
+              }}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  await handleImageUpload(
+                    file,
+                    `projects/handover/${index}`,
+                    (url) => updateHandoverItem(index, "imgUrl", url),
+                    `handoverItem-${index}`
+                  );
+                  if (handoverItemImageInputRefs.current[index]) {
+                    handoverItemImageInputRefs.current[index]!.value = "";
+                  }
+                }
+              }}
+            />
+
+            {!item.imgUrl ? (
+              <div className="mt-2">
+                <UploadButton
+                  onClick={() => handoverItemImageInputRefs.current[index]?.click()}
+                  isUploading={uploadingImages[`handoverItem-${index}`] || false}
+                  label="Upload ảnh tiêu chuẩn"
+                  hasImage={false}
+                />
+              </div>
+            ) : (
+              <div className="mt-2 space-y-2">
+                <ImagePreview
+                  src={item.imgUrl}
+                  alt={item.title || item.subtitle || "Handover item"}
+                  height="h-40"
+                  onRemove={() => updateHandoverItem(index, "imgUrl", "")}
+                />
+                <UploadButton
+                  onClick={() => handoverItemImageInputRefs.current[index]?.click()}
+                  isUploading={uploadingImages[`handoverItem-${index}`] || false}
+                  label="Thay đổi ảnh tiêu chuẩn"
+                  hasImage={true}
+                />
+              </div>
+            )}
+
+            <div className="mt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => removeHandoverItem(index)}
+                className="rounded-lg p-2 text-red-500"
+              >
+                <TrashIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderProgress = () => (
+    <div className="space-y-4">
+      <textarea
+        value={formData.progressDescription || ""}
+        onChange={(e) => updateField("progressDescription", e.target.value)}
+        rows={4}
+        placeholder="Mô tả tiến độ"
+        className="w-full rounded-xl border text-gray-800 border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
+      />
+      <input
+        type="url"
+        value={formData.progressYoutubeUrl || ""}
+        onChange={(e) => updateField("progressYoutubeUrl", e.target.value)}
+        placeholder="Youtube URL"
+        className="w-full rounded-xl border text-gray-800 border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
+      />
     </div>
   );
 
@@ -892,11 +1866,11 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           {formData.floorplans.map((floorplan, floorplanIndex) => (
             <div key={floorplanIndex} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <div className="mb-4">
-                <label className="mb-2 block text-xs font-medium text-gray-600">Mô tả</label>
+                <label className="mb-2 block text-xs font-medium text-gray-600">Mô tả chung</label>
                 <textarea
                   value={floorplan.description}
                   onChange={(e) => updateFloorplan(floorplanIndex, "description", e.target.value)}
-                  rows={2}
+                  rows={4}
                   placeholder="Mặt bằng căn hộ được tối ưu công năng..."
                   className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-500"
                 />
@@ -1496,12 +2470,22 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     switch (activeTab) {
       case "basic":
         return renderBasicInfo();
+      case "reason":
+        return renderReasonToBuy();
       case "overview":
         return renderOverview();
+      case "salePolicy":
+        return renderSalePolicy();
       case "location":
         return renderLocation();
       case "extention":
         return renderExtention();
+      case "apartment":
+        return renderApartment();
+      case "handover":
+        return renderHandover();
+      case "progress":
+        return renderProgress();
       case "floorplan":
         return renderFloorplan();
       case "gallery":

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, ArchiveBoxIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, ArchiveBoxIcon, ArrowPathIcon, StarIcon } from "@heroicons/react/24/outline";
 import { projectService } from "../../../services/project.service";
 import type { ProjectCategory } from "../../../constants/projectData";
 import ProjectCreation from "./ProjectCreation";
@@ -20,6 +20,9 @@ type Project = {
   city?: string;
   district?: string;
   coverImage?: string | null;
+  showOnHome?: boolean;
+  homeOrder?: number | null;
+  isFeatured?: boolean;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
@@ -52,7 +55,8 @@ const ProjectDashboard = () => {
 
       if (response.success && response.data) {
         // Transform API data to match component format
-        const transformedProjects: Project[] = response.data.map((project: any) => ({
+        const apiProjects = response.data as unknown as Project[];
+        const transformedProjects: Project[] = apiProjects.map((project) => ({
           id: project.id,
           slug: project.slug,
           title: project.title,
@@ -64,6 +68,9 @@ const ProjectDashboard = () => {
           city: project.city,
           district: project.district,
           coverImage: project.coverImage,
+          showOnHome: project.showOnHome ?? false,
+          homeOrder: project.homeOrder ?? null,
+          isFeatured: project.isFeatured ?? false,
           createdAt: project.createdAt,
           updatedAt: project.updatedAt,
           publishedAt: project.publishedAt,
@@ -135,8 +142,8 @@ const ProjectDashboard = () => {
             p.id === projectId
               ? {
                   ...p,
-                  status: (response.data as any).status as ProjectStatus,
-                  publishedAt: (response.data as any).publishedAt,
+                  status: (response.data as unknown as Project).status as ProjectStatus,
+                  publishedAt: (response.data as unknown as Project).publishedAt,
                 }
               : p
           )
@@ -150,6 +157,35 @@ const ProjectDashboard = () => {
     } catch (error) {
       console.error("Error toggling project status:", error);
       toast.error("Không thể cập nhật trạng thái");
+    }
+  };
+
+  const handleToggleFeatured = async (projectId: string, currentIsFeatured: boolean) => {
+    try {
+      const nextIsFeatured = !currentIsFeatured;
+      const response = await projectService.updateProject(projectId, {
+        isFeatured: nextIsFeatured,
+      });
+
+      if (response.success) {
+        const updatedProject = response.data as unknown as Project | undefined;
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  isFeatured: updatedProject?.isFeatured ?? nextIsFeatured,
+                }
+              : p
+          )
+        );
+        toast.success(nextIsFeatured ? "Đã đánh dấu dự án nổi bật" : "Đã bỏ đánh dấu dự án nổi bật");
+      } else {
+        toast.error(response.error || "Không thể cập nhật trạng thái nổi bật");
+      }
+    } catch (error) {
+      console.error("Error toggling featured project:", error);
+      toast.error("Không thể cập nhật trạng thái nổi bật");
     }
   };
 
@@ -266,7 +302,7 @@ const ProjectDashboard = () => {
             {filteredProjects.map((project) => (
               <div
                 key={project.id}
-                className="transition hover:bg-gray-50"
+                className={`transition hover:bg-gray-50 ${project.isFeatured ? "bg-amber-50/50" : ""}`}
               >
                 <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
                   {/* Cover Image */}
@@ -289,6 +325,12 @@ const ProjectDashboard = () => {
                     <div className="flex flex-wrap items-start gap-2 sm:items-center">
                       <h3 className="text-base font-semibold text-gray-900 sm:text-lg">{project.title}</h3>
                       {getStatusBadge(project.status)}
+                      {project.isFeatured && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                          <StarIcon className="h-3.5 w-3.5" />
+                          Nổi bật
+                        </span>
+                      )}
                     </div>
                     {project.subtitle && (
                       <p className="mt-1 text-sm text-gray-600">{project.subtitle}</p>
@@ -313,11 +355,28 @@ const ProjectDashboard = () => {
                           {new Date(project.publishedAt).toLocaleDateString("vi-VN")}
                         </span>
                       )}
+                      {project.isFeatured && typeof project.homeOrder === "number" && (
+                        <span className="flex items-center gap-1">
+                          <span className="font-medium">Thứ tự home:</span>
+                          {project.homeOrder}
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   {/* Actions */}
                   <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      onClick={() => handleToggleFeatured(project.id, project.isFeatured ?? false)}
+                      className={`rounded-lg p-2 transition ${
+                        project.isFeatured
+                          ? "bg-amber-100 text-amber-700 ring-1 ring-amber-300 hover:bg-amber-200"
+                          : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                      }`}
+                      title={project.isFeatured ? "Bỏ nổi bật" : "Đánh dấu nổi bật"}
+                    >
+                      <StarIcon className={`h-5 w-5 ${project.isFeatured ? "fill-current" : ""}`} />
+                    </button>
                     <button
                       onClick={() => handleToggleStatus(project.id, project.status)}
                       className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"

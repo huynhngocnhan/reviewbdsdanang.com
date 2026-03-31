@@ -27,7 +27,6 @@ const ProjectOverview: React.FC<Props> = ({ project }) => {
     </div>
   </div>
       </div>
-
       <div
         data-aos="fade-left"
         data-aos-duration="800"

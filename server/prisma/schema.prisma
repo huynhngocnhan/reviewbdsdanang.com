@@ -25,8 +25,8 @@ enum SectionType {
   OVERVIEW
   LOCATION
   GALLERY // Phối cảnh
-  EXTENTION
-  FLOORPLAN
+  EXTENTION // tiện ích
+  FLOORPLAN // mặt bằng
   PRICE
   PROGRESS
   FAQ
@@ -170,6 +170,12 @@ model Project {
   locationImage String?
   /// Google Maps embed URL
   mapEmbedUrl String?
+  /// V2 - URL vị trí 360
+  location360Url String?
+  /// V2 - nhóm tiện ích theo phút di chuyển
+  nearbyGroups Json?
+  /// V2 - hạ tầng giao thông lân cận
+  nearbyTrafficItems Json?
 
   /// Toạ độ bản đồ (tuỳ chọn)
   lat Decimal? @db.Decimal(10, 7)
@@ -189,6 +195,29 @@ model Project {
 
   /// Tags nổi bật (vd: ["View sông", "Trung tâm", "Sổ hồng"]) - matching mockup
   highlights String[] @default([])
+
+  /// [NEW] Có hiển thị dự án ở trang chủ hay không
+  /// - Admin bật/tắt để tránh trang chủ hiển thị quá nhiều dự án
+  showOnHome Boolean @default(false)
+
+  /// [NEW] Thứ tự ưu tiên hiển thị trên trang chủ (số nhỏ lên trước)
+  /// - Có thể để null nếu không cần ưu tiên
+  homeOrder Int?
+
+  /// [NEW] Đánh dấu là dự án nổi bật (hiển thị filter "Dự án nổi bật" ở trang chủ)
+  isFeatured Boolean @default(false)
+
+  /// [NEW] Cấu hình sticky menu theo anchor (overlay trái/phải, danh sách mục)
+  stickyMenu Json?
+
+  /// [NEW] Hero mini-form lấy SĐT + nhu cầu
+  heroLeadForm Json?
+
+  /// [NEW] Floating CTA mở rộng (ngoài phone/zalo mặc định)
+  floatingCtas Json?
+
+  /// [NEW] SEO head mở rộng + JSON-LD
+  seoHead Json?
 
   /// Hero image cho section tổng quan
   heroImage String?
@@ -218,9 +247,74 @@ model Project {
   extentionDescription String?
   /// Tiện ích - hình ảnh (vd: [{src, alt, title, description}])
   extentionImages Json?
+  /// V2 - điểm đến/tiện ích kết nối
+  extentionDestinations Json?
 
-  /// Mặt bằng (vd: [{description, floorPlanImage}])
+  /// Mặt bằng (legacy) (vd: [{description, floorPlanImage}])
   floorplans Json?
+
+  /// [NEW] Lý do chọn mua (legacy JSON)
+  reasonToBuy Json?
+  /// V2 - tiêu đề section lý do chọn mua
+  reasonToBuyTitle String?
+  /// V2 - mô tả lý do chọn mua
+  reasonToBuyDescription String?
+  /// V2 - ảnh lý do chọn mua
+  reasonToBuyImage String?
+  /// V2 - alt ảnh lý do chọn mua
+  reasonToBuyImageAlt String?
+
+  /// [NEW] Chính sách bán hàng (legacy JSON)
+  salesPolicy Json?
+  /// V2 - chính sách bán hàng chuẩn theo UI hiện tại
+  salePolicy Json?
+  /// V2 - mô tả ngắn chính sách bán hàng
+  salePolicyDes String?
+  /// V2 - ảnh chính sách bán hàng
+  salePolicyImg String?
+  /// V2 - alt ảnh chính sách bán hàng
+  salePolicyAlt String?
+  /// V2 - danh sách mô tả chi tiết chính sách
+  salePolicyDescriptionDetails Json?
+
+  /// [NEW] Mặt bằng tổng quan (vd: [{src, alt, title}])
+  floorplanMaster Json?
+
+  /// [NEW] Mặt bằng tầng (vd: [{floor, images:[{src, alt}]}])
+  floorplanByFloor Json?
+
+  /// V2 - thiết kế căn hộ
+  apartmentDesign Json?
+
+  /// V2 - tiêu chuẩn bàn giao (vd: { des: "string", items: [{subtitle, title, des, imgUrl}] })
+  handoverStandard Json?
+
+  /// [NEW] Loại căn hộ (vd: [{name, area, description, images:[{src, alt}]}])
+  unitLayouts Json?
+
+  /// [NEW] Tiến độ dự án theo mốc thời gian (vd: [{label, date, description}])
+  progressMilestones Json?
+
+  /// [NEW] Tiến độ dự án - gallery (vd: [{src, alt, capturedAt}])
+  progressGallery Json?
+
+  /// [NEW] Tiến độ dự án - video YouTube URL (embed/watch)
+  progressVideoUrl String?
+  /// V2 - tiến độ dự án
+  progress Json?
+  /// V2 - mô tả tiến độ dự án
+  progressDescription String?
+  /// V2 - video tiến độ YouTube
+  progressYoutubeUrl String?
+
+  /// [NEW] FAQ (vd: [{question, answer}])
+  faqs Json?
+
+  /// [NEW] Pháp lý bổ sung (vd: [{title, value, fileUrl}])
+  legalInfo Json?
+
+  /// [NEW] Disclaimer quảng cáo
+  advertisingDisclaimer String?
 
   /// Custom Sections (vd: [{customTitle, customDes, contents: [{contentTitle, contentDes, images}]}])
   customSections Json?
@@ -239,6 +333,7 @@ model Project {
   @@index([status])
   @@index([category])
   @@index([city, district])
+  @@index([showOnHome, homeOrder]) // [NEW] hỗ trợ query trang chủ nhanh hơn
 }
 
 model ProjectSection {

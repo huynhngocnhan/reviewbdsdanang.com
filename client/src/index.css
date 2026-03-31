@@ -94,3 +94,60 @@ body {
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+@keyframes floatBtn {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.btn-float {
+  animation: floatBtn 1.5s ease-in-out infinite;
+}
+
+@keyframes floatX {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-6px); /* sang trái */
+  }
+}
+
+.btn-float-x {
+  animation: floatX 1.5s ease-in-out infinite;
+}
+
+@keyframes zoomText {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.text-zoom {
+  display: inline-block;
+  animation: zoomText 1.8s ease-in-out infinite;
+}
+
+@keyframes ladiShake {
+  0% { transform: rotate(0); }
+  10% { transform: rotate(-7deg); }
+  20% { transform: rotate(7deg); }
+  30% { transform: rotate(-6deg); }
+  40% { transform: rotate(6deg); }
+  50% { transform: rotate(0); }
+
+  /* nghỉ */
+  100% { transform: rotate(0); }
+}
+
+.btn-ladi {
+  transform-origin: top center;
+  animation: ladiShake 1.2s ease-in-out infinite;
+}

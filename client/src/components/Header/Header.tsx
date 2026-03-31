@@ -60,21 +60,21 @@ const Header: React.FC = () => {
         name: "Dự án Sun Group",
         href: "/",
         children: sun.length > 0
-          ? sun.map((p) => ({ name: p.title, href: `/project/${p.slug}` }))
+          ? sun.map((p) => ({ name: p.title, href: `/du-an/${p.slug}` }))
           : EMPTY_CHILD,
       },
       {
-        name: "Dự án Vin Home",
+        name: "Dự án VinHomes",
         href: "/",
         children: vin.length > 0
-          ? vin.map((p) => ({ name: p.title, href: `/project/${p.slug}` }))
+          ? vin.map((p) => ({ name: p.title, href: `/du-an/${p.slug}` }))
           : EMPTY_CHILD,
       },
       {
-        name: "Dự án cao cấp khác",
+        name: "Căn hộ cao cấp khác",
         href: "/",
         children: other.length > 0
-          ? other.map((p) => ({ name: p.title, href: `/project/${p.slug}` }))
+          ? other.map((p) => ({ name: p.title, href: `/du-an/${p.slug}` }))
           : EMPTY_CHILD,
       },
     ];

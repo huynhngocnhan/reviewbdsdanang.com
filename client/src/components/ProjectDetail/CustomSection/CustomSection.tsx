@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState } from "react";
 import { Carousel } from "antd";
-import type { CustomSectionItem } from "../../../constants/projectData";
+import type { CustomSectionData, CustomContent, ProjectGallery } from "../../../constants/projectData";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Single Custom Section Item Component
-const CustomSectionItem: React.FC<{ section: CustomSectionItem }> = ({ section }) => {
+const SectionItem: React.FC<{ section: CustomSectionData }> = ({ section }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   if (!section.customTitle) {
@@ -57,7 +57,7 @@ const CustomSectionItem: React.FC<{ section: CustomSectionItem }> = ({ section }
             className="mb-4 sm:mb-6"
           >
             <div className="flex flex-wrap justify-center gap-2 sm:gap-0">
-              {contents.map((content, idx) => (
+              {contents.map((content: CustomContent, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setActiveIndex(idx)}
@@ -133,7 +133,7 @@ const CustomSectionItem: React.FC<{ section: CustomSectionItem }> = ({ section }
                     effect="fade"
                     className="custom-section-carousel"
                   >
-                    {activeContent.images.map((image, imageIndex) => (
+                    {(activeContent.images ?? []).map((image: ProjectGallery, imageIndex: number) => (
                       <div key={`${image.src}-${imageIndex}`}>
                         <div className="relative h-[280px] sm:h-[400px] lg:h-[500px]">
                           <img
@@ -150,7 +150,7 @@ const CustomSectionItem: React.FC<{ section: CustomSectionItem }> = ({ section }
                                 </h3>
                               )}
                               <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-amber-400 mb-2">
-                                Hình ảnh {imageIndex + 1} / {activeContent.images.length}
+                                Hình ảnh {imageIndex + 1} / {(activeContent.images ?? []).length}
                               </p>
 
                             </div>
@@ -167,7 +167,7 @@ const CustomSectionItem: React.FC<{ section: CustomSectionItem }> = ({ section }
           {/* Pagination Dots */}
           {contents.length > 1 && (
             <div className="flex justify-center gap-2 mt-4 sm:mt-6">
-              {contents.map((_, idx) => (
+              {contents.map((_: CustomContent, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setActiveIndex(idx)}
@@ -193,7 +193,7 @@ const CustomSectionItem: React.FC<{ section: CustomSectionItem }> = ({ section }
 
 type Props = {
   project: {
-    customSections?: CustomSectionItem[];
+    customSections?: CustomSectionData[];
   };
 };
 
@@ -208,7 +208,7 @@ const CustomSection: React.FC<Props> = ({ project }) => {
   return (
     <>
       {customSections.map((section, index) => (
-        <CustomSectionItem
+        <SectionItem
           key={index}
           section={section}
         />
