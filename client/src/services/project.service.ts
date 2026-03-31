@@ -224,4 +224,12 @@ export const projectService = {
     const response = await api.post(`/projects/${id}/archive`);
     return response.data;
   },
+
+  /**
+   * Toggle featured status — only returns { id, isFeatured }
+   */
+  async toggleFeatured(id: string): Promise<ApiResponse<{ id: string; isFeatured: boolean }>> {
+    const response = await api.post(`/projects/${id}/featured`);
+    return response.data;
+  },
 };

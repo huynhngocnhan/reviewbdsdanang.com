@@ -136,15 +136,13 @@ const ProjectDashboard = () => {
         response = await projectService.publishProject(projectId);
       }
 
-      if (response.success && response.data) {
+      if (response.success) {
+        const nextStatus: ProjectStatus = currentStatus === "PUBLISHED" ? "ARCHIVED" : "PUBLISHED";
+        const nextPublishedAt = currentStatus === "PUBLISHED" ? undefined : new Date().toISOString();
         setProjects((prev) =>
           prev.map((p) =>
             p.id === projectId
-              ? {
-                  ...p,
-                  status: (response.data as unknown as Project).status as ProjectStatus,
-                  publishedAt: (response.data as unknown as Project).publishedAt,
-                }
+              ? { ...p, status: nextStatus, publishedAt: nextPublishedAt ?? p.publishedAt }
               : p
           )
         );
@@ -160,26 +158,24 @@ const ProjectDashboard = () => {
     }
   };
 
-  const handleToggleFeatured = async (projectId: string, currentIsFeatured: boolean) => {
+  const handleToggleFeatured = async (projectId: string) => {
     try {
-      const nextIsFeatured = !currentIsFeatured;
-      const response = await projectService.updateProject(projectId, {
-        isFeatured: nextIsFeatured,
-      });
+      const response = await projectService.toggleFeatured(projectId);
 
-      if (response.success) {
-        const updatedProject = response.data as unknown as Project | undefined;
+      if (response.success && response.data) {
+        // Only update the isFeatured field to preserve all other project fields
         setProjects((prev) =>
           prev.map((p) =>
             p.id === projectId
-              ? {
-                  ...p,
-                  isFeatured: updatedProject?.isFeatured ?? nextIsFeatured,
-                }
+              ? { ...p, isFeatured: response.data!.isFeatured }
               : p
           )
         );
-        toast.success(nextIsFeatured ? "Đã đánh dấu dự án nổi bật" : "Đã bỏ đánh dấu dự án nổi bật");
+        toast.success(
+          response.data!.isFeatured
+            ? "Đã đánh dấu dự án nổi bật"
+            : "Đã bỏ đánh dấu dự án nổi bật"
+        );
       } else {
         toast.error(response.error || "Không thể cập nhật trạng thái nổi bật");
       }
@@ -367,7 +363,7 @@ const ProjectDashboard = () => {
                   {/* Actions */}
                   <div className="flex shrink-0 items-center gap-2">
                     <button
-                      onClick={() => handleToggleFeatured(project.id, project.isFeatured ?? false)}
+                      onClick={() => handleToggleFeatured(project.id)}
                       className={`rounded-lg p-2 transition ${
                         project.isFeatured
                           ? "bg-amber-100 text-amber-700 ring-1 ring-amber-300 hover:bg-amber-200"

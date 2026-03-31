@@ -14,6 +14,7 @@ router.post("/", authMiddleware, projectController.create.bind(projectController
 router.put("/:id", authMiddleware, projectController.update.bind(projectController));
 router.delete("/:id", authMiddleware, projectController.delete.bind(projectController));
 router.post("/:id/publish", authMiddleware, projectController.publish.bind(projectController));
+router.post("/:id/featured", authMiddleware, projectController.toggleFeatured.bind(projectController));
 router.post("/:id/archive", authMiddleware, projectController.archive.bind(projectController));
 
 export default router;
