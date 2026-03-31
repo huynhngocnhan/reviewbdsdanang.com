@@ -291,6 +291,53 @@ class ProjectController {
   }
 
   /**
+   * POST /api/projects/:id/featured
+   * Toggle featured status
+   */
+  async toggleFeatured(req: AuthRequest, res: Response) {
+    try {
+      const params = ProjectParamsDtoSchema.parse(req.params);
+
+      const result = await projectService.toggleFeatured(params.id);
+
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          error: "Project not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: result,
+        message: result.isFeatured ? "Project marked as featured" : "Project unmarked as featured",
+      });
+    } catch (error: any) {
+      console.error("Error toggling featured:", error);
+
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: "Validation error",
+          details: error.errors,
+        });
+      }
+
+      if (error.code === "P2025") {
+        return res.status(404).json({
+          success: false,
+          error: "Project not found",
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: "Failed to toggle featured status",
+      });
+    }
+  }
+
+  /**
    * POST /api/projects/:id/archive
    * Archive project
    */

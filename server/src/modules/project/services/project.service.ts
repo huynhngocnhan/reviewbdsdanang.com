@@ -481,9 +481,23 @@ class ProjectService {
     const result = await prisma.project.update({
       where: { id },
       data: { status: "PUBLISHED", publishedAt: new Date() },
-      include: { sections: true },
     });
-    return this.serializeBigInt(result);
+    return { id: result.id, status: result.status, publishedAt: result.publishedAt };
+  }
+
+  /**
+   * Toggle featured status
+   */
+  async toggleFeatured(id: string) {
+    const project = await prisma.project.findUnique({ where: { id } });
+    if (!project) return null;
+
+    const result = await prisma.project.update({
+      where: { id },
+      data: { isFeatured: !project.isFeatured },
+    });
+
+    return { id: result.id, isFeatured: result.isFeatured };
   }
 
   /**
@@ -494,7 +508,7 @@ class ProjectService {
       where: { id },
       data: { status: "ARCHIVED" },
     });
-    return this.serializeBigInt(result);
+    return { id: result.id, status: result.status };
   }
 
   /**
