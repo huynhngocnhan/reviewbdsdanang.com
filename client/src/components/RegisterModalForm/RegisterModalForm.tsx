@@ -129,7 +129,7 @@ const RegisterModalForm: React.FC<Props> = ({
               </button>
 
               <p className="w-full rounded-lg bg-[#EADBCB] px-3 py-2 text-center text-sm font-semibold text-[#5C4033]">
-                Hotline: 093 888 5879
+                Hotline: 093.888.58.79
               </p>
 
               {message && (

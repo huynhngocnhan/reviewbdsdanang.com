@@ -42,9 +42,9 @@ const FloorPlanV2 = ({ project }: Props) => {
           <h2
             id="floorplan-title"
             itemProp="name"
-            className="flex flex-col items-center justify-center text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-gray-800"
+            className="flex flex-col items-center justify-center text-3xl sm:text-4xl font-black uppercase tracking-wide text-gray-800"
           >
-            Mặt bằng tổng quan <span className="text-4xl md:text-5xl text-[#c76b25]">{project.title}</span>
+            Mặt bằng tổng quan <span className="text-4xl font-extrabold md:text-5xl text-[#c76b25]">{project.title}</span>
           </h2>
           <p
             itemProp="description"

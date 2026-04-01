@@ -92,7 +92,7 @@ const LeadForm = ({ project, projectOptions }: Props) => {
         <div className="text-center text-[#F8E8D7]">
           <h2
             id="lead-form-heading"
-            className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-wide uppercase"
+            className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-4xl font-bold -tracking-tighter uppercase"
           >
             Quý khách hàng đang quan tâm dự án và chưa tìm được căn ưng ý để đầu tư?
           </h2>
@@ -101,7 +101,7 @@ const LeadForm = ({ project, projectOptions }: Props) => {
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           <div className="lg:col-span-4 rounded-2xl bg-[#7A2517]/80 border border-[#D7A67A]/40 p-4 sm:p-5 shadow-2xl backdrop-blur-[2px]">
             <form
               onSubmit={handleSubmit}

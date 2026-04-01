@@ -19,7 +19,7 @@ const ProjectLocationV2 = ({ project }: Props) => {
           <div className="lg:col-span-5 text-white">
             <h2
               id="project-location-title"
-              className="text-3xl sm:text-4xl font-extrabold tracking-wide uppercase"
+              className="text-3xl sm:text-4xl font-black tracking-wide uppercase"
             >
               Vị trí dự án
             </h2>

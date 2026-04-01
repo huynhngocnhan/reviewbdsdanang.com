@@ -40,7 +40,7 @@ const ProjectProgress: React.FC<Props> = ({ project }) => {
       <div className="mx-auto max-w-7xl px-4">
         <header className="grid gap-5 border-b border-[#17372F]/40 pb-7 md:grid-cols-[1.2fr_1fr] md:items-start lg:items-end">
           <div className="md:order-2 md:justify-self-end md:text-right">
-            <p className="text-xl font-semibold uppercase tracking-[0.28em] text-white">Cập nhật mới nhất</p>
+            <p className="text-xl font-extrabold uppercase tracking-[0.28em] text-white">Cập nhật mới nhất</p>
             <h2 id="project-progress-title" className="mt-3 text-4xl font-extrabold uppercase leading-tight sm:text-6xl" itemProp="name">
               Tiến độ dự án
             </h2>
