@@ -92,7 +92,7 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
         <header className="mb-8 text-center">
           <h2
             id="reason-to-buy-title"
-            className="text-2xl font-extrabold uppercase tracking-[0.16em] text-white sm:text-3xl lg:text-4xl"
+            className="text-2xl font-black uppercase tracking-[0.16em] text-white sm:text-3xl lg:text-4xl"
             itemProp="name"
           >
             {reasonToBuyTitle}

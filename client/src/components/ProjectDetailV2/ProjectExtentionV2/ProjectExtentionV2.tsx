@@ -56,7 +56,7 @@ const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20">
         <div className="grid gap-4 lg:grid-cols-[1.1fr_1.4fr]">
           <div>
-            <p className="text-xl  font-semibold uppercase tracking-[0.28em] text-white">Hệ tiện ích mở rộng</p>
+            <p className="text-xl font-extrabold uppercase tracking-[0.24em] text-white">Hệ tiện ích mở rộng</p>
             <h2 id="project-extension-title" className="mt-3 text-4xl font-extrabold uppercase text-[#ffe228] sm:text-6xl">
               {project.title}
             </h2>
@@ -93,7 +93,7 @@ const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
 
         <div className="mt-16">
           <header>
-            <h3 className="mt-2 text-2xl font-bold text-white sm:text-3xl tracking-[0.16em] uppercase">Và Hưởng trọn hệ tiện ích đại đô thị</h3>
+            <h3 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl tracking-[0.16em] uppercase">Và Hưởng trọn hệ tiện ích đại đô thị</h3>
           </header>
 
           <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

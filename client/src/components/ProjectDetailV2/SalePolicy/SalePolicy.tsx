@@ -89,7 +89,7 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
   const footerNote =
     policy?.footerNote ||
     "Chính sách bán hàng và ưu đãi có thể được cập nhật theo từng giai đoạn. Quý khách vui lòng liên hệ để được cung cấp thông tin chi tiết và phù hợp nhu cầu.";
-  const contactPhone = policy?.contactPhone || "0938885879";
+  const contactPhone = policy?.contactPhone || "093.888.58.79";
   const contactPhoneHref = `tel:${contactPhone.replace(/\s+/g, "")}`;
 
   return (
@@ -102,7 +102,7 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <header className="text-center">
-          <h2 id="sale-policy-title" className="text-2xl font-bold uppercase tracking-[0.2em] text-gray-900 sm:text-3xl" itemProp="name">
+          <h2 id="sale-policy-title" className="text-2xl font-black uppercase tracking-[0.14em] text-gray-900 sm:text-3xl" itemProp="name">
             {heading}
           </h2>
           <p className="mt-2 bg-gradient-to-b from-amber-500 to-amber-600 bg-clip-text text-4xl font-extrabold uppercase tracking-tight text-transparent sm:text-5xl">

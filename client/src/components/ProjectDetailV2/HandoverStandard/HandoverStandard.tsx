@@ -60,7 +60,7 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
       <div className="relative mx-auto max-w-[1500px] px-4 py-14 sm:px-6 sm:py-16 lg:px-10">
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-12 lg:gap-8">
           <header className="lg:col-span-6">
-            <p className="text-xl font-semibold uppercase tracking-[0.2em] text-[#876347]">Tiêu chuẩn bàn giao</p>
+            <p className="text-xl font-extrabold uppercase tracking-[0.2em] text-[#876347]">Tiêu chuẩn bàn giao</p>
             <h2
               id="handover-standard-title"
               className="mt-3 text-4xl font-extrabold uppercase leading-[1.1] tracking-wide sm:text-5xl lg:text-6xl"

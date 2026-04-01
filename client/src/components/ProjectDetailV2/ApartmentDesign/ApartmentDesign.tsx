@@ -91,7 +91,7 @@ const ApartmentDesign = ({ project }: Props) => {
     >
       <div className="mx-auto max-w-6xl px-4 py-14">
         <header className="text-center">
-          <p className="text-lg font-semibold uppercase tracking-[0.28em] text-white">
+          <p className="text-lg font-extrabold uppercase tracking-[0.28em] text-white">
             Thiết kế căn hộ
           </p>
           <h2

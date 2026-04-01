@@ -40,7 +40,7 @@ const ProjectOverviewV2 = ({ project }: Props) => {
             className="lg:col-span-5 rounded-xl p-2"
           >
             <header className="text-left">
-              <p className="text-base font-extrabold uppercase tracking-[0.2em] text-[#8A6A4F]">
+              <p className="text-lg font-black uppercase tracking-[0.16em] text-[#af6930]">
                 Tổng quan dự án
               </p>
               <h2
