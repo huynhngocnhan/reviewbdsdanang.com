@@ -113,7 +113,7 @@ const defaultFormData: ProjectFormData = {
   extentionDescription: "",
   extentionImages: [],
   extentionDestinations: [],
-  floorplans: [],
+  floorplans: [{ description: "", floorPlanImage: [] }],
   customSections: [],
   highlights: [],
   reasonToBuyTitle: "",
@@ -330,7 +330,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     { id: "extention", label: "Tiện ích", icon: BuildingOfficeIcon },
     { id: "handover", label: "Tiêu chuẩn bàn giao", icon: DocumentTextIcon },
     { id: "progress", label: "Tiến độ", icon: DocumentTextIcon },
-    { id: "custom", label: "Custom", icon: DocumentTextIcon },
+    // { id: "custom", label: "Custom", icon: DocumentTextIcon },
   ];
 
   const updateField = <K extends keyof ProjectFormData>(field: K, value: ProjectFormData[K]) => {
@@ -455,44 +455,53 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     updateField("extentionImages", currentImages.filter((_, i) => i !== index));
   };
 
-  const addFloorplan = () => {
-    updateField("floorplans", [
-      ...formData.floorplans,
-      { description: "", floorPlanImage: [] },
-    ]);
-  };
-
   const updateFloorplan = (index: number, field: "description", value: string) => {
-    const newFloorplans = [...formData.floorplans];
+    const newFloorplans = [...(formData.floorplans || [{ description: "", floorPlanImage: [] }])];
+    if (!newFloorplans[index]) {
+      newFloorplans[index] = { description: "", floorPlanImage: [] };
+    }
     newFloorplans[index] = { ...newFloorplans[index], [field]: value };
     updateField("floorplans", newFloorplans);
   };
 
   const addFloorplanImage = (floorplanIndex: number) => {
-    const newFloorplans = [...formData.floorplans];
-    newFloorplans[floorplanIndex].floorPlanImage.push({ src: "", alt: "" });
+    const newFloorplans = [...(formData.floorplans || [{ description: "", floorPlanImage: [] }])];
+    if (!newFloorplans[floorplanIndex]) {
+      newFloorplans[floorplanIndex] = { description: "", floorPlanImage: [] };
+    }
+    newFloorplans[floorplanIndex].floorPlanImage = [
+      ...(newFloorplans[floorplanIndex].floorPlanImage || []),
+      { src: "", alt: "" },
+    ];
     updateField("floorplans", newFloorplans);
   };
 
   const updateFloorplanImage = (floorplanIndex: number, imageIndex: number, field: "src" | "alt", value: string) => {
-    const newFloorplans = [...formData.floorplans];
-    newFloorplans[floorplanIndex].floorPlanImage[imageIndex] = {
-      ...newFloorplans[floorplanIndex].floorPlanImage[imageIndex],
+    const newFloorplans = [...(formData.floorplans || [{ description: "", floorPlanImage: [] }])];
+    if (!newFloorplans[floorplanIndex]) {
+      newFloorplans[floorplanIndex] = { description: "", floorPlanImage: [] };
+    }
+    const images = [...(newFloorplans[floorplanIndex].floorPlanImage || [])];
+    if (!images[imageIndex]) {
+      images[imageIndex] = { src: "", alt: "" };
+    }
+    images[imageIndex] = {
+      ...images[imageIndex],
       [field]: value,
     };
+    newFloorplans[floorplanIndex].floorPlanImage = images;
     updateField("floorplans", newFloorplans);
   };
 
   const removeFloorplanImage = (floorplanIndex: number, imageIndex: number) => {
-    const newFloorplans = [...formData.floorplans];
-    newFloorplans[floorplanIndex].floorPlanImage = newFloorplans[floorplanIndex].floorPlanImage.filter(
+    const newFloorplans = [...(formData.floorplans || [{ description: "", floorPlanImage: [] }])];
+    if (!newFloorplans[floorplanIndex]) {
+      return;
+    }
+    newFloorplans[floorplanIndex].floorPlanImage = (newFloorplans[floorplanIndex].floorPlanImage || []).filter(
       (_, i) => i !== imageIndex
     );
     updateField("floorplans", newFloorplans);
-  };
-
-  const removeFloorplan = (index: number) => {
-    updateField("floorplans", formData.floorplans.filter((_, i) => i !== index));
   };
 
   const addNearbyGroup = () => {
@@ -821,7 +830,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Giới thiệu chi tiết (hiển thị phần tổng quan)</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">Giới thiệu chi tiết (hiển thị phần Tổng quan dự án)</label>
         <textarea
           value={formData.intro}
           onChange={(e) => updateField("intro", e.target.value)}
@@ -1145,7 +1154,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           <button
             type="button"
             onClick={addSpec}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+            className="inline-flex bg-amber-400 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
           >
             <PlusIcon className="h-4 w-4" />
             Thêm thông tin
@@ -1270,7 +1279,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       <div className="space-y-3 rounded-xl border border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-gray-700">Khoảng thời gian tới các địa điểm nổi bật (4 items để hiển thị tốt hơn)</p>
-          <button type="button" onClick={addNearbyGroup} className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800">
+          <button type="button" onClick={addNearbyGroup} className="bg-amber-400 inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800">
             <PlusIcon className="h-3 w-3 text-gray-800" /> Thêm
           </button>
         </div>
@@ -1306,7 +1315,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       <div className="space-y-3 rounded-xl border border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-gray-700">Các đô thị liền kề (đẹp nhất là 4 items)</p>
-          <button type="button" onClick={addNearbyTrafficItem} className="inline-flex text-gray-800 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs">
+          <button type="button" onClick={addNearbyTrafficItem} className="bg-amber-400 inline-flex text-gray-800 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs">
             <PlusIcon className="h-3 w-3 text-gray-800" /> Thêm
           </button>
         </div>
@@ -1476,7 +1485,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           <button
             type="button"
             onClick={addExtentionImage}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+            className="inline-flex bg-amber-400 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
           >
             <PlusIcon className="h-4 w-4" />
             Thêm tiện ích
@@ -1556,7 +1565,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           <button
             type="button"
             onClick={addExtentionDestination}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+            className="inline-flex bg-amber-400 items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
           >
             <PlusIcon className="h-4 w-4" />
             Thêm tiện ích xung quanh
@@ -1594,7 +1603,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           <button
             type="button"
             onClick={addApartmentDetail}
-            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800"
+            className="inline-flex bg-amber-400 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800"
           >
             <PlusIcon className="h-3 w-3" /> Thêm dòng
           </button>
@@ -1617,11 +1626,11 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
       <div className="space-y-3">
         <div className="flex items-center justify-between text-gray-700">
-          <p className="text-sm font-semibold text-gray-700">Danh sách căn hộ</p>
+          <p className="text-sm font-semibold text-gray-700">Danh sách căn hộ (thêm từng căn)</p>
           <button
             type="button"
             onClick={addApartmentItem}
-            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs"
+            className="inline-flex bg-amber-400 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs"
           >
             <PlusIcon className="h-3 w-3" /> Thêm căn hộ
           </button>
@@ -1742,7 +1751,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           <button
             type="button"
             onClick={addHandoverItem}
-            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800"
+            className="inline-flex bg-amber-400 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs text-gray-800"
           >
             <PlusIcon className="h-3 w-3" /> Thêm tiêu chuẩn
           </button>
@@ -1858,17 +1867,20 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     </div>
   );
 
-  const renderFloorplan = () => (
-    <div className="space-y-6">
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Mặt bằng</label>
-        <div className="space-y-6">
-          {formData.floorplans.map((floorplan, floorplanIndex) => (
-            <div key={floorplanIndex} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+  const renderFloorplan = () => {
+    const floorplan = formData.floorplans?.[0] ?? { description: "", floorPlanImage: [] };
+    const floorplanIndex = 0;
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-gray-700">Mặt bằng</label>
+          <div className="space-y-6">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <div className="mb-4">
                 <label className="mb-2 block text-xs font-medium text-gray-600">Mô tả chung</label>
                 <textarea
-                  value={floorplan.description}
+                  value={floorplan.description || ""}
                   onChange={(e) => updateFloorplan(floorplanIndex, "description", e.target.value)}
                   rows={4}
                   placeholder="Mặt bằng căn hộ được tối ưu công năng..."
@@ -1878,7 +1890,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
               <div className="space-y-3">
                 <label className="block text-xs font-medium text-gray-600">Hình ảnh mặt bằng</label>
-                {floorplan.floorPlanImage.map((image, imageIndex) => {
+                {(floorplan.floorPlanImage || []).map((image, imageIndex) => {
                   const inputKey = `${floorplanIndex}-${imageIndex}`;
                   return (
                     <div key={imageIndex} className="space-y-2">
@@ -1949,34 +1961,18 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
                 <button
                   type="button"
                   onClick={() => addFloorplanImage(floorplanIndex)}
-                  className="inline-flex items-center gap-2 rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition"
+                  className="inline-flex bg-amber-400 items-center gap-2 rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition"
                 >
                   <PlusIcon className="h-3 w-3" />
                   Thêm ảnh
                 </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => removeFloorplan(floorplanIndex)}
-                className="mt-4 rounded-lg bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100 transition"
-              >
-                Xóa mặt bằng này
-              </button>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={addFloorplan}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
-          >
-            <PlusIcon className="h-4 w-4" />
-            Thêm mặt bằng
-          </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderCustom = () => {
     const customSections = formData.customSections || [];
