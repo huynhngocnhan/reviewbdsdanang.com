@@ -38,7 +38,7 @@ const ProjectLocationV2 = ({ project }: Props) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Xem vị trí 360 độ của dự án ${project.title}`}
-                  className="mt-5 inline-flex items-center rounded-xl bg-[#f9de2b] px-4 py-2.5 text-[#17372F] font-bold hover:bg-[#efd24b] transition"
+                  className="btn-float mt-5 inline-flex items-center rounded-xl bg-[#f9de2b] px-4 py-2.5 text-[#17372F] font-bold hover:bg-[#efd24b] transition"
                 >
                   Xem vị trí 360°
                 </a>
