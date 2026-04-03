@@ -112,6 +112,8 @@ export default async function handler(req: VercelRequestLike, res: VercelRespons
     html = upsertMetaByProperty(html, "og:title", title);
     html = upsertMetaByProperty(html, "og:description", description);
     html = upsertMetaByProperty(html, "og:image", image);
+    html = upsertMetaByProperty(html, "og:image:width", "1200");
+    html = upsertMetaByProperty(html, "og:image:height", "630");
 
     html = upsertMetaByProperty(html, "twitter:card", "summary_large_image");
     html = upsertMetaByProperty(html, "twitter:url", projectUrl);
