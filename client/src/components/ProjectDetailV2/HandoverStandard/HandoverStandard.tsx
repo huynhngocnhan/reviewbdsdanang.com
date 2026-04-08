@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { MOCK_HANDOVER_STANDARD, type ProjectData } from "../../../constants/projectData";
+import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
 type Props = {
@@ -30,14 +30,20 @@ const getMosaicSpanClass = (index: number) => {
 };
 
 const HandoverStandard: React.FC<Props> = ({ project }) => {
-  const handover =
-    project.handoverStandard && project.handoverStandard.items.length > 0
-      ? project.handoverStandard
-      : MOCK_HANDOVER_STANDARD;
+  const handover = project.handoverStandard;
 
-  const items = handover.items.filter((item) => item.imgUrl || item.title || item.subtitle || item.des);
+  if (!handover) {
+    return null;
+  }
 
-  if (items.length === 0) {
+  const description = handover.des?.trim() || "";
+  const items = (handover.items || []).filter((item) => item.imgUrl || item.title || item.subtitle || item.des);
+
+  const hasDescription = Boolean(description);
+  const hasItems = items.length > 0;
+  const hasFullContent = hasDescription && hasItems;
+
+  if (!hasDescription && !hasItems) {
     return null;
   }
 
@@ -45,6 +51,35 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
   const introItem = items[1];
   const heroItem = items[0];
   const remainItems = items.slice(2);
+
+  if (!hasFullContent) {
+    return (
+      <section
+        id="handover-standard"
+        aria-labelledby="handover-standard-title"
+        className="relative overflow-hidden bg-[#F3E8DC] text-[#17372F]"
+        itemScope
+        itemType="https://schema.org/CreativeWork"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(23,55,47,0.06),transparent_38%),radial-gradient(circle_at_86%_12%,rgba(135,99,71,0.10),transparent_42%)]" />
+        <div className="relative mx-auto max-w-5xl px-4 py-14 text-center sm:px-6 sm:py-16">
+          <p className="text-xl font-extrabold uppercase tracking-[0.2em] text-[#876347]">Tiêu chuẩn bàn giao</p>
+          <h2
+            id="handover-standard-title"
+            className="mt-3 text-4xl font-extrabold uppercase leading-[1.1] tracking-wide sm:text-5xl"
+            itemProp="name"
+          >
+            {projectTitle}
+          </h2>
+          {hasDescription ? (
+            <p className="mx-auto mt-6 max-w-3xl whitespace-pre-line text-left text-base leading-relaxed text-[#17372F]/90 sm:text-center sm:text-lg" itemProp="description">
+              {description}
+            </p>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -69,7 +104,7 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
               {projectTitle}
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#17372F]/85" itemProp="description">
-              {handover.des}
+              {description}
             </p>
 
             {introItem ? (
