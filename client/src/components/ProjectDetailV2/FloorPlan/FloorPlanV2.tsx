@@ -48,7 +48,7 @@ const FloorPlanV2 = ({ project }: Props) => {
           </h2>
           <p
             itemProp="description"
-            className="mx-auto mt-3 max-w-5xl whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#6B4E3D]"
+            className="mx-auto mt-3 max-w-5xl whitespace-pre-line text-justify sm:text-center text-sm sm:text-base leading-relaxed text-[#6B4E3D]"
           >
             {floorPlanDescription}
           </p>

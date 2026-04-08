@@ -711,8 +711,9 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         apartmentDesign: formData.apartmentDesign,
         extentionDestinations: formData.extentionDestinations?.filter((d) => d.des || d.img),
         handoverStandard: formData.handoverStandard,
-        progressDescription: formData.progressDescription || undefined,
-        progressYoutubeUrl: formData.progressYoutubeUrl || undefined,
+        progressDescription: formData.progressDescription?.trim() || undefined,
+        // Với update: gửi chuỗi rỗng để backend thực sự ghi đè và xóa giá trị cũ
+        progressYoutubeUrl: formData.progressYoutubeUrl?.trim() ?? "",
       };
 
       let response;
