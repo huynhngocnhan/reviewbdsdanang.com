@@ -122,12 +122,20 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
           />
 
           <div className="w-full max-w-3xl">
-            <article className="rounded-2xl border-2 border-[#C96B5B] bg-[#F9F3EC] p-5 shadow-xl sm:p-7">
+            <article className="rounded-2xl border-2 border-[#C96B5B] bg-[#F9F3EC] p-5 shadow-xl overflow-hidden sm:p-7">
               {project.salePolicyDes ? (
                 <div
-                  className="max-w-2xl space-y-2 leading-relaxed text-[#3D2B1F]
-                    [&_ul]:ml-8 [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:space-y-2 [&_ol]:space-y-4
-                    [&_li]:leading-relaxed [&_strong]:font-semibold"
+                  className="max-w-full min-w-0 space-y-2 leading-relaxed text-[#3D2B1F]
+                    [&_*]:max-w-full [&_*]:min-w-0
+                    [&_p]:break-words [&_p]:overflow-wrap-anywhere
+                    [&_li]:break-words [&_li]:overflow-wrap-anywhere [&_li]:leading-relaxed
+                    [&_a]:break-all
+                    [&_img]:h-auto [&_img]:max-w-full
+                    [&_iframe]:max-w-full
+                    [&_table]:block [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto
+                    [&_ul]:ml-6 [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:space-y-2
+                    [&_ol]:ml-6 [&_ol]:mt-2 [&_ol]:list-decimal [&_ol]:space-y-2
+                    [&_strong]:font-semibold"
                   itemProp="description"
                   dangerouslySetInnerHTML={{ __html: sanitizeQuillHtml(project.salePolicyDes) }}
                 />

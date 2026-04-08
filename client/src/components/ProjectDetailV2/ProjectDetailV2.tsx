@@ -83,6 +83,31 @@ const ProjectDetailV2 = () => {
   const registerProjects = useMemo(() => allProjects.map((p) => p.title), [allProjects]);
   const projectHighlights = useMemo(() => project?.highlights ?? [], [project]);
 
+  const hasHandoverContent = useMemo(() => {
+    if (!project?.handoverStandard) return false;
+
+    const hasDescription = Boolean(project.handoverStandard.des?.trim());
+    const hasItems = project.handoverStandard.items?.some((item) =>
+      Boolean(item.imgUrl?.trim() || item.title?.trim() || item.subtitle?.trim() || item.des?.trim())
+    );
+
+    return hasDescription || Boolean(hasItems);
+  }, [project]);
+
+  const hasProgressContent = useMemo(() => {
+    if (!project) return false;
+
+    return Boolean(project.progressDescription?.trim());
+  }, [project]);
+
+  const hasUtilitiesContent = useMemo(() => {
+    if (!project) return false;
+
+    return Boolean(
+      project.extentionImages?.some((item) => Boolean(item.src?.trim() || item.title?.trim() || item.alt?.trim()))
+    );
+  }, [project]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100/90">
@@ -198,18 +223,24 @@ const ProjectDetailV2 = () => {
         <section id="apartment-design" className="bg-[#876347] py-4">
           <ApartmentDesign project={project} />
         </section>
-        <section id="utilities" className="bg-[#876347]">
-          <ProjectExtentionV2 project={project} />
-        </section>
-        <section id="handover">
-          <HandoverStandard project={project} />
-        </section>
+        {hasUtilitiesContent ? (
+          <section id="utilities" className="bg-[#876347]">
+            <ProjectExtentionV2 project={project} />
+          </section>
+        ) : null}
+        {hasHandoverContent ? (
+          <section id="handover">
+            <HandoverStandard project={project} />
+          </section>
+        ) : null}
         <section>
           <FullWidthForm project={project} />
         </section>
-        <section id="progress" className="bg-[#876347]">
-          <ProjectProgress project={project} />
-        </section>
+        {hasProgressContent ? (
+          <section id="progress" className="bg-[#876347]">
+            <ProjectProgress project={project} />
+          </section>
+        ) : null}
         <section id="register" >
             <RegisterForm projects={registerProjects} />
           </section>
