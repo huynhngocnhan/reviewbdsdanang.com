@@ -22,6 +22,9 @@ import { projectService } from "../../../services/project.service";
 // Generate slug from title
 const generateSlug = (title: string): string => {
   return title
+    .trim()
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
