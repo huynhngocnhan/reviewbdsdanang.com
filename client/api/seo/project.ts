@@ -7,6 +7,7 @@ declare const process: {
 };
 
 type ProjectSeoPayload = {
+  slug?: string;
   title?: string;
   subtitle?: string;
   shortDescription?: string;
@@ -99,7 +100,18 @@ export default async function handler(req: VercelRequestLike, res: VercelRespons
     const description =
       project.metaDescription || project.shortDescription || project.subtitle || DEFAULT_DESCRIPTION;
     const image = project.ogImage || project.coverImage || `${siteUrl}/og-image.svg`;
-    const projectUrl = `${siteUrl}/du-an/${slug}`;
+    const canonicalSlug = String(project.slug || slug).trim();
+    const projectUrl = `${siteUrl}/du-an/${canonicalSlug}`;
+
+    // If requested slug is not canonical slug from DB, issue a permanent redirect.
+    // This helps search engines consolidate old/incorrect URLs to the correct one.
+    if (canonicalSlug && canonicalSlug !== slug) {
+      return res
+        .status(301)
+        .setHeader("Location", projectUrl)
+        .setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=1800")
+        .send("");
+    }
 
     let html = template;
     html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);

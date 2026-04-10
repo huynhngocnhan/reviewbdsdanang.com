@@ -12,44 +12,16 @@ type Destination = {
   image: string;
 };
 
-const fallbackDestinations: Destination[] = [
-  {
-    title: "Trung tâm thương mại hiện đại",
-    description: "Không gian mua sắm - giải trí đa tầng, kết nối nhanh từ dự án.",
-    image:
-      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Công viên cảnh quan",
-    description: "Không gian xanh rộng lớn cho hoạt động thư giãn và thể thao ngoài trời.",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Trung tâm sự kiện",
-    description: "Điểm đến văn hóa, hội nghị và sự kiện quy mô khu vực.",
-    image:
-      "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Khách sạn & dịch vụ quốc tế",
-    description: "Chuỗi dịch vụ lưu trú, ẩm thực và hội họp tiêu chuẩn cao cấp.",
-    image:
-      "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
 const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
   const amenities = project.extentionImages ?? [];
 
-  // Lấy từ project.extentionDestinations (từ form admin), fallback sang mock
-  const nearbyDestinations: Destination[] = (project.extentionDestinations?.length ?? 0) > 0
-    ? project.extentionDestinations!.map((d: ExtentionDestination) => ({
-        title: d.des?.split("\n")[0] ?? "",
-        description: d.des ?? "",
-        image: d.img ?? "",
-      }))
-    : fallbackDestinations;
+  const nearbyDestinations: Destination[] = (project.extentionDestinations ?? [])
+    .map((d: ExtentionDestination) => ({
+      title: d.des?.split("\n")[0] ?? "",
+      description: d.des ?? "",
+      image: d.img ?? "",
+    }))
+    .filter((d) => Boolean(d.title || d.description || d.image));
 
   return (
     <section className="text-white" aria-labelledby="project-extension-title">
@@ -91,25 +63,27 @@ const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
           ))}
         </div>
 
-        <div className="mt-16">
-          <header>
-            <h3 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl tracking-[0.16em] uppercase">Và Hưởng trọn hệ tiện ích đại đô thị</h3>
-          </header>
+        {nearbyDestinations.length > 0 ? (
+          <div className="mt-16">
+            <header>
+              <h3 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl tracking-[0.16em] uppercase">Và Hưởng trọn hệ tiện ích đại đô thị</h3>
+            </header>
 
-          <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {nearbyDestinations.map((destination) => (
-              <article
-                key={`${destination.title}-${destination.image}`}
-                className="overflow-hidden rounded-md shadow-[0_16px_35px_rgba(0,0,0,0.3)]"
-              >
-                <img src={destination.image} alt={destination.title} loading="lazy" className="h-40 w-full object-cover" />
-                <div className="p-2">
-                  <p className="text-center text-sm text-white/90">{destination.description}</p>
-                </div>
-              </article>
-            ))}
+            <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {nearbyDestinations.map((destination) => (
+                <article
+                  key={`${destination.title}-${destination.image}`}
+                  className="overflow-hidden rounded-md shadow-[0_16px_35px_rgba(0,0,0,0.3)]"
+                >
+                  <img src={destination.image} alt={destination.title} loading="lazy" className="h-40 w-full object-cover" />
+                  <div className="p-2">
+                    <p className="text-center text-sm text-white/90">{destination.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );

@@ -12,7 +12,6 @@
       "permanent": true
     }
   ],
-
   "headers": [
     {
       "source": "/(.*)",
@@ -36,8 +35,11 @@
       ]
     }
   ],
-
   "routes": [
+    {
+      "src": "^/sitemap\\.xml$",
+      "dest": "/api/sitemap"
+    },
     {
       "src": "^/du-an/([^/]+)$",
       "dest": "/api/seo/project?slug=$1"
