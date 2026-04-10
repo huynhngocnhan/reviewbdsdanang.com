@@ -54,13 +54,25 @@ export default async function handler(req: VercelRequestLike, res: VercelRespons
     const apiBaseRaw = process.env.SEO_API_BASE_URL || process.env.VITE_API_URL || siteUrl;
     const apiBase = normalizeApiBase(apiBaseRaw);
 
-    const response = await fetch(`${apiBase}/projects?status=PUBLISHED&page=1&limit=1000`);
-    if (!response.ok) {
-      return res.status(response.status).send("Failed to build sitemap");
-    }
+    const pageSize = 100;
+    let page = 1;
+    let totalPages = 1;
+    const projects: ProjectItem[] = [];
 
-    const json = await response.json();
-    const projects: ProjectItem[] = Array.isArray(json?.data) ? json.data : [];
+    do {
+      const response = await fetch(`${apiBase}/projects?status=PUBLISHED&page=${page}&limit=${pageSize}`);
+      if (!response.ok) {
+        return res.status(response.status).send("Failed to build sitemap");
+      }
+
+      const json = await response.json();
+      const pageItems: ProjectItem[] = Array.isArray(json?.data) ? json.data : [];
+      projects.push(...pageItems);
+
+      const paginationTotalPages = Number(json?.pagination?.totalPages || 1);
+      totalPages = Number.isFinite(paginationTotalPages) && paginationTotalPages > 0 ? paginationTotalPages : 1;
+      page += 1;
+    } while (page <= totalPages);
 
     const baseUrls = [
       { loc: `${siteUrl}/`, lastmod: new Date().toISOString().slice(0, 10), changefreq: "daily", priority: "1.0" },
