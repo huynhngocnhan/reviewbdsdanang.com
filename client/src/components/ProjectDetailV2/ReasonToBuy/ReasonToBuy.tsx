@@ -103,8 +103,19 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
         <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:mt-10 lg:grid-cols-2 lg:gap-10">
           <article className="rounded-2xl p-4 text-[#6B4E3D] sm:p-7" itemProp="description">
             <p className="whitespace-pre-line text-lg italic leading-8 text-gray-100 lg:text-base">{reasonToBuyDescription}</p>
+          </article>
 
-            <div className="mt-6 rounded-2xl border border-[#C8A889] bg-[#E9D9C8] p-5 shadow-xl sm:p-6">
+          <figure className="space-y-5">
+            <div className="overflow-hidden">
+              <ZoomableImage
+                src={reasonToBuyImage}
+                alt={reasonToBuyImageAlt}
+                className="h-full w-full rounded-lg shadow-2xl lg:h-full"
+                imageClassName="h-full w-full lg:h-full"
+              />
+            </div>
+
+            <div className="rounded-2xl border border-[#C8A889] bg-[#E9D9C8] p-5 shadow-xl sm:p-6">
               <h3 className="text-xl font-bold uppercase tracking-wide text-[#5C4033] sm:text-2xl">Đăng ký nhận tư vấn</h3>
               <form className="mt-4 space-y-3" onSubmit={handleSubmit} noValidate aria-label="Form đăng ký nhận tư vấn dự án">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -154,21 +165,7 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
                 <p className="mt-3 text-sm font-medium text-emerald-700">Cảm ơn bạn! Chuyên viên sẽ liên hệ trong thời gian sớm nhất.</p>
               )}
 
-              {errorMsg && (
-                <p className="mt-3 text-sm font-medium text-red-600">{errorMsg}</p>
-              )}
-            </div>
-          </article>
-
-          <figure className="space-y-5">
-            <div className="overflow-hidden">
-              <ZoomableImage
-              src={reasonToBuyImage}
-              alt={reasonToBuyImageAlt}
-              className="h-full w-full rounded-lg shadow-2xl lg:h-full"
-              imageClassName="h-full w-full  lg:h-full"
-              />
-                
+              {errorMsg && <p className="mt-3 text-sm font-medium text-red-600">{errorMsg}</p>}
             </div>
           </figure>
         </div>
