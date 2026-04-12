@@ -21,7 +21,7 @@ const ProjectExtentionV2 = lazy(() => import("./ProjectExtentionV2/ProjectExtent
 const HandoverStandard = lazy(() => import("./HandoverStandard/HandoverStandard"));
 const ProjectProgress = lazy(() => import("./ProjectProgress/ProjectProgress"));
 
-const projectTabs = [
+const baseProjectTabs = [
   { id: "reason-to-buy", label: "Giá trị" },
   { id: "sale-policy", label: "Chính sách" },
   { id: "lead-form", label: "Tư vấn"},
@@ -106,6 +106,17 @@ const ProjectDetailV2 = () => {
       project.extentionImages?.some((item) => Boolean(item.src?.trim() || item.title?.trim() || item.alt?.trim()))
     );
   }, [project]);
+
+  const projectTabs = useMemo(
+    () =>
+      baseProjectTabs.filter((tab) => {
+        if (tab.id === "utilities") return hasUtilitiesContent;
+        if (tab.id === "handover") return hasHandoverContent;
+        if (tab.id === "progress") return hasProgressContent;
+        return true;
+      }),
+    [hasUtilitiesContent, hasHandoverContent, hasProgressContent],
+  );
 
   if (loading) {
     return (
