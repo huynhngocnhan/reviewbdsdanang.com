@@ -1,4 +1,5 @@
 import type React from "react";
+import { memo } from "react";
 
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
@@ -246,4 +247,4 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
   );
 };
 
-export default HandoverStandard;
+export default memo(HandoverStandard);

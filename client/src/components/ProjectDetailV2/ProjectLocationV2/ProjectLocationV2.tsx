@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
@@ -127,4 +128,4 @@ const ProjectLocationV2 = ({ project }: Props) => {
   );
 };
 
-export default ProjectLocationV2;
+export default memo(ProjectLocationV2);

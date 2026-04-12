@@ -15,11 +15,9 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     projectService
-      .getProjects({ status: "PUBLISHED", limit: 100 })
-      .then((res) => {
-        if (res.success && res.data) {
-          setProjects(res.data);
-        }
+      .getPublishedProjectsCached(100)
+      .then((data) => {
+        setProjects(data);
       })
       .catch(() => {});
   }, []);
@@ -32,7 +30,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="bg-gray-100/90">
-      <Header />
+      <Header projectsData={projects} />
       <VideoBanner />
       <HomePageCard projectData={projects} />
       <Partner/>

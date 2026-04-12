@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 
 type Props = {
@@ -88,4 +89,4 @@ const ProjectProgress: React.FC<Props> = ({ project }) => {
   );
 };
 
-export default ProjectProgress;
+export default memo(ProjectProgress);

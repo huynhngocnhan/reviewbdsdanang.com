@@ -41,6 +41,13 @@ type ApiResponse<T> = {
 type ProjectListResponse = ApiResponse<ProjectData[]>;
 type ProjectResponse = ApiResponse<ProjectData>;
 
+const PUBLISHED_CACHE_TTL_MS = 60_000;
+let publishedProjectsCache: { data: ProjectData[]; expiresAt: number } | null = null;
+let publishedProjectsInFlight: Promise<ProjectData[]> | null = null;
+
+const projectBySlugCache = new Map<string, { data: ProjectData; expiresAt: number }>();
+const projectBySlugInFlight = new Map<string, Promise<ProjectData | null>>();
+
 // Query params
 type ProjectQueryParams = {
   status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
@@ -170,6 +177,43 @@ export const projectService = {
   },
 
   /**
+   * Shared cached list for published projects (avoid duplicate fetch in Header/Home).
+   */
+  async getPublishedProjectsCached(limit = 100): Promise<ProjectData[]> {
+    const now = Date.now();
+    if (publishedProjectsCache && publishedProjectsCache.expiresAt > now) {
+      return publishedProjectsCache.data;
+    }
+
+    if (publishedProjectsInFlight) {
+      return publishedProjectsInFlight;
+    }
+
+    publishedProjectsInFlight = this.getProjects({ status: "PUBLISHED", limit })
+      .then((res) => {
+        const data = res.success && res.data ? res.data : [];
+        publishedProjectsCache = {
+          data,
+          expiresAt: Date.now() + PUBLISHED_CACHE_TTL_MS,
+        };
+        return data;
+      })
+      .finally(() => {
+        publishedProjectsInFlight = null;
+      });
+
+    return publishedProjectsInFlight;
+  },
+
+  /**
+   * Invalidate published projects cache when needed.
+   */
+  invalidatePublishedProjectsCache() {
+    publishedProjectsCache = null;
+    publishedProjectsInFlight = null;
+  },
+
+  /**
    * Get single project by ID
    */
   async getProjectById(id: string): Promise<ProjectResponse> {
@@ -183,6 +227,74 @@ export const projectService = {
   async getProjectBySlug(slug: string): Promise<ProjectResponse> {
     const response = await api.get(`/projects/slug/${slug}`);
     return response.data;
+  },
+
+  /**
+   * Cached project detail by slug.
+   */
+  async getProjectBySlugCached(slug: string): Promise<ProjectResponse> {
+    const key = slug.trim();
+    const now = Date.now();
+    const cached = projectBySlugCache.get(key);
+    if (cached && cached.expiresAt > now) {
+      return { success: true, data: cached.data };
+    }
+
+    const inFlight = projectBySlugInFlight.get(key);
+    if (inFlight) {
+      const data = await inFlight;
+      return data ? { success: true, data } : { success: false, error: "Project not found" };
+    }
+
+    const promise = this.getProjectBySlug(key)
+      .then((res) => {
+        if (res.success && res.data) {
+          projectBySlugCache.set(key, {
+            data: res.data,
+            expiresAt: Date.now() + PUBLISHED_CACHE_TTL_MS,
+          });
+          return res.data;
+        }
+        return null;
+      })
+      .catch(() => null)
+      .finally(() => {
+        projectBySlugInFlight.delete(key);
+      });
+
+    projectBySlugInFlight.set(key, promise);
+    const data = await promise;
+    return data ? { success: true, data } : { success: false, error: "Project not found" };
+  },
+
+  /**
+   * Prefetch project detail by slug (best effort).
+   */
+  prefetchProjectBySlug(slug: string) {
+    const key = slug.trim();
+    if (!key) return;
+    const now = Date.now();
+    const cached = projectBySlugCache.get(key);
+    if (cached && cached.expiresAt > now) return;
+    if (projectBySlugInFlight.has(key)) return;
+
+    const promise = this.getProjectBySlug(key)
+      .then((res) => {
+        if (res.success && res.data) {
+          projectBySlugCache.set(key, {
+            data: res.data,
+            expiresAt: Date.now() + PUBLISHED_CACHE_TTL_MS,
+          });
+          return res.data;
+        }
+        return null;
+      })
+      .catch(() => null)
+      .finally(() => {
+        projectBySlugInFlight.delete(key);
+      });
+
+    projectBySlugInFlight.set(key, promise);
   },
 
   /**

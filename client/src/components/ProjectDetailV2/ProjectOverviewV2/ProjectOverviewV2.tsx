@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import RegisterModalForm from "../../RegisterModalForm/RegisterModalForm";
 import ZoomableImage from "../../ZoomableImage";
@@ -98,4 +98,4 @@ const ProjectOverviewV2 = ({ project }: Props) => {
   );
 };
 
-export default ProjectOverviewV2;
+export default memo(ProjectOverviewV2);
