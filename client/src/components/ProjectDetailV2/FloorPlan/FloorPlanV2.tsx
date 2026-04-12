@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
@@ -81,4 +81,4 @@ const FloorPlanV2 = ({ project }: Props) => {
   );
 };
 
-export default FloorPlanV2;
+export default memo(FloorPlanV2);

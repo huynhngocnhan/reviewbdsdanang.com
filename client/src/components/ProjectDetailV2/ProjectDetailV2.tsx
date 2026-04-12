@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -10,15 +10,16 @@ import ReasonToBuy from "./ReasonToBuy/ReasonToBuy";
 import SalePolicy from "./SalePolicy/SalePolicy";
 import LeadForm from "./LeadForm/LeadForm";
 import ProjectLocationV2 from "./ProjectLocationV2/ProjectLocationV2";
-import FloorPlanV2 from "./FloorPlan/FloorPlanV2";
 import FullWidthForm from "../FullWidthForm/FullWidthForm";
 import LeftOverlay from "../LeftOverlay/LeftOverlay";
-import ApartmentDesign from "./ApartmentDesign/ApartmentDesign";
-import ProjectExtentionV2 from "./ProjectExtentionV2/ProjectExtentionV2";
-import HandoverStandard from "./HandoverStandard/HandoverStandard";
-import ProjectProgress from "./ProjectProgress/ProjectProgress";
 import TabBarOverlay from "../TabBarOverlay/TabBarOverlay";
 import ContactOverlay from "../ContactOverlay/ContactOverlay";
+
+const FloorPlanV2 = lazy(() => import("./FloorPlan/FloorPlanV2"));
+const ApartmentDesign = lazy(() => import("./ApartmentDesign/ApartmentDesign"));
+const ProjectExtentionV2 = lazy(() => import("./ProjectExtentionV2/ProjectExtentionV2"));
+const HandoverStandard = lazy(() => import("./HandoverStandard/HandoverStandard"));
+const ProjectProgress = lazy(() => import("./ProjectProgress/ProjectProgress"));
 
 const projectTabs = [
   { id: "reason-to-buy", label: "Giá trị" },
@@ -48,7 +49,7 @@ const ProjectDetailV2 = () => {
     });
 
     projectService
-      .getProjectBySlug(slug!)
+      .getProjectBySlugCached(slug!)
       .then((res) => {
         if (!isMounted) return;
         if (res.success && res.data) {
@@ -71,11 +72,9 @@ const ProjectDetailV2 = () => {
 
   useEffect(() => {
     projectService
-      .getProjects({ status: "PUBLISHED" })
-      .then((res) => {
-        if (res.success && res.data) {
-          setAllProjects(res.data);
-        }
+      .getPublishedProjectsCached(100)
+      .then((data) => {
+        setAllProjects(data);
       })
       .catch(() => {});
   }, []);
@@ -144,6 +143,7 @@ const ProjectDetailV2 = () => {
             alt={project.title}
             className="h-full w-full object-cover shadow-lg"
             fetchPriority="high"
+            loading="eager"
             decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
@@ -215,22 +215,30 @@ const ProjectDetailV2 = () => {
           <ProjectLocationV2 project={project} />
         </section>
         <section id="floorplan">
-          <FloorPlanV2 project={project} />
+          <Suspense fallback={null}>
+            <FloorPlanV2 project={project} />
+          </Suspense>
         </section>
         <section>
           <FullWidthForm project={project} />
         </section>
         <section id="apartment-design" className="bg-[#876347] py-4">
-          <ApartmentDesign project={project} />
+          <Suspense fallback={null}>
+            <ApartmentDesign project={project} />
+          </Suspense>
         </section>
         {hasUtilitiesContent ? (
           <section id="utilities" className="bg-[#876347]">
-            <ProjectExtentionV2 project={project} />
+            <Suspense fallback={null}>
+              <ProjectExtentionV2 project={project} />
+            </Suspense>
           </section>
         ) : null}
         {hasHandoverContent ? (
           <section id="handover">
-            <HandoverStandard project={project} />
+            <Suspense fallback={null}>
+              <HandoverStandard project={project} />
+            </Suspense>
           </section>
         ) : null}
         <section>
@@ -238,7 +246,9 @@ const ProjectDetailV2 = () => {
         </section>
         {hasProgressContent ? (
           <section id="progress" className="bg-[#876347]">
-            <ProjectProgress project={project} />
+            <Suspense fallback={null}>
+              <ProjectProgress project={project} />
+            </Suspense>
           </section>
         ) : null}
         <section id="register" >

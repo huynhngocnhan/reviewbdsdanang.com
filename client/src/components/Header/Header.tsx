@@ -28,10 +28,14 @@ type MenuItem = {
 
 const EMPTY_CHILD = [{ name: "Chưa có dự án", href: "#", disabled: true }];
 
-const Header: React.FC = () => {
+type HeaderProps = {
+  projectsData?: ProjectData[];
+};
+
+const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [fetchedProjects, setFetchedProjects] = useState<ProjectData[]>([]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -41,13 +45,19 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (projectsData.length > 0) {
+      return;
+    }
+
     projectService
-      .getProjects({ status: "PUBLISHED", limit: 100 })
-      .then((res) => {
-        if (res.success && res.data) setProjects(res.data);
+      .getPublishedProjectsCached(100)
+      .then((data) => {
+        setFetchedProjects(data);
       })
       .catch(() => {});
-  }, []);
+  }, [projectsData]);
+
+  const projects = projectsData.length > 0 ? projectsData : fetchedProjects;
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const sun = projects.filter((p) => p.category === "SUN");

@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { MOCK_PROJECTS } from "../../../constants/projectData";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
@@ -87,6 +87,9 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
       className="w-full bg-transparent py-8 md:py-10"
       itemScope
       itemType="https://schema.org/WebPageElement"
+      data-aos="fade-up"
+      data-aos-duration="500"
+      data-aos-once="true"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <header className="mb-8 text-center">
@@ -174,4 +177,4 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
   );
 };
 
-export default ReasonToBuy;
+export default memo(ReasonToBuy);

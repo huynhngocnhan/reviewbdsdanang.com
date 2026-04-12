@@ -2,6 +2,7 @@ import { useState } from "react";
 import type React from "react";
 import { Divider } from "antd";
 import type { ProjectData, ProjectCategory } from "../../constants/projectData";
+import { projectService } from "../../services/project.service";
 
 type FilterType = ProjectCategory | "all" | "featured";
 
@@ -100,6 +101,8 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
               data-aos="fade-up"
               data-aos-duration="800"
               data-aos-delay={index * 100}
+              onMouseEnter={() => projectService.prefetchProjectBySlug(item.slug)}
+              onFocus={() => projectService.prefetchProjectBySlug(item.slug)}
               className="bg-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-200">
@@ -107,6 +110,8 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
                   src={item.coverImage}
                   alt={item.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     e.currentTarget.src =

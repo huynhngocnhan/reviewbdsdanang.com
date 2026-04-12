@@ -1,4 +1,5 @@
 import type React from "react";
+import { memo } from "react";
 import ZoomableImage from "../../ZoomableImage";
 import type { ProjectData, ExtentionDestination } from "../../../constants/projectData";
 
@@ -89,4 +90,4 @@ const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
   );
 };
 
-export default ProjectExtentionV2;
+export default memo(ProjectExtentionV2);

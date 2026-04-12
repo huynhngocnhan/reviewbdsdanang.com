@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import type { ProjectData, ApartmentItem } from "../../../constants/projectData";
 import ApartmentForm from "../../ApartmentForm/ApartmentForm";
@@ -217,4 +217,4 @@ const ApartmentDesign = ({ project }: Props) => {
   );
 };
 
-export default ApartmentDesign;
+export default memo(ApartmentDesign);
