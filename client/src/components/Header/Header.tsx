@@ -42,7 +42,7 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     projectService
-      .getProjects({ status: "PUBLISHED" })
+      .getProjects({ status: "PUBLISHED", limit: 100 })
       .then((res) => {
         if (res.success && res.data) setProjects(res.data);
       })

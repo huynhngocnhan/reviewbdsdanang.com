@@ -51,7 +51,8 @@ function sanitizeQuillHtml(html: string): string {
       }
     });
 
-    return container.innerHTML;
+    // Quill sometimes emits non-breaking spaces (&nbsp;) causing unexpected no-wrap.
+    return container.innerHTML.replace(/&nbsp;/g, " ");
   } catch {
     return html.replace(/\s+style="[^"]*"/g, "");
   }
@@ -122,14 +123,14 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
           />
 
           <div className="w-full max-w-3xl">
-            <article className="rounded-2xl border-2 border-[#C96B5B] bg-[#F9F3EC] p-5 shadow-xl overflow-hidden sm:p-7">
+            <article className="rounded-2xl border-2 border-[#C96B5B] bg-[#F9F3EC] p-5 shadow-xl sm:p-7">
               {project.salePolicyDes ? (
                 <div
                   className="max-w-full min-w-0 space-y-2 leading-relaxed text-[#3D2B1F]
-                    [&_*]:max-w-full [&_*]:min-w-0
-                    [&_p]:break-words [&_p]:overflow-wrap-anywhere
-                    [&_li]:break-words [&_li]:overflow-wrap-anywhere [&_li]:leading-relaxed
-                    [&_a]:break-all
+                    [&_*]:max-w-full [&_*]:min-w-0 [&_*]:break-words
+                    [&_p]:whitespace-normal [&_p]:[word-break:normal]
+                    [&_li]:whitespace-normal [&_li]:[word-break:normal] [&_li]:leading-relaxed
+                    [&_a]:break-words [&_a]:[word-break:normal]
                     [&_img]:h-auto [&_img]:max-w-full
                     [&_iframe]:max-w-full
                     [&_table]:block [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto
