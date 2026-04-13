@@ -102,6 +102,7 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
               data-aos-duration="800"
               data-aos-delay={index * 100}
               onMouseEnter={() => projectService.prefetchProjectBySlug(item.slug)}
+              onTouchStart={() => projectService.prefetchProjectBySlug(item.slug)}
               onFocus={() => projectService.prefetchProjectBySlug(item.slug)}
               className="bg-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >

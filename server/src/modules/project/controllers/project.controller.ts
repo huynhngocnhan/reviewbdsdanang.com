@@ -42,7 +42,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -82,7 +82,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -121,7 +121,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -138,7 +138,8 @@ class ProjectController {
    */
   async getBySlug(req: AuthRequest, res: Response) {
     try {
-      const { slug } = req.params;
+      const slugParam = (req.params as any).slug as string | string[];
+      const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
 
       const project = await projectService.getProjectBySlug(slug);
 
@@ -186,7 +187,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -232,7 +233,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -272,7 +273,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -319,7 +320,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
@@ -359,7 +360,7 @@ class ProjectController {
         return res.status(400).json({
           success: false,
           error: "Validation error",
-          details: error.errors,
+          details: error.issues,
         });
       }
 
