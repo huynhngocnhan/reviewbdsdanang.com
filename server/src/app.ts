@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import compression from "compression";
 import authRoutes from "./modules/auth/routes/auth.route";
 import uploadRoutes from "./modules/upload/routes/upload.route";
 import assetRoutes from "./modules/asset/routes/asset.route";
@@ -18,6 +19,7 @@ app.use(cors({
   ],
   credentials: true,
 }));
+app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 
