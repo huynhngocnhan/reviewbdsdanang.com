@@ -1257,18 +1257,14 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           onChange={async (e) => {
             const file = e.target.files?.[0];
             if (file) {
-              setUploadingImages((prev) => ({ ...prev, locationImage: true }));
-              try {
-                // Simulate URL upload (replace with actual upload logic)
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  updateField("locationImage", event.target?.result as string);
-                  setUploadingImages((prev) => ({ ...prev, locationImage: false }));
-                };
-                reader.readAsDataURL(file);
-              } catch (error) {
-                console.error("Error uploading location image:", error);
-                setUploadingImages((prev) => ({ ...prev, locationImage: false }));
+              await handleImageUpload(
+                file,
+                "projects/location",
+                (url) => updateField("locationImage", url),
+                "locationImage"
+              );
+              if (locationImageInputRef.current) {
+                locationImageInputRef.current.value = "";
               }
             }
           }}
