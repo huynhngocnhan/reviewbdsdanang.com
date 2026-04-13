@@ -92,7 +92,7 @@ const LeadForm = ({ project, projectOptions }: Props) => {
         <div className="text-center text-[#F8E8D7]">
           <h2
             id="lead-form-heading"
-            className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-4xl font-bold -tracking-tighter uppercase"
+            className="font-extrabold text-3xl sm:text-4xl lg:text-4xl -tracking-tighter uppercase"
           >
             Quý khách hàng đang quan tâm dự án và chưa tìm được căn ưng ý để đầu tư?
           </h2>

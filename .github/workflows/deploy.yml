@@ -25,8 +25,8 @@ jobs:
 
             cd server
             npm ci
-            npx prisma migrate deploy
             npx prisma generate
+            npx prisma migrate deploy
             npm run build
 
             pm2 delete reviewbds-backend || true
