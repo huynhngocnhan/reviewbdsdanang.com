@@ -34,6 +34,22 @@ const generateSlug = (title: string): string => {
     .replace(/-+/g, "-"); // Replace multiple hyphens with single hyphen
 };
 
+const getYouTubeVideoId = (url: string): string => {
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) return "";
+
+  const embedMatch = trimmedUrl.match(/youtube\.com\/embed\/([^?&/]+)/);
+  if (embedMatch?.[1]) return embedMatch[1];
+
+  const shortMatch = trimmedUrl.match(/youtu\.be\/([^?&/]+)/);
+  if (shortMatch?.[1]) return shortMatch[1];
+
+  const watchMatch = trimmedUrl.match(/[?&]v=([^?&/]+)/);
+  if (watchMatch?.[1]) return watchMatch[1];
+
+  return "";
+};
+
 type ProjectCreationProps = {
   onBack?: () => void;
   onSave?: () => void; // Called after successful save
@@ -94,6 +110,8 @@ type ProjectFormData = Omit<ProjectData, "id"> & {
   extentionDestinations?: ExtentionDestinationForm[];
   progressDescription?: string;
   progressYoutubeUrl?: string;
+  progressVideoUploadDate?: string;
+  progressVideoThumbnailUrl?: string;
   salePolicyLite?: SalePolicyLiteForm;
 };
 
@@ -141,6 +159,8 @@ const defaultFormData: ProjectFormData = {
   },
   progressDescription: "",
   progressYoutubeUrl: "",
+  progressVideoUploadDate: "",
+  progressVideoThumbnailUrl: "",
 };
 
 type TabType =
@@ -308,6 +328,8 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
             },
             progressDescription: project.progressDescription || "",
             progressYoutubeUrl: project.progressYoutubeUrl || "",
+            progressVideoUploadDate: project.progressVideoUploadDate || "",
+            progressVideoThumbnailUrl: project.progressVideoThumbnailUrl || "",
           });
         }
         
@@ -666,6 +688,12 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
 
     setIsSubmitting(true);
     try {
+      const progressYoutubeUrl = formData.progressYoutubeUrl?.trim() ?? "";
+      const progressVideoId = getYouTubeVideoId(progressYoutubeUrl);
+      const progressVideoThumbnailUrl = progressVideoId
+        ? `https://img.youtube.com/vi/${progressVideoId}/hqdefault.jpg`
+        : undefined;
+
       const projectData = {
         slug: formData.slug,
         title: formData.title,
@@ -716,7 +744,9 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         handoverStandard: formData.handoverStandard,
         progressDescription: formData.progressDescription?.trim() || undefined,
         // Với update: gửi chuỗi rỗng để backend thực sự ghi đè và xóa giá trị cũ
-        progressYoutubeUrl: formData.progressYoutubeUrl?.trim() ?? "",
+        progressYoutubeUrl,
+        progressVideoUploadDate: progressYoutubeUrl ? new Date().toISOString() : undefined,
+        progressVideoThumbnailUrl,
       };
 
       let response;
@@ -1868,6 +1898,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         placeholder="Youtube URL"
         className="w-full rounded-xl border text-gray-800 border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
       />
+
     </div>
   );
 

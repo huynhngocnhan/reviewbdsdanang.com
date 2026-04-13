@@ -248,6 +248,8 @@ export const CreateProjectDtoSchema = z.object({
   // Progress
   progressDescription: z.string().optional(),
   progressYoutubeUrl: z.string().optional(),
+  progressVideoUploadDate: z.string().optional(),
+  progressVideoThumbnailUrl: z.string().optional(),
   progressMilestones: z.array(ProgressMilestoneSchema).default([]),
   progressGallery: z.array(ProgressGalleryItemSchema).default([]),
   progressVideoUrl: z.string().optional(),
