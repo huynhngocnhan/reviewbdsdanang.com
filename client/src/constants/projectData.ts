@@ -269,6 +269,8 @@ export interface ProjectData {
   // V2 Progress
   progressDescription?: string;
   progressYoutubeUrl?: string;
+  progressVideoUploadDate?: string;
+  progressVideoThumbnailUrl?: string;
   floorplans: FloorplanCategory[];
   customSections?: CustomSectionData[];
   // Legacy

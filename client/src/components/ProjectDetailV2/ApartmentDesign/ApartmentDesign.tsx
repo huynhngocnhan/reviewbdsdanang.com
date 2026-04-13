@@ -131,9 +131,10 @@ const ApartmentDesign = ({ project }: Props) => {
                 className="group relative overflow-hidden rounded-xl bg-[#17372F]/40 shadow-[0_18px_40px_rgba(0,0,0,0.25)]"
                 itemProp="itemListElement"
                 itemScope
-                itemType="https://schema.org/Product"
+                itemType="https://schema.org/ListItem"
               >
                 <meta itemProp="position" content={String(index + 1)} />
+                <div itemProp="item" itemScope itemType="https://schema.org/Thing">
                 <div className="absolute left-4 top-4 z-10 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#2C2C2C] shadow-lg">
                   {item.label}
                 </div>
@@ -169,6 +170,7 @@ const ApartmentDesign = ({ project }: Props) => {
                     </span>
                   </h3>
                   <p className="mt-2 text-sm text-white/90">{item.description}</p>
+                </div>
                 </div>
               </article>
             ))}

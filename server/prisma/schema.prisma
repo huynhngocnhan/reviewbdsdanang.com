@@ -306,6 +306,10 @@ model Project {
   progressDescription String?
   /// V2 - video tiến độ YouTube
   progressYoutubeUrl String?
+  /// V2 - ngày đăng video tiến độ (ISO string)
+  progressVideoUploadDate String?
+  /// V2 - thumbnail video tiến độ
+  progressVideoThumbnailUrl String?
 
   /// [NEW] FAQ (vd: [{question, answer}])
   faqs Json?
