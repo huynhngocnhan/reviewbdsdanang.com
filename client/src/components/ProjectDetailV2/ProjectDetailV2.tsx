@@ -43,8 +43,7 @@ const ProjectDetailV2 = () => {
 
   useEffect(() => {
     let isMounted = true;
-
-    Promise.resolve().then(() => {
+    const frameId = window.requestAnimationFrame(() => {
       if (isMounted) setLoading(true);
     });
 
@@ -67,16 +66,34 @@ const ProjectDetailV2 = () => {
 
     return () => {
       isMounted = false;
+      window.cancelAnimationFrame(frameId);
     };
   }, [slug]);
 
   useEffect(() => {
-    projectService
-      .getPublishedProjectsCached(100)
-      .then((data) => {
-        setAllProjects(data);
-      })
-      .catch(() => {});
+    // Defer non-critical list fetch so mobile can render detail first.
+    let isMounted = true;
+    const run = () => {
+      projectService
+        .getPublishedProjectsCached(100)
+        .then((data) => {
+          if (!isMounted) return;
+          setAllProjects(data);
+        })
+        .catch(() => {});
+    };
+
+    const idleCallback = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    let timeoutId: number | undefined;
+    if (idleCallback) {
+      idleCallback(run);
+    } else {
+      timeoutId = window.setTimeout(run, 300);
+    }
+    return () => {
+      isMounted = false;
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   const registerProjects = useMemo(() => allProjects.map((p) => p.title), [allProjects]);

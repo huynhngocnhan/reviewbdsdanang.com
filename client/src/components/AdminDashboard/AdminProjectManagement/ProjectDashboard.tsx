@@ -87,6 +87,10 @@ const ProjectDashboard = () => {
     }
   }, []);
 
+  const invalidatePublicProjectCache = () => {
+    projectService.invalidatePublishedProjectsCache();
+  };
+
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
@@ -116,6 +120,7 @@ const ProjectDashboard = () => {
     try {
       const response = await projectService.deleteProject(projectId);
       if (response.success) {
+        invalidatePublicProjectCache();
         setProjects((prev) => prev.filter((p) => p.id !== projectId));
         toast.success("Xóa dự án thành công");
       } else {
@@ -137,6 +142,7 @@ const ProjectDashboard = () => {
       }
 
       if (response.success) {
+        invalidatePublicProjectCache();
         const nextStatus: ProjectStatus = currentStatus === "PUBLISHED" ? "ARCHIVED" : "PUBLISHED";
         const nextPublishedAt = currentStatus === "PUBLISHED" ? undefined : new Date().toISOString();
         setProjects((prev) =>
@@ -163,6 +169,7 @@ const ProjectDashboard = () => {
       const response = await projectService.toggleFeatured(projectId);
 
       if (response.success && response.data) {
+        invalidatePublicProjectCache();
         // Only update the isFeatured field to preserve all other project fields
         setProjects((prev) =>
           prev.map((p) =>
@@ -206,11 +213,28 @@ const ProjectDashboard = () => {
   }, [projects, activeCategory]);
 
   if (showCreation) {
-    return <ProjectCreation onBack={() => setShowCreation(false)} onSave={() => fetchProjects(true)} />;
+    return (
+      <ProjectCreation
+        onBack={() => setShowCreation(false)}
+        onSave={() => {
+          invalidatePublicProjectCache();
+          fetchProjects(true);
+        }}
+      />
+    );
   }
 
   if (editingProjectId) {
-    return <ProjectCreation projectId={editingProjectId} onBack={() => setEditingProjectId(null)} onSave={() => fetchProjects(true)} />;
+    return (
+      <ProjectCreation
+        projectId={editingProjectId}
+        onBack={() => setEditingProjectId(null)}
+        onSave={() => {
+          invalidatePublicProjectCache();
+          fetchProjects(true);
+        }}
+      />
+    );
   }
 
   return (

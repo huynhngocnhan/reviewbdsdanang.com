@@ -7,7 +7,7 @@ const VideoBanner: React.FC = () => {
         autoPlay
         muted
         loop
-        preload="auto"
+        preload="metadata"
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
