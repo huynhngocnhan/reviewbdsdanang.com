@@ -110,8 +110,12 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
                 <img
                   src={item.coverImage}
                   alt={item.title}
+                  width={640}
+                  height={360}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="w-full h-full object-cover"
-                  loading="lazy"
+                  loading={index < 2 ? "eager" : "lazy"}
+                  fetchPriority={index < 2 ? "high" : "low"}
                   decoding="async"
                   referrerPolicy="no-referrer"
                   onError={(e) => {

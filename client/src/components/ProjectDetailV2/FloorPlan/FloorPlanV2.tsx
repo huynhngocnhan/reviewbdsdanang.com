@@ -64,6 +64,10 @@ const FloorPlanV2 = ({ project }: Props) => {
                   className="w-full"
                   imageClassName="w-full object-contain"
                   showHoverOverlay={false}
+                  width={1600}
+                  height={900}
+                  sizes="(max-width: 1280px) 100vw, 1200px"
+                  fetchPriority="low"
                 />
                 <figcaption className="px-4 py-3 text-center text-sm text-[#6B4E3D]">
                   Sơ đồ mặt bằng {project.title}{image.alt ? ` - ${image.alt}` : ""}

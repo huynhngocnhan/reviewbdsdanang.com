@@ -108,6 +108,10 @@ const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
             <img
               alt="Sun Group"
               src={SunLogo}
+              width={1200}
+              height={469}
+              fetchPriority="high"
+              decoding="async"
               className={`w-auto transition-all duration-300 ${isScrolled ? "h-10" : "h-12"}`}
             />
           </a>
@@ -210,7 +214,14 @@ const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
           <div className="flex items-center justify-between">
             <a href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
               <span className="sr-only">Sun Group</span>
-              <img alt="Sun Group" src={SunLogo} className="h-8 w-auto" />
+              <img
+                alt="Sun Group"
+                src={SunLogo}
+                width={1200}
+                height={469}
+                decoding="async"
+                className="h-8 w-auto"
+              />
             </a>
             <button
               type="button"

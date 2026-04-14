@@ -149,9 +149,14 @@ const ApartmentDesign = ({ project }: Props) => {
                     src={item.image}
                     alt={`Thiết kế căn hộ ${item.name}`}
                     itemProp="image"
+                    width={800}
+                    height={450}
+                    sizes="(max-width: 640px) 100vw, 50vw"
                     className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
+                    fetchPriority="low"
+                    referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 transition group-hover:opacity-60" />
                   <span className="absolute bottom-4 left-4 inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
@@ -202,8 +207,12 @@ const ApartmentDesign = ({ project }: Props) => {
             <img
               src={selectedImage.image}
               alt={selectedImage.name}
+              width={1920}
+              height={1080}
+              sizes="100vw"
               className="h-[70vh] w-full object-contain bg-black"
               decoding="async"
+              referrerPolicy="no-referrer"
             />
 
             <div className="px-6 py-4">

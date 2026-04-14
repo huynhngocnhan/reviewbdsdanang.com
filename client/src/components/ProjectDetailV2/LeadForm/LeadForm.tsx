@@ -211,8 +211,13 @@ const LeadForm = ({ project, projectOptions }: Props) => {
             <img
               src={mainFloorplanImage}
               alt={`${project.title} - mặt bằng dự án`}
+              width={1200}
+              height={630}
+              sizes="(max-width: 1024px) 100vw, 66vw"
               loading="lazy"
               decoding="async"
+              fetchPriority="low"
+              referrerPolicy="no-referrer"
               className="w-full h-full min-h-[420px] object-cover"
             />
           </div>

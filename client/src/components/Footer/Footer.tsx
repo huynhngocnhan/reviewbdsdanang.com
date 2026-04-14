@@ -28,7 +28,12 @@ type SocialLink = {
 const FALLBACK_AVATAR =
   "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop";
 
-const Footer: React.FC = () => {
+/** Placeholder instead of avatar image (e.g. project detail loading shell). */
+type FooterProps = {
+  deferAvatar?: boolean;
+};
+
+const Footer: React.FC<FooterProps> = ({ deferAvatar = false }) => {
   const [admin, setAdmin] = useState<FooterAdminData | null>(null);
 
   useEffect(() => {
@@ -76,17 +81,28 @@ const Footer: React.FC = () => {
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-8 lg:gap-10">
           <div className="mx-auto shrink-0 sm:mx-0">
             <div className="rounded-2xl border border-amber-200 bg-white p-2 shadow-sm">
-              <img
-                src={admin?.profile?.avatarAsset?.url || avatarUrl}
-                alt={fullName}
-                className="h-28 w-28 rounded-xl object-cover sm:h-40 sm:w-40"
-                referrerPolicy="no-referrer"
-                loading="lazy"
-                onError={(event) => {
-                  event.currentTarget.src = FALLBACK_AVATAR;
-                  event.currentTarget.onerror = null;
-                }}
-              />
+              {deferAvatar ? (
+                <div
+                  className="h-28 w-28 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/80 sm:h-40 sm:w-40"
+                  aria-hidden
+                />
+              ) : (
+                <img
+                  src={admin?.profile?.avatarAsset?.url || avatarUrl}
+                  alt={fullName}
+                  width={160}
+                  height={160}
+                  className="h-28 w-28 rounded-xl object-cover sm:h-40 sm:w-40"
+                  referrerPolicy="no-referrer"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="low"
+                  onError={(event) => {
+                    event.currentTarget.src = FALLBACK_AVATAR;
+                    event.currentTarget.onerror = null;
+                  }}
+                />
+              )}
             </div>
           </div>
 

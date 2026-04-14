@@ -52,6 +52,10 @@ const ProjectLocationV2 = ({ project }: Props) => {
             alt={`${project.title} - vị trí dự án`}
             className="lg:col-span-7 rounded-2xl border border-white/20 shadow-2xl"
             imageClassName="min-h-[450px]"
+            width={1200}
+            height={800}
+            sizes="(max-width: 1024px) 100vw, 58vw"
+            fetchPriority="low"
           />
 
           {project.mapEmbedUrl && (
@@ -105,8 +109,13 @@ const ProjectLocationV2 = ({ project }: Props) => {
                       <img
                         src={item.img}
                         alt={item.title}
+                        width={480}
+                        height={176}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
                         loading="lazy"
                         decoding="async"
+                        fetchPriority="low"
+                        referrerPolicy="no-referrer"
                         className="h-full w-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />

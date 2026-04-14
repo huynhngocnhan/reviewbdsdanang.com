@@ -11,6 +11,10 @@ type Props = {
   loading?: "eager" | "lazy";
   decoding?: "sync" | "async" | "auto";
   fetchPriority?: "high" | "low" | "auto";
+  /** Intrinsic dimensions for layout reserve (display size still from CSS). */
+  width?: number;
+  height?: number;
+  sizes?: string;
 };
 
 const ZoomableImage: React.FC<Props> = ({
@@ -22,6 +26,9 @@ const ZoomableImage: React.FC<Props> = ({
   loading = "lazy",
   decoding = "async",
   fetchPriority = "auto",
+  width,
+  height,
+  sizes,
 }) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -36,9 +43,13 @@ const ZoomableImage: React.FC<Props> = ({
         <img
           src={src}
           alt={alt}
+          width={width}
+          height={height}
+          sizes={sizes}
           loading={loading}
           decoding={decoding}
           fetchPriority={fetchPriority}
+          referrerPolicy="no-referrer"
           className={`h-full w-full object-cover transition duration-300 group-hover:scale-[1.02] ${imageClassName}`}
         />
         {showHoverOverlay && (

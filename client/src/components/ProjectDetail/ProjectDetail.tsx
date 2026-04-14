@@ -53,7 +53,7 @@ const ProjectDetail: React.FC = () => {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
         </div>
-        <Footer />
+        <Footer deferAvatar />
       </div>
     );
   }
@@ -70,7 +70,7 @@ const ProjectDetail: React.FC = () => {
             Đường dẫn không đúng hoặc dự án chưa được cập nhật.
           </p>
         </div>
-        <Footer />
+        <Footer deferAvatar />
       </div>
     );
   }
@@ -84,7 +84,14 @@ const ProjectDetail: React.FC = () => {
           <img
             src={project.coverImage}
             alt={project.title}
+            width={1920}
+            height={1080}
+            sizes="100vw"
             className="h-full w-full object-cover shadow-lg"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
