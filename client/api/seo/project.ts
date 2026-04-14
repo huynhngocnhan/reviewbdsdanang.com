@@ -13,6 +13,7 @@ type ProjectSeoPayload = {
   shortDescription?: string;
   metaTitle?: string;
   metaDescription?: string;
+  reasonToBuyTitle?: string;
   coverImage?: string;
   ogImage?: string;
 };
@@ -63,6 +64,19 @@ const upsertCanonical = (html: string, canonicalUrl: string) => {
   return html.replace("</head>", `  ${tag}\n</head>`);
 };
 
+/** SERP title: project name + reason section when no manual metaTitle. */
+function buildProjectSeoTitle(project: ProjectSeoPayload): string {
+  if (project.metaTitle?.trim()) {
+    return project.metaTitle.trim();
+  }
+  const name = project.title?.trim() || DEFAULT_TITLE;
+  const reason = project.reasonToBuyTitle?.trim();
+  if (reason) {
+    return `${name} - ${reason}`;
+  }
+  return name;
+}
+
 export default async function handler(req: VercelRequestLike, res: VercelResponseLike) {
   try {
     const hostHeader = req.headers?.host;
@@ -96,7 +110,7 @@ export default async function handler(req: VercelRequestLike, res: VercelRespons
     const projectJson = await projectResponse.json();
     const project: ProjectSeoPayload = projectJson?.data || {};
 
-    const title = project.metaTitle || project.title || DEFAULT_TITLE;
+    const title = buildProjectSeoTitle(project);
     const description =
       project.metaDescription || project.shortDescription || project.subtitle || DEFAULT_DESCRIPTION;
     const image = project.ogImage || project.coverImage || `${siteUrl}/og-image.svg`;
