@@ -766,6 +766,8 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       }
 
       if (response.success) {
+        // Keep public pages (Home/Header/Detail) in sync right after admin CRUD.
+        projectService.invalidatePublishedProjectsCache();
         onSave?.();
         // Navigate to project list or detail
         setTimeout(() => {

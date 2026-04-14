@@ -218,7 +218,7 @@ class ProjectService {
    * Get projects with filtering and pagination
    */
   async getProjects(query: ProjectQueryDto) {
-    const { status, category, city, district, search, page, limit } = query;
+    const { status, category, city, district, search, page, limit, view } = query;
 
     const where: Prisma.ProjectWhereInput = {};
 
@@ -234,24 +234,47 @@ class ProjectService {
       ];
     }
 
-    const [projects, total] = await Promise.all([
-      prisma.project.findMany({
-        where,
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        include: {
-          coverAsset: { select: { id: true, url: true } },
-        },
-      }),
-      prisma.project.count({ where }),
-    ]);
+    const isSummary = view === "summary";
+
+    const projectsPromise = isSummary
+      ? prisma.project.findMany({
+          where,
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            shortDescription: true,
+            category: true,
+            isFeatured: true,
+            coverImage: true,
+            coverAsset: { select: { url: true } },
+            // optional flags for homepage sorting/visibility
+            showOnHome: true,
+            homeOrder: true,
+          },
+        })
+      : prisma.project.findMany({
+          where,
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: { createdAt: "desc" },
+          include: {
+            coverAsset: { select: { id: true, url: true } },
+          },
+        });
+
+    const [projects, total] = await Promise.all([projectsPromise, prisma.project.count({ where })]);
 
     return {
-      projects: projects.map((p) => this.serializeBigInt({
-        ...p,
-        coverImage: p.coverImage || p.coverAsset?.url || null,
-      })),
+      projects: projects.map((p: any) =>
+        this.serializeBigInt({
+          ...p,
+          coverImage: p.coverImage || p.coverAsset?.url || null,
+        }),
+      ),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
   }

@@ -250,6 +250,8 @@ exports.ProjectQueryDtoSchema = zod_1.z.object({
     city: zod_1.z.string().optional(),
     district: zod_1.z.string().optional(),
     search: zod_1.z.string().optional(),
+    /** Response shape hint for performance-sensitive pages (e.g. homepage). */
+    view: zod_1.z.enum(["summary", "full"]).optional(),
     page: zod_1.z.coerce.number().int().positive().default(1),
     limit: zod_1.z.coerce.number().int().positive().max(100).default(10),
 });

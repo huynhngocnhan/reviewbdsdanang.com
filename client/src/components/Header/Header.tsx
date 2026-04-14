@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
     }
 
     projectService
-      .getPublishedProjectsCached(100)
+      .getPublishedProjectsSummaryCached(100)
       .then((data) => {
         setFetchedProjects(data);
       })

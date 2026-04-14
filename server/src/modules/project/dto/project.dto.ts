@@ -299,6 +299,8 @@ export const ProjectQueryDtoSchema = z.object({
   city: z.string().optional(),
   district: z.string().optional(),
   search: z.string().optional(),
+  /** Response shape hint for performance-sensitive pages (e.g. homepage). */
+  view: z.enum(["summary", "full"]).optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
 });

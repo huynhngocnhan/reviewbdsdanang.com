@@ -75,7 +75,7 @@ const ProjectDetailV2 = () => {
     let isMounted = true;
     const run = () => {
       projectService
-        .getPublishedProjectsCached(100)
+        .getPublishedProjectsSummaryCached(100)
         .then((data) => {
           if (!isMounted) return;
           setAllProjects(data);
@@ -142,7 +142,7 @@ const ProjectDetailV2 = () => {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
         </div>
-        <Footer deferAvatar />
+        <Footer deferAvatar disableAdminFetch />
       </div>
     );
   }
@@ -155,7 +155,7 @@ const ProjectDetailV2 = () => {
           <h1 className="text-2xl font-bold text-gray-900">Không tìm thấy dự án</h1>
           <p className="mt-2 text-gray-600">Đường dẫn không đúng hoặc dự án chưa được cập nhật.</p>
         </div>
-        <Footer deferAvatar />
+        <Footer deferAvatar disableAdminFetch />
       </div>
     );
   }

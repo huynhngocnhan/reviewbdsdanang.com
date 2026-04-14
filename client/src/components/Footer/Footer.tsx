@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { adminService } from "../../services/admin.service";
 
 type FooterAdminProfile = {
@@ -31,25 +31,65 @@ const FALLBACK_AVATAR =
 /** Placeholder instead of avatar image (e.g. project detail loading shell). */
 type FooterProps = {
   deferAvatar?: boolean;
+  disableAdminFetch?: boolean;
 };
 
-const Footer: React.FC<FooterProps> = ({ deferAvatar = false }) => {
+const Footer: React.FC<FooterProps> = ({ deferAvatar = false, disableAdminFetch = false }) => {
   const [admin, setAdmin] = useState<FooterAdminData | null>(null);
+  const [shouldFetchAdmin, setShouldFetchAdmin] = useState(false);
+  const footerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    if (disableAdminFetch) return;
+    const node = footerRef.current;
+    if (!node) return;
 
+    // Start fetching before footer becomes visible so data is ready by the time user reaches it.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry?.isIntersecting) return;
+        setShouldFetchAdmin(true);
+        observer.disconnect();
+      },
+      { rootMargin: "450px 0px" },
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [disableAdminFetch]);
+
+  useEffect(() => {
+    if (disableAdminFetch) return;
+    if (!shouldFetchAdmin) return;
     const fetchAdmin = async () => {
       try {
         const respone = await adminService.getAdmin();
         if (respone) {
-        setAdmin(respone.admin)
+          setAdmin(respone.admin);
         }
       } catch {
         setAdmin(null);
       }
     };
-    void fetchAdmin();
-  }, []);
+
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    let timer: number | undefined;
+    if (idle) {
+      idle(() => {
+        void fetchAdmin();
+      });
+    } else {
+      timer = window.setTimeout(() => {
+        void fetchAdmin();
+      }, 120);
+    }
+
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [disableAdminFetch, shouldFetchAdmin]);
 
   const profile = admin?.profile;
   const fullName = profile?.fullName ?? "Chuyên viên tư vấn BĐS";
@@ -76,7 +116,7 @@ const Footer: React.FC<FooterProps> = ({ deferAvatar = false }) => {
 }
 
   return (
-    <footer className="border-t border-amber-100 bg-white">
+    <footer ref={footerRef} className="border-t border-amber-100 bg-white">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-8 lg:gap-10">
           <div className="mx-auto shrink-0 sm:mx-0">

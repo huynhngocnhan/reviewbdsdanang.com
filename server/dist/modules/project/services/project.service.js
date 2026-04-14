@@ -141,7 +141,7 @@ class ProjectService {
      * Get projects with filtering and pagination
      */
     async getProjects(query) {
-        const { status, category, city, district, search, page, limit } = query;
+        const { status, category, city, district, search, page, limit, view } = query;
         const where = {};
         if (status)
             where.status = status;
@@ -158,8 +158,28 @@ class ProjectService {
                 { shortDescription: { contains: search, mode: "insensitive" } },
             ];
         }
-        const [projects, total] = await Promise.all([
-            prisma_1.prisma.project.findMany({
+        const isSummary = view === "summary";
+        const projectsPromise = isSummary
+            ? prisma_1.prisma.project.findMany({
+                where,
+                skip: (page - 1) * limit,
+                take: limit,
+                orderBy: { createdAt: "desc" },
+                select: {
+                    id: true,
+                    slug: true,
+                    title: true,
+                    shortDescription: true,
+                    category: true,
+                    isFeatured: true,
+                    coverImage: true,
+                    coverAsset: { select: { url: true } },
+                    // optional flags for homepage sorting/visibility
+                    showOnHome: true,
+                    homeOrder: true,
+                },
+            })
+            : prisma_1.prisma.project.findMany({
                 where,
                 skip: (page - 1) * limit,
                 take: limit,
@@ -167,9 +187,8 @@ class ProjectService {
                 include: {
                     coverAsset: { select: { id: true, url: true } },
                 },
-            }),
-            prisma_1.prisma.project.count({ where }),
-        ]);
+            });
+        const [projects, total] = await Promise.all([projectsPromise, prisma_1.prisma.project.count({ where })]);
         return {
             projects: projects.map((p) => this.serializeBigInt({
                 ...p,
