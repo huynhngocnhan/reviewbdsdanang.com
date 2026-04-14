@@ -2,6 +2,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3Client, BUCKET_NAME } from "../../../lib/r2";
 import { v4 as uuidv4 } from "uuid";
+import { R2_OBJECT_CACHE_CONTROL } from "../constants";
 
 export class UploadService {
   private readonly publicBaseUrl = process.env.R2_PUBLIC_BASE_URL || "";
@@ -14,6 +15,7 @@ export class UploadService {
       Bucket: BUCKET_NAME,
       Key: key,
       ContentType: contentType,
+      CacheControl: R2_OBJECT_CACHE_CONTROL,
     });
 
     // URL này có hiệu lực trong 3600 giây (1 giờ)
@@ -30,6 +32,8 @@ export class UploadService {
       key,
       uploadUrl,
       publicUrl,
+      /** Client must send this exact header on the presigned PUT (included in the signature). */
+      cacheControl: R2_OBJECT_CACHE_CONTROL,
     };
   }
 }

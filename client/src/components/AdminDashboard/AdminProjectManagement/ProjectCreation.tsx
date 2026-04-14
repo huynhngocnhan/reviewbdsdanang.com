@@ -16,7 +16,8 @@ import {
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import type { ProjectData, ProjectCategory, ProjectExtentionImage } from "../../../constants/projectData";
-import { adminService } from "../../../services/admin.service";
+import { adminService, presignedR2PutHeaders } from "../../../services/admin.service";
+import { compressImageToWebP } from "../../../utils/compressImageToWebP";
 import { projectService } from "../../../services/project.service";
 
 // Generate slug from title
@@ -388,25 +389,25 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     try {
       setUploadingImages((prev) => ({ ...prev, [uploadKey]: true }));
 
+      const fileToUpload = await compressImageToWebP(file);
+
       const presign = await adminService.getPresignedUrl({
-        fileName: file.name,
-        contentType: file.type,
+        fileName: fileToUpload.name,
+        contentType: fileToUpload.type,
         folder,
       });
 
       await fetch(presign.uploadUrl, {
         method: "PUT",
-        headers: {
-          "Content-Type": file.type,
-        },
-        body: file,
+        headers: presignedR2PutHeaders(fileToUpload.type, presign),
+        body: fileToUpload,
       });
 
       const createdAsset = await adminService.createAsset({
         key: presign.key,
         url: presign.publicUrl,
-        contentType: file.type,
-        size: file.size,
+        contentType: fileToUpload.type,
+        size: fileToUpload.size,
         type: "IMAGE",
       });
 
@@ -2132,25 +2133,25 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       try {
         setUploadingImages((prev) => ({ ...prev, [inputKey]: true }));
 
+        const fileToUpload = await compressImageToWebP(file);
+
         const presign = await adminService.getPresignedUrl({
-          fileName: file.name,
-          contentType: file.type,
+          fileName: fileToUpload.name,
+          contentType: fileToUpload.type,
           folder,
         });
 
         await fetch(presign.uploadUrl, {
           method: "PUT",
-          headers: {
-            "Content-Type": file.type,
-          },
-          body: file,
+          headers: presignedR2PutHeaders(fileToUpload.type, presign),
+          body: fileToUpload,
         });
 
         const createdAsset = await adminService.createAsset({
           key: presign.key,
           url: presign.publicUrl,
-          contentType: file.type,
-          size: file.size,
+          contentType: fileToUpload.type,
+          size: fileToUpload.size,
           type: "IMAGE",
         });
 

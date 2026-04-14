@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { routeParamString } from "../../../lib/routeParams";
 import { RegistrationService } from "../services/registration.service";
 
 const registrationService = new RegistrationService();
@@ -83,7 +84,10 @@ export class RegistrationController {
    */
   static async getReportById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = routeParamString(req, "id");
+      if (!id) {
+        return res.status(400).json({ message: "Thiếu id" });
+      }
       const report = await registrationService.getReportById(id);
 
       if (!report) {
@@ -106,7 +110,10 @@ export class RegistrationController {
    */
   static async updateReportStatus(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = routeParamString(req, "id");
+      if (!id) {
+        return res.status(400).json({ message: "Thiếu id" });
+      }
       const { status, adminNote } = req.body;
       const adminId = (req as any).adminId; // Lấy từ auth middleware
 
@@ -146,7 +153,10 @@ export class RegistrationController {
    */
   static async deleteReport(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = routeParamString(req, "id");
+      if (!id) {
+        return res.status(400).json({ message: "Thiếu id" });
+      }
       await registrationService.deleteReport(id);
 
       return res.status(200).json({

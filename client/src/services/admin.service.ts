@@ -10,7 +10,16 @@ type PresignResponse = {
   uploadUrl: string;
   key: string;
   publicUrl: string;
+  /** Must be sent as `Cache-Control` on the PUT to R2 when present (matches presigned signature). */
+  cacheControl?: string;
 };
+
+/** Headers for PUT to presigned R2 URL (Content-Type + optional Cache-Control from presign). */
+export function presignedR2PutHeaders(contentType: string, presign: Pick<PresignResponse, "cacheControl">) {
+  const headers: Record<string, string> = { "Content-Type": contentType };
+  if (presign.cacheControl) headers["Cache-Control"] = presign.cacheControl;
+  return headers;
+}
 
 type CreateAssetPayload = {
   key: string;
