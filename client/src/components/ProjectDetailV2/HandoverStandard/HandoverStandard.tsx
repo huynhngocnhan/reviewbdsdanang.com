@@ -139,6 +139,10 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
                       className="h-48 w-full sm:h-56"
                       imageClassName="h-48 w-full rounded-lg object-cover sm:h-56"
                       showHoverOverlay={false}
+                      width={800}
+                      height={224}
+                      sizes="(max-width: 640px) 100vw, 800px"
+                      fetchPriority="low"
                     />
                     <figcaption className="sr-only">{`${getSafeText(introItem.subtitle, "Hạng mục")} - ${getDisplayTitle(introItem.subtitle, introItem.title)}`}</figcaption>
                   </figure>
@@ -171,6 +175,10 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
                     className="h-[300px] w-full sm:h-[380px] lg:h-[430px]"
                     imageClassName="h-[300px] w-full rounded-lg object-cover transition duration-700 hover:scale-105 sm:h-[380px] lg:h-[430px]"
                     showHoverOverlay={false}
+                    width={1200}
+                    height={430}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    fetchPriority="low"
                   />
                   <figcaption className="sr-only">{`${getSafeText(heroItem.subtitle, "Hạng mục")} - ${getDisplayTitle(heroItem.subtitle, heroItem.title)}`}</figcaption>
                 </figure>
@@ -232,6 +240,10 @@ const HandoverStandard: React.FC<Props> = ({ project }) => {
                           className="h-64 w-full md:h-72"
                           imageClassName="h-64 w-full rounded-lg object-cover transition duration-700 hover:scale-105 md:h-72"
                           showHoverOverlay={false}
+                          width={960}
+                          height={288}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          fetchPriority="low"
                         />
                         <figcaption className="sr-only">{`${subtitle} - ${title}`}</figcaption>
                       </figure>

@@ -30,6 +30,10 @@ const ProjectOverviewV2 = ({ project }: Props) => {
               alt={`Tổng quan phối cảnh dự án ${project.title}`}
               className="h-full min-h-[320px] rounded-xl shadow-2xl sm:min-h-[420px] lg:min-h-[520px]"
               imageClassName="h-full w-full"
+              width={1200}
+              height={800}
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              fetchPriority="low"
             />
           </article>
 

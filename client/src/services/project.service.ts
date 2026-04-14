@@ -57,6 +57,7 @@ type ProjectQueryParams = {
   search?: string;
   page?: number;
   limit?: number;
+  view?: "summary" | "full";
 };
 
 // Create/Update input type — matches backend CreateProjectDto fully (V2)
@@ -180,6 +181,14 @@ export const projectService = {
    * Shared cached list for published projects (avoid duplicate fetch in Header/Home).
    */
   async getPublishedProjectsCached(limit = 100): Promise<ProjectData[]> {
+    // Backward compatible alias: published list used by public pages should be summary.
+    return this.getPublishedProjectsSummaryCached(limit);
+  },
+
+  /**
+   * Homepage/header-friendly published list (small payload).
+   */
+  async getPublishedProjectsSummaryCached(limit = 100): Promise<ProjectData[]> {
     const now = Date.now();
     if (publishedProjectsCache && publishedProjectsCache.expiresAt > now) {
       return publishedProjectsCache.data;
@@ -189,7 +198,7 @@ export const projectService = {
       return publishedProjectsInFlight;
     }
 
-    publishedProjectsInFlight = this.getProjects({ status: "PUBLISHED", limit })
+    publishedProjectsInFlight = this.getProjects({ status: "PUBLISHED", limit, view: "summary" })
       .then((res) => {
         const data = res.success && res.data ? res.data : [];
         publishedProjectsCache = {
@@ -211,6 +220,9 @@ export const projectService = {
   invalidatePublishedProjectsCache() {
     publishedProjectsCache = null;
     publishedProjectsInFlight = null;
+    // Ensure detail pages refetch after admin CRUD/publish changes.
+    projectBySlugCache.clear();
+    projectBySlugInFlight.clear();
   },
 
   /**

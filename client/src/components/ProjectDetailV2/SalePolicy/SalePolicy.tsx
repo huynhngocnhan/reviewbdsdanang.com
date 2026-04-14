@@ -120,6 +120,11 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
             alt={project.salePolicyAlt || `${project.title} - Chính sách bán hàng`}
             className="w-full max-w-3xl rounded-2xl shadow-2xl"
             imageClassName="min-h-[300px]"
+            width={1200}
+            height={800}
+            sizes="(max-width: 768px) 100vw, 768px"
+            loading="lazy"
+            fetchPriority="low"
           />
 
           <div className="w-full max-w-3xl">

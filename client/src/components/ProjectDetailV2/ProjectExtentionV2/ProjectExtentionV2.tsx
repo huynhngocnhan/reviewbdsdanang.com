@@ -55,6 +55,10 @@ const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
                 className="relative block h-56 w-full text-left"
                 imageClassName="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
                 showHoverOverlay={false}
+                width={672}
+                height={224}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                fetchPriority="low"
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-90" />
               <div className="pointer-events-none absolute bottom-2 left-4 right-4">
@@ -76,7 +80,18 @@ const ProjectExtentionV2: React.FC<Props> = ({ project }) => {
                   key={`${destination.title}-${destination.image}`}
                   className="overflow-hidden rounded-md shadow-[0_16px_35px_rgba(0,0,0,0.3)]"
                 >
-                  <img src={destination.image} alt={destination.title} loading="lazy" className="h-40 w-full object-cover" />
+                  <img
+                    src={destination.image}
+                    alt={destination.title}
+                    width={640}
+                    height={160}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                    referrerPolicy="no-referrer"
+                    className="h-40 w-full object-cover"
+                  />
                   <div className="p-2">
                     <p className="text-center text-sm text-white/90">{destination.description}</p>
                   </div>

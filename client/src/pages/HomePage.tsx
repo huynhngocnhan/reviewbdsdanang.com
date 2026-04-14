@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     projectService
-      .getPublishedProjectsCached(100)
+      .getPublishedProjectsSummaryCached(100)
       .then((data) => {
         setProjects(data);
       })

@@ -115,6 +115,10 @@ const ReasonToBuy: React.FC<Props> = ({ project }) => {
                 alt={reasonToBuyImageAlt}
                 className="h-full w-full rounded-lg shadow-2xl lg:h-full"
                 imageClassName="h-full w-full lg:h-full"
+                width={960}
+                height={640}
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                fetchPriority="low"
               />
             </div>
 

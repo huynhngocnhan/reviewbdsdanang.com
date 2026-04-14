@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { routeParamString } from "../../../lib/routeParams";
 import { AssetService } from "../services/asset.service";
 import { AssetType } from "@prisma/client";
 
@@ -44,7 +45,10 @@ export class AssetController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = routeParamString(req, "id");
+      if (!id) {
+        return res.status(400).json({ message: "Missing id" });
+      }
       const asset = await assetService.getAssetById(id);
 
       if (!asset) {
