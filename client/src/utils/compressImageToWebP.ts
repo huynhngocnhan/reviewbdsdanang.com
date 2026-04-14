@@ -12,7 +12,7 @@ const DEFAULT_QUALITY = 0.82;
 
 /**
  * Raster images → WebP + downscale. SVG unchanged (avoid rasterizing vectors).
- * If WebP is unavailable or processing fails, returns the original file.
+ * If WebP encode fails (e.g. toBlob null) or decode fails, returns the original file.
  */
 export async function compressImageToWebP(
   file: File,
@@ -60,11 +60,6 @@ export async function compressImageToWebP(
     });
 
     if (!blob) {
-      return file;
-    }
-
-    // Avoid replacing with a much larger file (rare for photos; common for tiny PNG UI assets)
-    if (blob.size > file.size * 1.15 && file.size < 500_000) {
       return file;
     }
 
