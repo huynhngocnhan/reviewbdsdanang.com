@@ -41,16 +41,8 @@ const xmlEscape = (value = "") =>
 
 export default async function handler(req: VercelRequestLike, res: VercelResponseLike) {
   try {
-    const hostHeader = req.headers?.host;
-    const host = Array.isArray(hostHeader)
-      ? hostHeader[0] || "www.reviewbdsdanang.com"
-      : hostHeader || "www.reviewbdsdanang.com";
-
-    const protoHeader = req.headers?.["x-forwarded-proto"];
-    const protoRaw = Array.isArray(protoHeader) ? protoHeader[0] || "https" : protoHeader || "https";
-    const protocol = protoRaw.split(",")[0];
-
-    const siteUrl = `${protocol}://${host}`;
+    // Keep sitemap URLs stable (avoid host/proto variations).
+    const siteUrl = (process.env.SITE_URL || "https://www.reviewbdsdanang.com").replace(/\/$/, "");
     const apiBaseRaw = process.env.SEO_API_BASE_URL || process.env.VITE_API_URL || siteUrl;
     const apiBase = normalizeApiBase(apiBaseRaw);
 
@@ -74,8 +66,11 @@ export default async function handler(req: VercelRequestLike, res: VercelRespons
       page += 1;
     } while (page <= totalPages);
 
+    const today = new Date().toISOString().slice(0, 10);
     const baseUrls = [
-      { loc: `${siteUrl}/`, lastmod: new Date().toISOString().slice(0, 10), changefreq: "daily", priority: "1.0" },
+      { loc: `${siteUrl}/`, lastmod: today, changefreq: "daily", priority: "1.0" },
+      // Optional hub page (even if SPA) helps discovery/internal linking.
+      { loc: `${siteUrl}/du-an`, lastmod: today, changefreq: "daily", priority: "0.8" },
     ];
 
     const projectUrls = projects

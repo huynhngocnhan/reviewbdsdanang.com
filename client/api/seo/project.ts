@@ -64,30 +64,60 @@ const upsertCanonical = (html: string, canonicalUrl: string) => {
   return html.replace("</head>", `  ${tag}\n</head>`);
 };
 
+const upsertMetaByNameOrProperty = (html: string, key: string, content: string) => {
+  // Prefer correct attribute where possible, but tolerate existing tags.
+  const byName = new RegExp(`<meta\\s+name=["']${key}["']\\s+content=["'][^"']*["']\\s*\\/?>(\\s*)`, "i");
+  const byProperty = new RegExp(
+    `<meta\\s+property=["']${key}["']\\s+content=["'][^"']*["']\\s*\\/?>(\\s*)`,
+    "i"
+  );
+  const tag = `<meta name="${key}" content="${escapeHtml(content)}" />`;
+  if (byName.test(html)) return html.replace(byName, `${tag}$1`);
+  if (byProperty.test(html)) return html.replace(byProperty, `${tag}$1`);
+  return html.replace("</head>", `  ${tag}\n</head>`);
+};
+
+const upsertJsonLd = (html: string, json: unknown) => {
+  const payload = JSON.stringify(json);
+  const tag = `<script type="application/ld+json" data-seo="project">${payload}</script>`;
+  const regex = /<script[^>]+type=["']application\/ld\+json["'][^>]*data-seo=["']project["'][^>]*>[\s\S]*?<\/script>\s*/i;
+  if (regex.test(html)) return html.replace(regex, `${tag}\n`);
+  return html.replace("</head>", `  ${tag}\n</head>`);
+};
+
+const TITLE_SUFFIX_TEMPLATES = [
+  "Giá bán - Vị trí - Tiến độ (2026)",
+  "Review - Pháp lý - Ưu nhược điểm",
+  "Mặt bằng - Tiện ích - Chính sách bán hàng",
+  "Có nên mua? - Phân tích tiềm năng - Đánh giá chi tiết",
+];
+
+const stableIndexFromString = (input: string, modulo: number) => {
+  if (modulo <= 1) return 0;
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
+  }
+  return hash % modulo;
+};
+
 /** SERP title: project name + reason section when no manual metaTitle. */
 function buildProjectSeoTitle(project: ProjectSeoPayload): string {
   if (project.metaTitle?.trim()) {
     return project.metaTitle.trim();
   }
   const name = project.title?.trim() || DEFAULT_TITLE;
-  const reason = project.reasonToBuyTitle?.trim();
-  if (reason) {
-    return `${name} - ${reason}`;
-  }
-  return name;
+  // Avoid "random per request" titles. Pick a stable suffix per project instead.
+  const key = String(project.slug || project.title || name);
+  const idx = stableIndexFromString(key, TITLE_SUFFIX_TEMPLATES.length);
+  const suffix = TITLE_SUFFIX_TEMPLATES[idx];
+  return suffix ? `${name} - ${suffix}` : name;
 }
 
 export default async function handler(req: VercelRequestLike, res: VercelResponseLike) {
   try {
-    const hostHeader = req.headers?.host;
-    const host = Array.isArray(hostHeader)
-      ? hostHeader[0] || "www.reviewbdsdanang.com"
-      : hostHeader || "www.reviewbdsdanang.com";
-
-    const protoHeader = req.headers?.["x-forwarded-proto"];
-    const protoRaw = Array.isArray(protoHeader) ? protoHeader[0] || "https" : protoHeader || "https";
-    const protocol = protoRaw.split(",")[0];
-    const siteUrl = `${protocol}://${host}`;
+    // Keep canonical URLs stable: always use the same site URL (prefer env, fallback www).
+    const siteUrl = (process.env.SITE_URL || "https://www.reviewbdsdanang.com").replace(/\/$/, "");
 
     const slug = String(req.query?.slug || "").trim();
     if (!slug) {
@@ -140,14 +170,50 @@ export default async function handler(req: VercelRequestLike, res: VercelRespons
     html = upsertMetaByProperty(html, "og:image", image);
     html = upsertMetaByProperty(html, "og:image:width", "1200");
     html = upsertMetaByProperty(html, "og:image:height", "630");
+    html = upsertMetaByProperty(html, "og:site_name", "Review BĐS Đà Nẵng");
+    html = upsertMetaByProperty(html, "og:locale", "vi_VN");
 
-    html = upsertMetaByProperty(html, "twitter:card", "summary_large_image");
-    html = upsertMetaByProperty(html, "twitter:url", projectUrl);
-    html = upsertMetaByProperty(html, "twitter:title", title);
-    html = upsertMetaByProperty(html, "twitter:description", description);
-    html = upsertMetaByProperty(html, "twitter:image", image);
+    // Twitter tags should use name="", but we also replace existing property="" if present.
+    html = upsertMetaByNameOrProperty(html, "twitter:card", "summary_large_image");
+    html = upsertMetaByNameOrProperty(html, "twitter:url", projectUrl);
+    html = upsertMetaByNameOrProperty(html, "twitter:title", title);
+    html = upsertMetaByNameOrProperty(html, "twitter:description", description);
+    html = upsertMetaByNameOrProperty(html, "twitter:image", image);
 
     html = upsertCanonical(html, projectUrl);
+    html = upsertMetaByName(
+      html,
+      "robots",
+      "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+    );
+
+    const breadcrumbJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Trang chủ", item: `${siteUrl}/` },
+        { "@type": "ListItem", position: 2, name: "Dự án", item: `${siteUrl}/du-an` },
+        { "@type": "ListItem", position: 3, name: project.title || canonicalSlug, item: projectUrl },
+      ],
+    };
+
+    const articleJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      mainEntityOfPage: { "@type": "WebPage", "@id": projectUrl },
+      headline: title,
+      description,
+      image: [image],
+      inLanguage: "vi-VN",
+      author: { "@type": "Organization", name: "Review BĐS Đà Nẵng" },
+      publisher: {
+        "@type": "Organization",
+        name: "Review BĐS Đà Nẵng",
+        logo: { "@type": "ImageObject", url: `${siteUrl}/logo.png` },
+      },
+    };
+
+    html = upsertJsonLd(html, [breadcrumbJsonLd, articleJsonLd]);
 
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=1800");
     return res.status(200).setHeader("Content-Type", "text/html; charset=utf-8").send(html);
