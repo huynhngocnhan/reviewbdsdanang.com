@@ -32,8 +32,8 @@ const VideoBanner: React.FC = () => {
           </p>
 
           {/* H1 chuẩn SEO */}
-          <h1 className="mt-3 text-2xl sm:text-4xl lg:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-lg">
-            Bất động sản <span className="text-amber-500">Đà Nẵng</span>
+          <h1 className="mt-3  text-2xl sm:text-4xl lg:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-lg">
+            Bất động sản <span className="text-amber-500 inline-block">Đà Nẵng</span>
           </h1>
 
           {/* Sub heading (KHÔNG dùng h2 để tránh conflict SEO) */}
