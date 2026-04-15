@@ -24,7 +24,7 @@ const VideoBanner: React.FC = () => {
 
       {/* Content */}
       <div className="absolute inset-0 z-[2] flex items-end">
-  <div className="w-full px-4 sm:px-8 lg:px-12 pb-8 sm:pb-20 lg:pb-28 max-w-[720px] text-white">
+        <div className="w-full px-4 sm:px-8 lg:px-12 pb-8 sm:pb-20 lg:pb-28 max-w-[720px] text-white">
           
           {/* Badge */}
           <p className="inline-flex rounded-full bg-amber-600/90 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-[0.14em] shadow-lg">
@@ -32,13 +32,13 @@ const VideoBanner: React.FC = () => {
           </p>
 
           {/* H1 chuẩn SEO */}
-          <h1 className="mt-3  text-2xl sm:text-4xl lg:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-lg">
-            Bất động sản <span className="text-amber-500 inline-block">Đà Nẵng</span>
+          <h1 className="mt-3 text-2xl sm:text-4xl lg:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-lg whitespace-nowrap">
+            Bất động sản <span className="text-amber-500">Đà Nẵng</span>
           </h1>
 
           {/* Sub heading (KHÔNG dùng h2 để tránh conflict SEO) */}
           <p className="mt-2 text-lg sm:text-2xl lg:text-3xl font-semibold text-slate-100 drop-shadow">
-            Cho một cuộc sống đẳng cấp
+            "Cho một cuộc sống đẳng cấp"
           </p>
 
           {/* Description */}
