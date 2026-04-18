@@ -40,6 +40,7 @@ const ProjectDashboard = () => {
     { value: "ALL", label: "Tất cả", color: "bg-purple-500" },
     { value: "SUN", label: "Sun Group", color: "bg-yellow-500" },
     { value: "VIN", label: "Vin Group", color: "bg-blue-500" },
+    { value: "FUTA", label: "Futa", color: "bg-emerald-600" },
     { value: "OTHER", label: "Các dự án khác", color: "bg-gray-500" },
   ];
 

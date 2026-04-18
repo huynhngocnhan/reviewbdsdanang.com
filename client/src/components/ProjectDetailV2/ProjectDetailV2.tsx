@@ -166,18 +166,23 @@ const ProjectDetailV2 = () => {
 
       <section className="relative" aria-labelledby="project-hero-title">
         <div className="relative h-[90vh] min-h-screen w-full overflow-hidden">
-          <img
-            src={project.coverImage}
-            alt={project.title}
-            width={1920}
-            height={1080}
-            sizes="100vw"
-            className="h-full w-full object-cover shadow-lg"
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-            referrerPolicy="no-referrer"
-          />
+          {/* Single hero image: clamp width to avoid excessive upscaling (less blur, better perf). */}
+          <div className="relative h-full w-full bg-black">
+            <div className="mx-auto h-full w-full max-w-[1920px]">
+              <img
+                src={project.coverImage}
+                alt={project.title}
+                width={1920}
+                height={1080}
+                sizes="(max-width: 1920px) 100vw, 1920px"
+                className="h-full w-full object-cover shadow-lg"
+                fetchPriority="high"
+                loading="eager"
+                decoding="async"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
           <div className="absolute inset-x-0 bottom-0">
@@ -287,7 +292,7 @@ const ProjectDetailV2 = () => {
             <RegisterForm projects={registerProjects} />
           </section>
       </main>
-      <ContactOverlay phoneNumber="0938885879" zaloUrl="https://zalo.me/0901830909" tiktokUrl="https://www.tiktok.com/@reviewbdsdanang.com"/>
+      <ContactOverlay phoneNumber="0901830909" zaloUrl="https://zalo.me/0901830909" tiktokUrl="https://www.tiktok.com/@reviewbdsdanang.com"/>
       <LeftOverlay projectTitle={project.title} projectImage={project.coverImage} />
       <TabBarOverlay items={projectTabs} />
       <Footer />

@@ -128,9 +128,9 @@ const FullWidthForm: React.FC<Props> = ({ project }) => {
 
         <div className="mt-6 flex justify-center items-center gap-4">
           <a
-            href="tel:0938885879"
+            href="tel:0901830909"
             className="btn-float inline-flex items-center gap-3 rounded-full bg-[#b96e1b] px-6 py-3 text-base font-extrabold text-white shadow-lg transition hover:bg-[#a46118]"
-            aria-label="Gọi hotline 0938885879"
+            aria-label="Gọi hotline 0901830909"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +140,7 @@ const FullWidthForm: React.FC<Props> = ({ project }) => {
             >
               <path d="M6.62 10.79a15.466 15.466 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.85 21 3 13.15 3 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z" />
             </svg>
-            <span>093.888.58.79</span>
+            <span>0901 83 0909</span>
           </a>
           <a href="https://zalo.me/0901830909" target="_blank" rel="noreferrer" className="btn-ladi">
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="60" height="60" viewBox="0 0 48 48">

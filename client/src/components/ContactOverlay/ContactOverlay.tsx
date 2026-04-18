@@ -9,7 +9,7 @@ type ContactOverlayProps = {
 };
 
 const ContactOverlay: React.FC<ContactOverlayProps> = ({
-  phoneNumber = "0938885879",
+  phoneNumber = "0901 83 0909",
   zaloUrl = "https://zalo.me/0900000000",
   tiktokUrl = "https://www.tiktok.com/@reviewbdsdanang.com",
   facebookUrl = "https://www.facebook.com/Tienquangvilla"

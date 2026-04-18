@@ -1,6 +1,7 @@
 import { api } from "../api/client";
 import type {
   ProjectData,
+  ProjectCategory,
   ProjectSpec,
   ProjectGallery,
   ProjectExtentionImage,
@@ -51,7 +52,7 @@ const projectBySlugInFlight = new Map<string, Promise<ProjectData | null>>();
 // Query params
 type ProjectQueryParams = {
   status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  category?: "SUN" | "VIN" | "OTHER";
+  category?: ProjectCategory;
   city?: string;
   district?: string;
   search?: string;
@@ -69,7 +70,7 @@ interface ProjectInput {
   shortDescription: string;
   intro?: string;
   longDescription?: string;
-  category: "SUN" | "VIN" | "OTHER";
+  category: ProjectCategory;
   developerName?: string;
   projectType?: string;
 

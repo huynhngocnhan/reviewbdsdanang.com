@@ -78,6 +78,14 @@ const HomePageCard: React.FC<Props> = ({ projectData }) => {
             Dự án Vin Home
           </button>
           <button
+            onClick={() => setActiveFilter("FUTA")}
+            className={`${buttonBaseClass} ${
+              activeFilter === "FUTA" ? buttonActiveClass : buttonInactiveClass
+            }`}
+          >
+            Dự án Futa Land
+          </button>
+          <button
             onClick={() => setActiveFilter("OTHER")}
             className={`${buttonBaseClass} ${
               activeFilter === "OTHER" ? buttonActiveClass : buttonInactiveClass
