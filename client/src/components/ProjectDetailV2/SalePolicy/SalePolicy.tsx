@@ -90,7 +90,7 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
   const footerNote =
     policy?.footerNote ||
     "Chính sách bán hàng và ưu đãi có thể được cập nhật theo từng giai đoạn. Quý khách vui lòng liên hệ để được cung cấp thông tin chi tiết và phù hợp nhu cầu.";
-  const contactPhone = policy?.contactPhone || "093.888.58.79";
+  const contactPhone = policy?.contactPhone || "0901 83 0909";
   const contactPhoneHref = `tel:${contactPhone.replace(/\s+/g, "")}`;
 
   return (
@@ -183,7 +183,7 @@ const SalePolicy: React.FC<Props> = ({ project }) => {
                       <path d="M6.62 10.79a15.466 15.466 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.85 21 3 13.15 3 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z" />
                     </svg>
                   </span>
-                  <span>{contactPhone}</span>
+                  <span>0901 83 0909</span>
                 </a>
                 <a href="https://zalo.me/0901830909" target="_blank" rel="noreferrer" className="btn-ladi" aria-label="Liên hệ tư vấn qua Zalo">
                   <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="60" height="60" viewBox="0 0 48 48" aria-hidden="true">
