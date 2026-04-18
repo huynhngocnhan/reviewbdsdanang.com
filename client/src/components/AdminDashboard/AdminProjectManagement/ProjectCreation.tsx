@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import type { ProjectData, ProjectCategory, ProjectExtentionImage } from "../../../constants/projectData";
 import { adminService, presignedR2PutHeaders } from "../../../services/admin.service";
-import { compressImageToWebP } from "../../../utils/compressImageToWebP";
+import { compressImageToWebP, type CompressImageToWebPOptions } from "../../../utils/compressImageToWebP";
 import { projectService } from "../../../services/project.service";
 
 // Generate slug from title
@@ -379,7 +379,8 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     file: File,
     folder: string,
     onSuccess: (url: string) => void,
-    uploadKey: string
+    uploadKey: string,
+    compressOptions?: CompressImageToWebPOptions,
   ) => {
     if (!file.type.startsWith("image/")) {
       toast.error("Chỉ cho phép upload file hình ảnh");
@@ -389,7 +390,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
     try {
       setUploadingImages((prev) => ({ ...prev, [uploadKey]: true }));
 
-      const fileToUpload = await compressImageToWebP(file);
+      const fileToUpload = await compressImageToWebP(file, compressOptions);
 
       const presign = await adminService.getPresignedUrl({
         fileName: fileToUpload.name,
@@ -838,6 +839,7 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         >
           <option value="SUN">Sun Group</option>
           <option value="VIN">Vin Group</option>
+          <option value="FUTA">Futa Land</option>
           <option value="OTHER">Khác</option>
         </select>
       </div>
@@ -923,7 +925,13 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
                 file,
                 "projects/cover",
                 (url) => updateField("coverImage", url),
-                "coverImage"
+                "coverImage",
+                {
+                  // Hero cover is displayed full-bleed; keep higher res to avoid upscaling blur.
+                  maxWidth: 3840,
+                  maxHeight: 2160,
+                  quality: 0.88,
+                },
               );
               if (coverImageInputRef.current) coverImageInputRef.current.value = "";
             }

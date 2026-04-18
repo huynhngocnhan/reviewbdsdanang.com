@@ -92,7 +92,7 @@ const ApartmentDesign = ({ project }: Props) => {
       <div className="mx-auto max-w-6xl px-4 py-14">
         <header className="text-center">
           <p className="text-lg font-extrabold uppercase tracking-[0.28em] text-white">
-            Thiết kế căn hộ
+            Loại hình sản phẩm
           </p>
           <h2
             id="apartment-design-title"

@@ -19,6 +19,7 @@ enum ProjectCategory {
   SUN
   VIN
   OTHER
+  FUTA
 }
 
 enum SectionType {
@@ -147,7 +148,7 @@ model Project {
 
   longDescription String?
 
-  /// Nhóm dự án để filter như hiện tại: SUN / VIN / OTHER
+  /// Nhóm dự án để filter: SUN / VIN / OTHER / FUTA
   category      ProjectCategory @default(OTHER)
   /// Tên chủ đầu tư (vd: Sun Group) - để hiển thị
   developerName String?

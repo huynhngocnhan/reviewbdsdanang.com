@@ -62,6 +62,7 @@ const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
   const menuItems = useMemo<MenuItem[]>(() => {
     const sun = projects.filter((p) => p.category === "SUN");
     const vin = projects.filter((p) => p.category === "VIN");
+    const futa = projects.filter((p) => p.category === "FUTA");
     const other = projects.filter((p) => p.category === "OTHER");
 
     return [
@@ -78,6 +79,13 @@ const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
         href: "/",
         children: vin.length > 0
           ? vin.map((p) => ({ name: p.title, href: `/du-an/${p.slug}` }))
+          : EMPTY_CHILD,
+      },
+      {
+        name: "Dự án Futa Land",
+        href: "/",
+        children: futa.length > 0
+          ? futa.map((p) => ({ name: p.title, href: `/du-an/${p.slug}` }))
           : EMPTY_CHILD,
       },
       {
@@ -98,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ projectsData = [] }) => {
     >
       <nav
         aria-label="Global"
-        className={`mx-auto flex max-w-7xl items-center justify-between transition-all duration-300 px-4 sm:px-6 lg:px-8 ${
+        className={`mx-auto flex max-w-8xl items-center justify-between transition-all duration-300 px-4 sm:px-6 lg:px-8 ${
           isScrolled ? "py-3 sm:py-4" : "py-4 sm:py-5"
         }`}
       >

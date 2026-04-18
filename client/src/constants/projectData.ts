@@ -1,4 +1,4 @@
-export type ProjectCategory = "SUN" | "VIN" | "OTHER";
+export type ProjectCategory = "SUN" | "VIN" | "OTHER" | "FUTA";
 
 export interface ProjectSpec {
   label: string;
