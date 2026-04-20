@@ -2,6 +2,59 @@ import { memo } from "react";
 import type { ProjectData } from "../../../constants/projectData";
 import ZoomableImage from "../../ZoomableImage";
 
+const buildMapEmbedUrl = (rawUrl: string, fallbackLocationText?: string) => {
+  const value = rawUrl.trim();
+
+  if (!value) {
+    return fallbackLocationText?.trim()
+      ? `https://www.google.com/maps?q=${encodeURIComponent(fallbackLocationText.trim())}&output=embed`
+      : "";
+  }
+
+  if (value.includes("/embed") || value.includes("output=embed")) {
+    return value;
+  }
+
+  const toEmbedFromGoogleMapsUrl = (input: string) => {
+    try {
+      const url = new URL(input.startsWith("http") ? input : `https://${input}`);
+
+      const query = url.searchParams.get("q") || url.searchParams.get("query");
+      if (query) {
+        return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+      }
+
+      const atMatch = url.href.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+      if (atMatch) {
+        const [, lat, lng] = atMatch;
+        return `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
+      }
+
+      const llMatch = url.href.match(/[?&](?:ll|center)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+      if (llMatch) {
+        const [, lat, lng] = llMatch;
+        return `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
+      }
+
+      const placeMatch = input.match(/\/maps\/place\/([^@?]+)/);
+      if (placeMatch?.[1]) {
+        return `https://www.google.com/maps?q=${encodeURIComponent(decodeURIComponent(placeMatch[1].replace(/\+/g, " ")))}&output=embed`;
+      }
+    } catch {
+      // fall through to fallback below
+    }
+
+    return "";
+  };
+
+  const normalized = toEmbedFromGoogleMapsUrl(value);
+  if (normalized) return normalized;
+
+  return fallbackLocationText?.trim()
+    ? `https://www.google.com/maps?q=${encodeURIComponent(fallbackLocationText.trim())}&output=embed`
+    : value;
+};
+
 type Props = {
   project: ProjectData;
 };
@@ -58,10 +111,10 @@ const ProjectLocationV2 = ({ project }: Props) => {
             fetchPriority="low"
           />
 
-          {project.mapEmbedUrl && (
+          {(project.mapEmbedUrl || project.locationText) && (
             <div className="mt-4 lg:col-span-7 overflow-hidden rounded-2xl border border-white/20">
               <iframe
-                src={project.mapEmbedUrl}
+                src={buildMapEmbedUrl(project.mapEmbedUrl, project.locationText)}
                 width="100%"
                 height="400"
                 style={{ border: 0 }}
