@@ -366,12 +366,65 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       if (field === "title" && typeof value === "string") {
         updated.slug = generateSlug(value);
       }
-      // Auto-generate mapEmbedUrl when locationText changes
-      if (field === "locationText" && typeof value === "string") {
-        updated.mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(value)}&output=embed`;
-      }
       return updated;
     });
+  };
+
+  const normalizeMapUrl = (rawUrl: string, fallbackLocationText?: string) => {
+    const value = rawUrl.trim();
+    if (!value) {
+      return fallbackLocationText?.trim()
+        ? `https://www.google.com/maps?q=${encodeURIComponent(fallbackLocationText.trim())}&output=embed`
+        : "";
+    }
+
+    if (value.includes("/embed") || value.includes("output=embed")) {
+      return value;
+    }
+
+    const tryBuildEmbedFromGoogleMapsUrl = (input: string) => {
+      try {
+        const url = new URL(input.startsWith("http") ? input : `https://${input}`);
+        const searchParams = url.searchParams;
+        const query = searchParams.get("q") || searchParams.get("query");
+        if (query) {
+          return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+        }
+
+        const atMatch = url.href.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+        if (atMatch) {
+          const [, lat, lng] = atMatch;
+          return `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
+        }
+
+        const llMatch = url.href.match(/[?&](?:ll|center)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+        if (llMatch) {
+          const [, lat, lng] = llMatch;
+          return `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
+        }
+
+        const placeMatch = input.match(/\/maps\/place\/([^@?]+)/);
+        if (placeMatch?.[1]) {
+          return `https://www.google.com/maps?q=${encodeURIComponent(decodeURIComponent(placeMatch[1].replace(/\+/g, " ")))}&output=embed`;
+        }
+      } catch {
+        // Fallback below
+      }
+
+      return "";
+    };
+
+    if (
+      value.includes("maps.app.goo.gl") ||
+      value.includes("google.com/maps") ||
+      value.includes("googleusercontent.com/maps")
+    ) {
+      return tryBuildEmbedFromGoogleMapsUrl(value) || (fallbackLocationText?.trim()
+        ? `https://www.google.com/maps?q=${encodeURIComponent(fallbackLocationText.trim())}&output=embed`
+        : value);
+    }
+
+    return `https://www.google.com/maps?q=${encodeURIComponent(value)}&output=embed`;
   };
 
   // Upload image helper
@@ -708,7 +761,8 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
         locationText: formData.locationText || undefined,
         locationDescription: formData.locationDescription || undefined,
         locationImage: formData.locationImage || undefined,
-        mapEmbedUrl: formData.mapEmbedUrl || undefined,
+        // Gửi chuỗi rỗng để backend ghi đè và xóa map cũ khi admin clear ô input.
+        mapEmbedUrl: formData.mapEmbedUrl?.trim() ? formData.mapEmbedUrl.trim() : "",
         coverImage: formData.coverImage || undefined,
         heroImage: formData.heroImage || undefined,
         specs: formData.specs,
@@ -1283,14 +1337,17 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ nhúng <span className="text-xs text-gray-400">(auto-gen từ địa chỉ)</span></label>
+        <label className="mb-2 block text-sm font-semibold text-gray-700">URL bản đồ Google Maps</label>
         <input
           type="url"
           value={formData.mapEmbedUrl}
-          readOnly
-          placeholder="Auto từ địa chỉ..."
-          className="w-full rounded-xl border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed"
+          onChange={(e) => updateField("mapEmbedUrl", e.target.value)}
+          placeholder="Để trống để tự gen; hoặc dán link Google Maps / maps.app.goo.gl"
+          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
         />
+        <p className="mt-2 text-xs leading-relaxed text-gray-500">
+          Nếu để trống, bản đồ sẽ tự sinh từ địa chỉ. Nếu dán link Google Maps, hệ thống sẽ lưu đúng link đó và hiển thị trực tiếp phía client.
+        </p>
       </div>
 
       <div>
@@ -1302,10 +1359,10 @@ const ProjectCreation: React.FC<ProjectCreationProps> = ({ onBack, onSave, proje
           placeholder="https://kuula.co/post/..."
           className="w-full rounded-xl border text-gray-700 border-gray-300 bg-gray-50 px-4 py-2.5 text-sm"
         />
-        {formData.mapEmbedUrl && (
+        {(formData.mapEmbedUrl || formData.locationText) && (
           <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
             <iframe
-              src={formData.mapEmbedUrl}
+              src={normalizeMapUrl(formData.mapEmbedUrl, formData.locationText)}
               width="100%"
               height="300"
               style={{ border: 0 }}

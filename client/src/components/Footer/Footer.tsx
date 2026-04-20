@@ -28,6 +28,12 @@ type SocialLink = {
 const FALLBACK_AVATAR =
   "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop";
 
+const COMPANY_INFO = {
+  name: "Công ty cổ phần tập đoàn Minh Minh Group",
+  address: "B2-10 Lô 49 Shophouse Minh Mạng, Khu đô thị sinh thái Nam Hoà Xuân, Phường Ngũ Hành Sơn, Thành phố Đà Nẵng, Việt Nam",
+  taxCode: "042180016433",
+};
+
 /** Placeholder instead of avatar image (e.g. project detail loading shell). */
 type FooterProps = {
   deferAvatar?: boolean;
@@ -131,8 +137,8 @@ const Footer: React.FC<FooterProps> = ({ deferAvatar = false, disableAdminFetch 
                   src={admin?.profile?.avatarAsset?.url || avatarUrl}
                   alt={fullName}
                   width={160}
-                  height={160}
-                  className="h-28 w-28 rounded-xl object-cover sm:h-40 sm:w-40"
+                  height={200}
+                  className="h-32 w-32 rounded-xl object-cover sm:h-40 sm:w-40"
                   referrerPolicy="no-referrer"
                   loading="eager"
                   decoding="async"
@@ -147,7 +153,7 @@ const Footer: React.FC<FooterProps> = ({ deferAvatar = false, disableAdminFetch 
           </div>
 
           <div className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-            <div className="text-center sm:text-left lg:col-span-7">
+            <div className="text-center sm:text-left lg:col-span-5">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">reviewbdsdanang.com</p>
               <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">{fullName}</h3>
               <p className="mt-2 text-sm font-medium text-gray-700">{title}</p>
@@ -156,17 +162,15 @@ const Footer: React.FC<FooterProps> = ({ deferAvatar = false, disableAdminFetch 
               <div className="mt-5 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <ContactChip href={`tel:${phone.replace(/\s+/g, "")}`}>📞 {formatPhone(phone)}</ContactChip>
                 <ContactChip href={`mailto:${email}`}>📧 {email}</ContactChip>
-                <ContactChip
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-                >
+                <ContactChip href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}>
                   📍 {address}
                 </ContactChip>
               </div>
             </div>
 
-            <div className="text-center sm:text-left lg:col-span-5">
+            <div className="flex flex-col items-center text-center lg:col-span-3 lg:items-start lg:text-left">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-gray-900">Kết nối nhanh</p>
-              <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
+              <div className="mt-3 flex w-full max-w-xs flex-col items-center gap-2 lg:items-start">
                 <SocialButton href={`tel:${phone.replace(/\s+/g, "")}`} label="Gọi ngay">
                   <PhoneIcon className="h-4 w-4" />
                   Gọi ngay
@@ -182,17 +186,21 @@ const Footer: React.FC<FooterProps> = ({ deferAvatar = false, disableAdminFetch 
                   </SocialButton>
                 ))}
               </div>
+            </div>
 
-              <p className="mt-5 text-xs leading-relaxed text-gray-500">
-                Thông tin trong website là minh bạch và được cập nhật thường xuyên từ hồ sơ admin.
-              </p>
+            <div className="flex flex-col items-center text-center lg:col-span-4 lg:items-start lg:text-left">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-gray-900">Thông tin công ty</p>
+              <div className="mt-3 w-full max-w-sm space-y-2.5">
+                <CompanyInfoRow label="Tên công ty" value={COMPANY_INFO.name} strong />
+                <CompanyInfoRow label="Địa chỉ" value={COMPANY_INFO.address} strong/>
+                <CompanyInfoRow label="Mã số thuế" value={COMPANY_INFO.taxCode} strong valueClassName="text-amber-700" />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="mt-10 border-t border-gray-100 pt-5 text-center text-xs text-gray-500 sm:flex sm:items-center sm:justify-between sm:text-left">
           <p>© 2026 {fullName}. All rights reserved.</p>
-          <p className="mt-1 sm:mt-0">Website designed by Huynh Ngoc Nhan.</p>
         </div>
       </div>
     </footer>
@@ -221,12 +229,34 @@ const SocialButton: React.FC<
       aria-label={label}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition hover:bg-amber-50"
+      className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 px-2.5 py-1.5 text-[13px] font-semibold text-amber-800 transition hover:bg-amber-50"
     >
       {children}
     </a>
   );
 };
+
+const CompanyInfoRow = ({
+  label,
+  value,
+  strong = false,
+  valueClassName = "",
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  valueClassName?: string;
+}) => (
+  <div className="flex flex-col items-center gap-2 rounded-xl px-3 py-2.5 text-center sm:flex-row sm:items-start sm:gap-2.5 sm:text-left">
+    <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-400" aria-hidden />
+    <div className="min-w-0">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">{label}</p>
+      <p className={`mt-1 break-words text-[12px] leading-snug text-gray-800 ${strong ? "font-semibold text-gray-900" : "font-medium"} ${valueClassName}`.trim()}>
+        {value}
+      </p>
+    </div>
+  </div>
+);
 
 const detectSocialLabel = (url: string) => {
   if (url.includes("facebook.com")) return "Facebook";
